@@ -1,25 +1,3 @@
-from tensorflow.python.client import device_lib
-
-
-def get_available_devices():
-    local_device_protos = device_lib.list_local_devices()
-    return [x.name for x in local_device_protos]
-
-
-print(get_available_devices())
-
-import tensorflow as tf
-
-print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
-
-exit(1)
-
-import os
-
-os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
-
-import tensorflow as tf
-
 import keras
 from keras.datasets import cifar10
 from keras.models import Sequential
@@ -29,12 +7,6 @@ from keras import regularizers
 from keras.layers import Dense, Dropout, BatchNormalization
 import matplotlib.pyplot as plt
 import numpy as np
-
-from tensorflow.python.keras import backend as K
-
-print(K._get_available_gpus())
-
-exit(2)
 
 (train_images, train_labels), (test_images, test_labels) = datasets.cifar10.load_data()
 
@@ -52,7 +24,7 @@ print(np.unique(test_labels))
 class_names = ['airplane', 'automobile', 'bird', 'cat', 'deer',
                'dog', 'frog', 'horse', 'ship', 'truck']
 
-# Visualizing some of the images from the training dataset
+# Visualizing some images from the training dataset
 plt.figure(figsize=[10, 10])
 for i in range(25):  # for first 25 images
     plt.subplot(5, 5, i + 1)
@@ -109,8 +81,9 @@ model.add(layers.Dropout(0.5))
 model.add(layers.Dense(num_classes, activation='softmax'))  # num_classes = 10
 
 # Checking the model summary
-# print(model.summary())
-# print(tf.config.list_physical_devices('GPU'))
+model.summary()
+
+# exit(1)
 
 model.compile(optimizer='adam', loss=keras.losses.categorical_crossentropy, metrics=['accuracy'])
 
@@ -134,3 +107,5 @@ plt.legend(['Training Accuracy', 'Validation Accuracy'], fontsize=14)
 plt.xlabel('Epochs', fontsize=10)
 plt.ylabel('Accuracy', fontsize=10)
 plt.title('Accuracy Curves', fontsize=12)
+
+model.save('cifar10_cnn.h5')
