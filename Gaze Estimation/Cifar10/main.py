@@ -8,104 +8,167 @@ from keras.layers import Dense, Dropout, BatchNormalization
 import matplotlib.pyplot as plt
 import numpy as np
 
-(train_images, train_labels), (test_images, test_labels) = datasets.cifar10.load_data()
+from models import *
 
-# Checking the number of rows (records) and columns (features)
-print(train_images.shape)
-print(train_labels.shape)
-print(test_images.shape)
-print(test_labels.shape)
+from keras.callbacks import ModelCheckpoint
+from keras.preprocessing.image import ImageDataGenerator
 
-# Checking the number of unique classes
-print(np.unique(train_labels))
-print(np.unique(test_labels))
+from sklearn.metrics import classification_report
 
-# Creating a list of all the class labels
-class_names = ['airplane', 'automobile', 'bird', 'cat', 'deer',
-               'dog', 'frog', 'horse', 'ship', 'truck']
 
-# Visualizing some images from the training dataset
-plt.figure(figsize=[10, 10])
-for i in range(25):  # for first 25 images
-    plt.subplot(5, 5, i + 1)
-    plt.xticks([])
-    plt.yticks([])
-    plt.grid(False)
-    plt.imshow(train_images[i], cmap=plt.cm.binary)
-    plt.xlabel(class_names[train_labels[i][0]])
+def visualize_images(x_dataset: np.ndarray, y_dataset: np.ndarray, class_names: list[str], no_images: int = 25):
+    # Visualizing some images from the training dataset
+    plt.figure(figsize=[10, 10])
+    for i in range(no_images):  # for first 25 images
+        plt.subplot(5, 5, i + 1)
+        plt.xticks([])
+        plt.yticks([])
+        plt.grid(False)
+        plt.imshow(x_dataset[i], cmap=plt.cm.binary)
+        plt.xlabel(class_names[y_dataset[i][0]])
 
-plt.show()
+    plt.show()
 
-# Converting the pixels data to float type
-train_images = train_images.astype('float32')
-test_images = test_images.astype('float32')
 
-# Standardizing (255 is the total number of pixels an image can have)
-train_images = train_images / 255
-test_images = test_images / 255
+def visualize_plots(history, model_path: str):
+    acc = history.history['accuracy']
+    val_acc = history.history['val_accuracy']
 
-# One hot encoding the target class (labels)
-num_classes = 10
-train_labels = utils.to_categorical(train_labels, num_classes)
-test_labels = utils.to_categorical(test_labels, num_classes)
+    loss = history.history['loss']
+    val_loss = history.history['val_loss']
 
-# Creating a sequential model and adding layers to it
+    plt.figure(figsize=(8, 8))
+    plt.subplot(2, 1, 1)
+    plt.plot(acc, label='Training Accuracy')
+    plt.plot(val_acc, label='Validation Accuracy')
+    plt.legend(loc='lower right')
+    plt.ylabel('Accuracy')
+    plt.ylim([min(plt.ylim()), 1])
+    plt.title('Training and Validation Accuracy')
 
-model = Sequential()
+    plt.subplot(2, 1, 2)
+    plt.plot(loss, label='Training Loss')
+    plt.plot(val_loss, label='Validation Loss')
+    plt.legend(loc='upper right')
+    plt.ylabel('Cross Entropy')
+    plt.title('Training and Validation Loss')
+    plt.xlabel('epoch')
 
-model.add(layers.Conv2D(32, (3, 3), padding='same', activation='relu', input_shape=(32, 32, 3)))
-model.add(layers.BatchNormalization())
-model.add(layers.Conv2D(32, (3, 3), padding='same', activation='relu'))
-model.add(layers.BatchNormalization())
-model.add(layers.MaxPooling2D(pool_size=(2, 2)))
-model.add(layers.Dropout(0.3))
+    plt.savefig(model_path + ".png")
 
-model.add(layers.Conv2D(64, (3, 3), padding='same', activation='relu'))
-model.add(layers.BatchNormalization())
-model.add(layers.Conv2D(64, (3, 3), padding='same', activation='relu'))
-model.add(layers.BatchNormalization())
-model.add(layers.MaxPooling2D(pool_size=(2, 2)))
-model.add(layers.Dropout(0.5))
+    plt.show()
 
-model.add(layers.Conv2D(128, (3, 3), padding='same', activation='relu'))
-model.add(layers.BatchNormalization())
-model.add(layers.Conv2D(128, (3, 3), padding='same', activation='relu'))
-model.add(layers.BatchNormalization())
-model.add(layers.MaxPooling2D(pool_size=(2, 2)))
-model.add(layers.Dropout(0.5))
 
-model.add(layers.Flatten())
-model.add(layers.Dense(128, activation='relu'))
-model.add(layers.BatchNormalization())
-model.add(layers.Dropout(0.5))
-model.add(layers.Dense(num_classes, activation='softmax'))  # num_classes = 10
+def visualize_wrong_predictions(model, model_path, x_dataset, y_dataset, dataset_name: str, labels,
+                                no_images: int = 25):
+    prediction = model.predict(x_dataset)
 
-# Checking the model summary
-model.summary()
+    y_prediction = np.argmax(prediction, axis=1)
+    y_true = np.argmax(y_dataset, axis=1)
 
-# exit(1)
+    loss, accuracy = model.evaluate(x_dataset, y_dataset)
+    print(f"{dataset_name} Loss: {loss:.3f}")
+    print(f"{dataset_name} Accuracy: {accuracy:.3f}\n")
 
-model.compile(optimizer='adam', loss=keras.losses.categorical_crossentropy, metrics=['accuracy'])
+    print(classification_report(y_true, y_prediction))
 
-history = model.fit(train_images, train_labels, batch_size=64, epochs=100,
-                    validation_data=(test_images, test_labels))
+    fig, axes = plt.subplots(5, 5, figsize=(12, 12))
+    axes = axes.ravel()
 
-# Loss curve
-plt.figure(figsize=[6, 4])
-plt.plot(history.history['loss'], 'black', linewidth=2.0)
-plt.plot(history.history['val_loss'], 'green', linewidth=2.0)
-plt.legend(['Training Loss', 'Validation Loss'], fontsize=14)
-plt.xlabel('Epochs', fontsize=10)
-plt.ylabel('Loss', fontsize=10)
-plt.title('Loss Curves', fontsize=12)
+    miss_pred = np.where(y_prediction != y_true)[0]
+    for i in np.arange(no_images):
+        axes[i].imshow(x_dataset[miss_pred[i]])
+        axes[i].set_title('True: %s \nPredict: %s' % (labels[y_true[miss_pred[i]]], labels[y_prediction[miss_pred[i]]]))
+        axes[i].axis('off')
+        plt.subplots_adjust(wspace=1)
 
-# Accuracy curve
-plt.figure(figsize=[6, 4])
-plt.plot(history.history['accuracy'], 'black', linewidth=2.0)
-plt.plot(history.history['val_accuracy'], 'blue', linewidth=2.0)
-plt.legend(['Training Accuracy', 'Validation Accuracy'], fontsize=14)
-plt.xlabel('Epochs', fontsize=10)
-plt.ylabel('Accuracy', fontsize=10)
-plt.title('Accuracy Curves', fontsize=12)
+    plt.savefig(model_path + " WP " + ".png")
 
-model.save('cifar10_cnn.h5')
+    plt.show()
+
+
+def main():
+    (x_train, y_train), (x_test, y_test) = datasets.cifar10.load_data()
+
+    # Checking the number of rows (records) and columns (features)
+    print("Images shapes:")
+    print(x_train.shape)
+    print(y_train.shape)
+    print(x_test.shape)
+    print(y_test.shape)
+
+    # Checking the number of unique classes
+    print("Number of unique classes")
+    print(np.unique(y_train))
+    print(np.unique(y_test))
+
+    # Creating a list of all the class labels
+    class_names = ['Airplane', 'Automobile', 'Bird', 'Cat', 'Deer', 'Dog', 'Frog', 'Horse', 'Ship', 'Truck']
+
+    visualize_images(x_train, y_train, class_names)
+
+    # Converting the pixels data to float type
+    x_train = x_train.astype('float32')
+    x_test = x_test.astype('float32')
+
+    # Standardizing (255 is the total number of pixels an image can have)
+    x_train = x_train / 255
+    x_test = x_test / 255
+
+    # One hot encoding the target class (labels)
+    no_classes = 10
+    y_train = utils.to_categorical(y_train, no_classes)
+    y_test = utils.to_categorical(y_test, no_classes)
+
+    # Creating a sequential model and adding layers to it
+
+    model_type = ModelType.Simple
+    no_epochs = 200
+    train_batch_size = 256
+
+    model_folder = "Models"
+    model_name = str(model_type) + " 2"
+    model_path = ("" if model_folder == "" else model_folder + "/") + model_name
+
+    model = get_model(model_type, no_classes)
+
+    # Checking the model summary
+    model.summary()
+
+    model.compile(optimizer='adam', loss=keras.losses.categorical_crossentropy, metrics=['accuracy'])
+
+    # Data augmentation
+    data_generator = ImageDataGenerator(featurewise_center=False,
+                                        samplewise_center=False,
+                                        featurewise_std_normalization=False,
+                                        samplewise_std_normalization=False,
+                                        zca_whitening=False,
+                                        rotation_range=15,
+                                        width_shift_range=0.1,
+                                        height_shift_range=0.1,
+                                        horizontal_flip=True,
+                                        vertical_flip=False)
+
+    data_generator.fit(x_train)
+
+    callbacks = ModelCheckpoint(filepath=model_path + ".h5",
+                                monitor='val_accuracy',
+                                verbose=1,
+                                save_best_only=True,
+                                save_weights_only=False,
+                                mode='auto',
+                                save_freq='epoch')
+
+    history = model.fit(data_generator.flow(x_train, y_train, batch_size=train_batch_size),
+                        epochs=no_epochs,
+                        validation_data=(x_test, y_test),
+                        callbacks=[callbacks])
+
+    visualize_plots(history, model_path)
+
+    best_model = models.load_model(model_path + ".h5")
+    visualize_wrong_predictions(best_model, model_path, x_test, y_test, "Test Dataset", class_names)
+
+
+if __name__ == '__main__':
+    main()
