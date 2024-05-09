@@ -1,8 +1,13 @@
 import cv2
 import csv
 from pynput.mouse import Listener
-import pyautogui
 import os
+
+# importing pyglet module
+import pyglet
+
+# importing shapes from the pyglet
+from pyglet import shapes
 
 image_index = 0
 folder = "Data3/"

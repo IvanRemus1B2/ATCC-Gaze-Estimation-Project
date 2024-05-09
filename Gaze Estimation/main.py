@@ -154,7 +154,7 @@ def read_dataset(archive, dataset_file_name: str, image_resize_shape: tuple[int,
     # print(f"Modified: {len(modified_files)}")
     # print(f"Percentage modified files:{len(modified_files) / (len(lines) - 1):.2f}")
 
-    return (images, images_info), targets
+    return (images / 255, images_info), targets
 
 
 def visualize_plots(history, model_path: str):
@@ -192,7 +192,7 @@ def main():
     model_type = ModelType.Test
 
     model_folder = "Models"
-    model_name = str(model_type) + "1"
+    model_name = str(model_type) + "2"
     model_path = ("" if model_folder == "" else model_folder + "/") + model_name
 
     x_train, y_train = read_dataset(archive, "pog corrected train3.csv", image_size)
@@ -221,7 +221,7 @@ def main():
     history = model.fit(
         {"image": x_train[0], "info": x_train[1]},
         {"pixel_prediction": y_train},
-        validation_data=(x_test, y_test),
+        validation_data=(x_val, y_val),
         epochs=no_epochs,
         batch_size=train_batch_size,
         callbacks=[callbacks]
