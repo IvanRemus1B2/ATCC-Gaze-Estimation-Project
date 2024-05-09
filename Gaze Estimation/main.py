@@ -1,10 +1,52 @@
 import zipfile
+
+import keras.optimizers
+from keras.callbacks import ModelCheckpoint
 import numpy as np
 import matplotlib.pyplot as plt
+from keras import models
 
 from PIL import Image
 import io
 import tensorflow as tf
+
+from models import *
+
+
+class Callback_MSE(tf.keras.callbacks.Callback):
+    def __init__(self, filepath, x_val, y_val, best=1e9, interval=1):
+        # Initialize the callback
+        super().__init__()
+        self.interval = interval  # Interval to check the score
+        self.best = best  # Best score initialized
+        self.x_images, self.x_info = x_val
+        self.y = y_val
+        self.filepath = filepath  # Filepath to save the best model
+
+    def on_epoch_end(self, epoch, logs=None):
+        # This function is called at the end of each epoch
+        if logs is None:
+            logs = {}
+        if epoch % self.interval == 0:
+            # Calculate predictions
+            y_pred = self.model.predict([self.x_images, self.x_info], verbose=0)["pixel_prediction"]
+
+            # print(self.y)
+            # print(y_pred)
+            # print(type(y_pred))
+            # print(type(self.y))
+
+            loss = keras.losses.MeanSquaredError()(y_pred, self.y)
+            # loss = np.mean(np.square(np.sum(y_pred - self.y, axis=1)))
+
+            # Print score for monitoring
+            print(f"\nMSE evaluation - epoch: {epoch} - loss: {loss:.4f}")
+
+            # Save the model if it's the best score so far
+            if self.best > loss:
+                self.model.save(self.filepath, overwrite=True)  # Save model
+                self.best = loss  # Update best score
+                print('\nModel saved with best loss:', self.best)
 
 
 def get_class_name(file_name: str) -> str:
@@ -16,7 +58,7 @@ def get_class_name(file_name: str) -> str:
     return class_name
 
 
-def read_dataset(archive, file_name: str, image_resize_shape: tuple[int, int]):
+def read_dataset(archive, dataset_file_name: str, image_resize_shape: tuple[int, int]):
     images = None
     images_info = None
     targets = None
@@ -25,9 +67,9 @@ def read_dataset(archive, file_name: str, image_resize_shape: tuple[int, int]):
 
     modified_files = dict()
     skipped_files = dict()
-    with archive.open(file_name, "r") as file:
+    with archive.open(dataset_file_name, "r") as file:
         lines = file.readlines()
-        print(f"\nFor {file_name}")
+        print(f"\nFor {dataset_file_name}")
 
         header = str(lines[0], 'utf-8').split(",")
         header[-1] = header[-1][:-2]
@@ -97,6 +139,9 @@ def read_dataset(archive, file_name: str, image_resize_shape: tuple[int, int]):
                 targets = np.concatenate([targets, target], axis=0)
                 images = np.concatenate([images, image_array], axis=0)
 
+            # if images.shape[0] > 2000:
+            #     break
+
     print(images.shape)
     print(images_info.shape)
     print(targets.shape)
@@ -112,15 +157,79 @@ def read_dataset(archive, file_name: str, image_resize_shape: tuple[int, int]):
     return (images, images_info), targets
 
 
+def visualize_plots(history, model_path: str):
+    loss = history.history['loss']
+    val_loss = history.history['val_loss']
+
+    plt.figure(figsize=(8, 8))
+    plt.subplot(2, 1, 2)
+    plt.plot(loss, label='Training Loss')
+    plt.plot(val_loss, label='Validation Loss')
+    plt.legend(loc='upper right')
+    plt.ylabel('Cross Entropy')
+    plt.title('Training and Validation Loss')
+    plt.xlabel('epoch')
+
+    plt.savefig(model_path + ".png")
+
+    plt.show()
+
+
 def main():
     zip_file_name = "PoG Dataset.zip"
     archive = zipfile.ZipFile(zip_file_name, "r")
 
     # Create datasets as tuples of (image,info),target
     file_names = ["pog corrected test3.csv", "pog corrected train3.csv", "pog corrected validation3.csv"]
-    image_resize_shape = (220, 350)
+    image_size = (32, 32)
+    no_channels = 3
 
-    x_train, y_train = read_dataset(archive, "pog corrected train3.csv", image_resize_shape)
+    info_length = 5
+
+    no_epochs = 100
+    train_batch_size = 128
+
+    model_type = ModelType.Test
+
+    model_folder = "Models"
+    model_name = str(model_type) + "1"
+    model_path = ("" if model_folder == "" else model_folder + "/") + model_name
+
+    x_train, y_train = read_dataset(archive, "pog corrected train3.csv", image_size)
+    x_val, y_val = read_dataset(archive, "pog corrected validation3.csv", image_size)
+    x_test, y_test = read_dataset(archive, "pog corrected test3.csv", image_size)
+
+    image_shape = list(image_size)
+    image_shape.append(no_channels)
+    image_shape = tuple(image_shape)
+    model = get_model(model_type, image_shape, info_length)
+
+    model.summary()
+
+    model.compile(optimizer='adam', loss='mean_squared_error', metrics=['MeanSquaredError'])
+
+    # callbacks = Callback_MSE(model_path + ".h5", x_val, y_val, interval=1)
+
+    callbacks = ModelCheckpoint(filepath=model_path + ".h5",
+                                monitor='val_loss',
+                                verbose=1,
+                                save_best_only=True,
+                                save_weights_only=False,
+                                mode='auto',
+                                save_freq='epoch')
+
+    history = model.fit(
+        {"image": x_train[0], "info": x_train[1]},
+        {"pixel_prediction": y_train},
+        validation_data=(x_test, y_test),
+        epochs=no_epochs,
+        batch_size=train_batch_size,
+        callbacks=[callbacks]
+    )
+
+    visualize_plots(history, model_path)
+
+    best_model = models.load_model(model_path + ".h5")
 
 
 if __name__ == '__main__':
