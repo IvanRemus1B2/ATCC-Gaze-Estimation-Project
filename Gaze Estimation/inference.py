@@ -9,7 +9,7 @@ import tensorflow as tf
 
 width_pixels, height_pixels = 1920, 1080
 width_mm, height_mm = 380, 215
-human_distance_cm = 500
+human_distance_cm = 50
 cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, width_pixels)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height_pixels)
@@ -27,11 +27,8 @@ model = models.load_model(model_path + ".h5")
 with Listener() as listener:
     while True:
         ret, frame = cap.read()
-
+        # TODO:Maybe the channels are BGR and the model was trained in RGB?
         image_input = np.array(tf.expand_dims(tf.image.resize(np.array(frame), (height_resize, width_resize)), 0))
-
-        print(np.max(image_input))
-
         image_input /= 255
 
         info_input = np.array([width_pixels, height_pixels, width_mm, height_mm, human_distance_cm]).reshape(
