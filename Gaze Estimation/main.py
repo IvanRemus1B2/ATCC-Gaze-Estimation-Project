@@ -1,4 +1,5 @@
 import zipfile
+import zipfile2
 
 import keras.optimizers
 from keras.callbacks import ModelCheckpoint
@@ -10,8 +11,12 @@ from PIL import Image
 import io
 import tensorflow as tf
 
+from typing import Union
+
 from models import *
 
+
+# TODO:Use Jupiter Notebook with Pycharm to save time
 
 class Callback_MSE(tf.keras.callbacks.Callback):
     def __init__(self, filepath, x_val, y_val, best=1e9, interval=1):
@@ -58,7 +63,8 @@ def get_class_name(file_name: str) -> str:
     return class_name
 
 
-def read_dataset(archive, dataset_file_name: str, image_resize_shape: tuple[int, int]):
+def read_dataset(archive, dataset_file_name: str, image_resize_shape: tuple[int, int],
+                 max_dataset_size: Union[int, None] = None, verbose: bool = False):
     images = None
     images_info = None
     targets = None
@@ -75,7 +81,11 @@ def read_dataset(archive, dataset_file_name: str, image_resize_shape: tuple[int,
         header[-1] = header[-1][:-2]
         print(f"File Header: {header}")
 
+        current_image_index = 1
         for line in lines[1:]:
+            if verbose:
+                print(f"At {current_image_index}")
+
             values = str(line, 'utf-8').split(",")
             values[-1] = values[-1][:-2]
 
@@ -139,6 +149,10 @@ def read_dataset(archive, dataset_file_name: str, image_resize_shape: tuple[int,
                 targets = np.concatenate([targets, target], axis=0)
                 images = np.concatenate([images, image_array], axis=0)
 
+            current_image_index += 1
+            if max_dataset_size is not None and current_image_index > max_dataset_size:
+                break
+
             # if images.shape[0] > 2000:
             #     break
 
@@ -175,29 +189,171 @@ def visualize_plots(history, model_path: str):
     plt.show()
 
 
-def main():
-    zip_file_name = "PoG Dataset.zip"
-    archive = zipfile.ZipFile(zip_file_name, "r")
+class MyCustomGenerator(keras.utils.Sequence):
+    def __init__(self, archive, dataset_name: str, batch_size: int, image_resize_shape,
+                 verbose: bool = False):
+        self.batch_size = batch_size
+        self.image_resize_shape = image_resize_shape
 
-    # Create datasets as tuples of (image,info),target
-    file_names = ["pog corrected test3.csv", "pog corrected train3.csv", "pog corrected validation3.csv"]
-    image_size = (32, 32)
+        self.archive = archive
+
+        self.images_names, self.images_info, self.targets = self.read_lines(dataset_name, verbose)
+
+    def read_lines(self, dataset_name: str, verbose: bool = False):
+        with self.archive.open(dataset_name, "r") as file:
+            lines = file.readlines()
+            if verbose:
+                print(f"\nFor {dataset_name}")
+
+                header = str(lines[0], 'utf-8').split(",")
+                header[-1] = header[-1][:-2]
+                print(f"File Header: {header}")
+
+            file_names = []
+            images_file_info, targets = None, None
+
+            for line in lines[1:]:
+                values = str(line, 'utf-8').split(",")
+                values[-1] = values[-1][:-2]
+
+                # class_name = get_class_name(values[0])
+                file_name = values[0]
+                file_names.append(file_name)
+
+                x_pixel_pos, y_pixel_pos = list(map(np.float32, values[1:3]))
+                width_pixels, height_pixels = list(map(np.float32, values[3:5]))
+
+                if not (0 <= x_pixel_pos <= width_pixels):
+                    x_pixel_pos = np.clip(x_pixel_pos, a_min=0, a_max=width_pixels)
+
+                if not (0 <= y_pixel_pos <= height_pixels):
+                    y_pixel_pos = np.clip(y_pixel_pos, a_min=0, a_max=height_pixels)
+
+                width_mm, height_mm = list(map(np.float32, values[5:7]))
+
+                human_distance_cm = values[7]
+                if human_distance_cm == "":
+                    human_distance_cm = 40
+
+                human_distance_cm = np.float32(human_distance_cm)
+                if human_distance_cm >= 80:
+                    human_distance_cm = human_distance_cm / 10
+
+                # TODO:Make sure that replacing this works the same way
+                x_norm, y_norm = np.float32(x_pixel_pos / width_pixels), np.float32(y_pixel_pos / height_pixels)
+
+                image_info = np.array([width_pixels, height_pixels, width_mm, height_mm, human_distance_cm]).reshape(
+                    (1, -1))
+                target = np.array([x_norm, y_norm]).reshape((1, -1))
+
+                if images_file_info is None:
+                    images_file_info = image_info
+                    targets = target
+                else:
+                    images_file_info = np.concatenate([images_file_info, image_info], axis=0)
+                    targets = np.concatenate([targets, target], axis=0)
+
+        return file_names, images_file_info, targets
+
+    def __len__(self):
+        return (np.ceil(len(self.images_names) / float(self.batch_size))).astype(np.int64)
+
+    def __getitem__(self, index):
+        pos = index * self.batch_size
+
+        batch_images_info = self.images_info[pos: pos + self.batch_size, :]
+        batch_targets = self.targets[pos: pos + self.batch_size, :]
+
+        batch_images = None
+        file_names = self.images_names[pos:pos + self.batch_size]
+        for file_name in file_names:
+            # Read images,assume they are jpg
+            with self.archive.open("PoG Dataset/" + file_name) as zip_image:
+                with Image.open(io.BytesIO(zip_image.read())) as image:
+                    # TODO:Consider making the dataset without an initial resizing
+                    image_array = np.array(tf.expand_dims(tf.image.resize(np.array(image), self.image_resize_shape), 0))
+                    if batch_images is None:
+                        batch_images = image_array
+                    else:
+                        batch_images = np.concatenate([batch_images, image_array], axis=0)
+
+        batch_images /= 255
+
+        return (batch_images, batch_images_info), batch_targets
+
+
+def create_dataset_generator(archive, dataset_name: str, batch_size: int, image_resized_shape: tuple[int, int]):
+    generator = MyCustomGenerator(archive, dataset_name, batch_size, image_resized_shape, False)
+    return generator
+
+
+def print_mse_loss(model, dataset_name: str, dataset_generator: keras.utils.Sequence, batch_size):
+    total_loss = 0.0
+    no_instances = 0
+
+    for index in range(len(dataset_generator)):
+        x_batch, target = dataset_generator.__getitem__(index)
+        prediction = model.predict_on_batch(x_batch)['pixel_prediction']
+
+        total_loss += keras.losses.MeanSquaredError(reduction='sum')(prediction, target)
+        no_instances += target.shape[0]
+
+    total_loss /= no_instances
+
+    print(f"For {dataset_name} mse_loss: {total_loss:.4f}")
+
+
+def test_model(model_name: str, train_batch_size: int, val_batch_size: int, test_batch_size: int):
+    print(f"\nFor {model_name}:")
+    zip_file_name = "PoG Dataset.zip"
+    archive = zipfile2.ZipFile(zip_file_name, "r")
+
+    height_resize, width_resize = list(map(int, model_name.split("-")[2][1:-1].split(",")))
+    image_size = (height_resize, width_resize)
+
+    train_generator = create_dataset_generator(archive, "pog corrected train3.csv", train_batch_size, image_size)
+    val_generator = create_dataset_generator(archive, "pog corrected validation3.csv", val_batch_size, image_size)
+    test_generator = create_dataset_generator(archive, "pog corrected test3.csv", test_batch_size, image_size)
+
+    model_folder = "Models"
+    model_path = ("" if model_folder == "" else model_folder + "/") + model_name
+
+    model = models.load_model(model_path + ".h5")
+
+    print_mse_loss(model, "pog corrected train3.csv", train_generator, train_batch_size)
+    print_mse_loss(model, "pog corrected validation3.csv", val_generator, val_batch_size)
+    print_mse_loss(model, "pog corrected test3.csv", test_generator, test_batch_size)
+
+
+def main():
+    test_model("Test_VGG_4M_Regularized_ELU-1-(128, 128)", 64, 64, 64)
+    return
+
+    zip_file_name = "PoG Dataset.zip"
+    archive = zipfile2.ZipFile(zip_file_name, "r")
+    #
+    # # Create datasets as tuples of (image,info),target
+    # file_names = ["pog corrected test3.csv", "pog corrected train3.csv", "pog corrected validation3.csv"]
+    image_size = (128, 128)
     no_channels = 3
 
     info_length = 5
 
-    no_epochs = 100
-    train_batch_size = 128
+    no_epochs = 20
+    train_batch_size = 64
+    val_batch_size = test_batch_size = 64
 
-    model_type = ModelType.Test
+    model_type = ModelType.Test_VGG_4M_Regularized_ELU
 
     model_folder = "Models"
-    model_name = str(model_type) + "2"
+    model_name = str(model_type).split(".")[1] + "-1-" + str(image_size)
     model_path = ("" if model_folder == "" else model_folder + "/") + model_name
 
-    x_train, y_train = read_dataset(archive, "pog corrected train3.csv", image_size)
-    x_val, y_val = read_dataset(archive, "pog corrected validation3.csv", image_size)
-    x_test, y_test = read_dataset(archive, "pog corrected test3.csv", image_size)
+    # verbose = False
+    # max_dataset_size = 2000
+    # x_train, y_train = read_dataset(archive, "pog corrected train3.csv", image_size, max_dataset_size, verbose)
+    # x_val, y_val = read_dataset(archive, "pog corrected validation3.csv", image_size, max_dataset_size, verbose)
+    # x_test, y_test = read_dataset(archive, "pog corrected test3.csv", image_size, max_dataset_size, verbose)
 
     image_shape = list(image_size)
     image_shape.append(no_channels)
@@ -210,6 +366,10 @@ def main():
 
     # callbacks = Callback_MSE(model_path + ".h5", x_val, y_val, interval=1)
 
+    train_generator = create_dataset_generator(archive, "pog corrected train3.csv", train_batch_size, image_size)
+    val_generator = create_dataset_generator(archive, "pog corrected validation3.csv", val_batch_size, image_size)
+    # test_generator = create_dataset_generator(archive, "pog corrected test3.csv", test_batch_size, image_size)
+
     callbacks = ModelCheckpoint(filepath=model_path + ".h5",
                                 monitor='val_loss',
                                 verbose=1,
@@ -218,12 +378,18 @@ def main():
                                 mode='auto',
                                 save_freq='epoch')
 
+    # history = model.fit(
+    #     {"image": x_train[0], "info": x_train[1]},
+    #     {"pixel_prediction": y_train},
+    #     validation_data=([x_val[0], x_val[1]], y_val),
+    #     epochs=no_epochs,
+    #     batch_size=train_batch_size,
+    #     callbacks=[callbacks]
+    # )
+
     history = model.fit(
-        {"image": x_train[0], "info": x_train[1]},
-        {"pixel_prediction": y_train},
-        validation_data=(x_val, y_val),
+        x=train_generator, validation_data=val_generator,
         epochs=no_epochs,
-        batch_size=train_batch_size,
         callbacks=[callbacks]
     )
 

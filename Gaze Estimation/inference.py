@@ -15,7 +15,11 @@ cap.set(cv2.CAP_PROP_FRAME_WIDTH, width_pixels)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height_pixels)
 
 model_folder = "Models"
-model_name = "ModelType.Test1"
+model_name = "Test_VGG_4M_Regularized_ELU-1-(128, 128)"
+
+# TODO:Check whether this resizing is done properly when not equal dimensions
+height_resize, width_resize = list(map(int, model_name.split("-")[2][1:-1].split(",")))
+
 model_path = ("" if model_folder == "" else model_folder + "/") + model_name
 
 model = models.load_model(model_path + ".h5")
@@ -24,11 +28,18 @@ with Listener() as listener:
     while True:
         ret, frame = cap.read()
 
-        image_input = np.array(tf.expand_dims(tf.image.resize(np.array(frame), (32, 32)), 0))
+        image_input = np.array(tf.expand_dims(tf.image.resize(np.array(frame), (height_resize, width_resize)), 0))
+
+        print(np.max(image_input))
+
+        image_input /= 255
+
         info_input = np.array([width_pixels, height_pixels, width_mm, height_mm, human_distance_cm]).reshape(
             (1, -1))
 
         y_pred = np.squeeze(model.predict([image_input, info_input], verbose=0)["pixel_prediction"])
+
+        print(y_pred)
 
         x_pos = int(y_pred[0] * width_pixels)
         y_pos = int(y_pred[1] * height_pixels)
