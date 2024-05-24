@@ -15,6 +15,10 @@ from typing import Union
 
 from models import *
 
+from keras.preprocessing.image import ImageDataGenerator
+from keras.utils import img_to_array
+from keras.utils import load_img
+
 
 # TODO:Use Jupiter Notebook with Pycharm to save time
 
@@ -190,12 +194,15 @@ def visualize_plots(history, model_path: str):
 
 
 class MyCustomGenerator(keras.utils.Sequence):
-    def __init__(self, archive, dataset_name: str, batch_size: int, image_resize_shape,
+    def __init__(self, archive, dataset_name: str, batch_size: int,
+                 image_resize_shape,
+                 augmentation_generator: Union[ImageDataGenerator, None] = None,
                  verbose: bool = False):
         self.batch_size = batch_size
         self.image_resize_shape = image_resize_shape
 
         self.archive = archive
+        self.augmentation_generator = augmentation_generator
 
         self.images_names, self.images_info, self.targets = self.read_lines(dataset_name, verbose)
 
@@ -271,7 +278,13 @@ class MyCustomGenerator(keras.utils.Sequence):
             with self.archive.open("PoG Dataset/" + file_name) as zip_image:
                 with Image.open(io.BytesIO(zip_image.read())) as image:
                     # TODO:Consider making the dataset without an initial resizing
-                    image_array = np.array(tf.expand_dims(tf.image.resize(np.array(image), self.image_resize_shape), 0))
+                    image_array = img_to_array(image)
+                    if self.augmentation_generator is not None:
+                        image_array = self.augmentation_generator.random_transform(image_array)
+
+                    image_array = np.array(
+                        tf.expand_dims(tf.image.resize(image_array, self.image_resize_shape), 0))
+
                     if batch_images is None:
                         batch_images = image_array
                     else:
@@ -280,11 +293,6 @@ class MyCustomGenerator(keras.utils.Sequence):
         batch_images /= 255
 
         return (batch_images, batch_images_info), batch_targets
-
-
-def create_dataset_generator(archive, dataset_name: str, batch_size: int, image_resized_shape: tuple[int, int]):
-    generator = MyCustomGenerator(archive, dataset_name, batch_size, image_resized_shape, False)
-    return generator
 
 
 def print_mse_loss(model, dataset_name: str, dataset_generator: keras.utils.Sequence, batch_size):
@@ -303,7 +311,9 @@ def print_mse_loss(model, dataset_name: str, dataset_generator: keras.utils.Sequ
     print(f"For {dataset_name} mse_loss: {total_loss:.4f}")
 
 
-def test_model(model_name: str, train_batch_size: int, val_batch_size: int, test_batch_size: int):
+def test_model(model_name: str,
+               train_batch_size: int, val_batch_size: int, test_batch_size: int,
+               train_generator=None, val_generator=None, test_generator=None):
     print(f"\nFor {model_name}:")
     zip_file_name = "PoG Dataset.zip"
     archive = zipfile2.ZipFile(zip_file_name, "r")
@@ -311,9 +321,12 @@ def test_model(model_name: str, train_batch_size: int, val_batch_size: int, test
     height_resize, width_resize = list(map(int, model_name.split("-")[2][1:-1].split(",")))
     image_size = (height_resize, width_resize)
 
-    train_generator = create_dataset_generator(archive, "pog corrected train3.csv", train_batch_size, image_size)
-    val_generator = create_dataset_generator(archive, "pog corrected validation3.csv", val_batch_size, image_size)
-    test_generator = create_dataset_generator(archive, "pog corrected test3.csv", test_batch_size, image_size)
+    if train_generator is None:
+        train_generator = MyCustomGenerator(archive, "pog corrected train3.csv", train_batch_size, image_size)
+    if val_generator is None:
+        val_generator = MyCustomGenerator(archive, "pog corrected validation3.csv", val_batch_size, image_size)
+    if test_generator is None:
+        test_generator = MyCustomGenerator(archive, "pog corrected test3.csv", test_batch_size, image_size)
 
     model_folder = "Models"
     model_path = ("" if model_folder == "" else model_folder + "/") + model_name
@@ -326,9 +339,6 @@ def test_model(model_name: str, train_batch_size: int, val_batch_size: int, test
 
 
 def main():
-    test_model("Test_VGG_4M_Regularized_ELU-1-(128, 128)", 64, 64, 64)
-    return
-
     zip_file_name = "PoG Dataset.zip"
     archive = zipfile2.ZipFile(zip_file_name, "r")
     #
@@ -343,10 +353,10 @@ def main():
     train_batch_size = 64
     val_batch_size = test_batch_size = 64
 
-    model_type = ModelType.Test_VGG_4M_Regularized_ELU
+    model_type = ModelType.Test_VGG_1M_Regularized_ELU
 
     model_folder = "Models"
-    model_name = str(model_type).split(".")[1] + "-1-" + str(image_size)
+    model_name = str(model_type).split(".")[1] + "-2-" + str(image_size)
     model_path = ("" if model_folder == "" else model_folder + "/") + model_name
 
     # verbose = False
@@ -366,9 +376,18 @@ def main():
 
     # callbacks = Callback_MSE(model_path + ".h5", x_val, y_val, interval=1)
 
-    train_generator = create_dataset_generator(archive, "pog corrected train3.csv", train_batch_size, image_size)
-    val_generator = create_dataset_generator(archive, "pog corrected validation3.csv", val_batch_size, image_size)
-    # test_generator = create_dataset_generator(archive, "pog corrected test3.csv", test_batch_size, image_size)
+    train_augmentation_generator = None
+    # train_augmentation_generator = ImageDataGenerator(
+    #     rotation_range=5,  # randomly rotate images in the range (degrees, 0 to 180)
+    #     # randomly shift images horizontally (fraction of total width)
+    #     width_shift_range=0.05,
+    #     # randomly shift images vertically (fraction of total height)
+    #     height_shift_range=0.05,
+    # )
+
+    train_generator = MyCustomGenerator(archive, "pog corrected train3.csv", train_batch_size, image_size,
+                                        train_augmentation_generator)
+    val_generator = MyCustomGenerator(archive, "pog corrected validation3.csv", val_batch_size, image_size)
 
     callbacks = ModelCheckpoint(filepath=model_path + ".h5",
                                 monitor='val_loss',
@@ -395,7 +414,9 @@ def main():
 
     visualize_plots(history, model_path)
 
-    best_model = models.load_model(model_path + ".h5")
+    test_generator = MyCustomGenerator(archive, "pog corrected test3.csv", test_batch_size, image_size)
+    test_model(model_name, train_batch_size, val_batch_size, test_batch_size,
+               train_generator, val_generator, test_generator)
 
 
 if __name__ == '__main__':
