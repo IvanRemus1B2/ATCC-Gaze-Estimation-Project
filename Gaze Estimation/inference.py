@@ -18,7 +18,7 @@ cap.set(cv2.CAP_PROP_FRAME_WIDTH, width_pixels)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height_pixels)
 
 model_folder = "Models"
-model_name = "Test_VGG_1M_Regularized_ELU-2-(128, 128)"
+model_name = "Test_VGG_4M_2-1-(156, 156)"
 
 # TODO:Check whether this resizing is done properly when not equal dimensions
 height_resize, width_resize = list(map(int, model_name.split("-")[2][1:-1].split(",")))
@@ -32,10 +32,10 @@ with Listener() as listener:
         ret, frame = cap.read()
         image_input = img_to_array(frame)
 
-        # TODO:Maybe the channels are BGR and the model was trained in RGB?
-        image_copy = copy.deepcopy(image_input)
-        image_input[:, :, 0] = image_copy[:, :, 2]
-        image_input[:, :, 2] = image_copy[:, :, 0]
+        # # TODO:Maybe the channels are BGR and the model was trained in RGB?
+        # image_copy = copy.deepcopy(image_input)
+        # image_input[:, :, 0] = image_copy[:, :, 2]
+        # image_input[:, :, 2] = image_copy[:, :, 0]
 
         image_input = np.array(tf.expand_dims(tf.image.resize(image_input, (height_resize, width_resize)), 0))
         image_input /= 255

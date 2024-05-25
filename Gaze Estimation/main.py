@@ -206,6 +206,12 @@ class MyCustomGenerator(keras.utils.Sequence):
 
         self.images_names, self.images_info, self.targets = self.read_lines(dataset_name, verbose)
 
+        self.length = (np.ceil(len(self.images_names) / float(self.batch_size))).astype(np.int64)
+
+        self.no_instances = len(self.images_names)
+        self.count = 0
+        self.order = np.arange(self.no_instances)
+
     def read_lines(self, dataset_name: str, verbose: bool = False):
         with self.archive.open(dataset_name, "r") as file:
             lines = file.readlines()
@@ -263,17 +269,22 @@ class MyCustomGenerator(keras.utils.Sequence):
         return file_names, images_file_info, targets
 
     def __len__(self):
-        return (np.ceil(len(self.images_names) / float(self.batch_size))).astype(np.int64)
+        return self.length
 
     def __getitem__(self, index):
+        if self.count % self.no_instances == 0:
+            np.random.shuffle(self.order)
+
         pos = index * self.batch_size
 
-        batch_images_info = self.images_info[pos: pos + self.batch_size, :]
-        batch_targets = self.targets[pos: pos + self.batch_size, :]
+        positions = self.order[pos:pos + self.batch_size]
+
+        batch_images_info = self.images_info[positions, :]
+        batch_targets = self.targets[positions, :]
 
         batch_images = None
-        file_names = self.images_names[pos:pos + self.batch_size]
-        for file_name in file_names:
+        for position in positions:
+            file_name = self.images_names[position]
             # Read images,assume they are jpg
             with self.archive.open("PoG Dataset/" + file_name) as zip_image:
                 with Image.open(io.BytesIO(zip_image.read())) as image:
@@ -291,6 +302,8 @@ class MyCustomGenerator(keras.utils.Sequence):
                         batch_images = np.concatenate([batch_images, image_array], axis=0)
 
         batch_images /= 255
+
+        self.count += 1
 
         return (batch_images, batch_images_info), batch_targets
 
@@ -349,11 +362,11 @@ def main():
 
     info_length = 5
 
-    no_epochs = 20
+    no_epochs = 1
     train_batch_size = 64
     val_batch_size = test_batch_size = 64
 
-    model_type = ModelType.Test_VGG_1M_Regularized_ELU
+    model_type = ModelType.Simple
 
     model_folder = "Models"
     model_name = str(model_type).split(".")[1] + "-2-" + str(image_size)

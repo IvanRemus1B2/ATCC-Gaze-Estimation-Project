@@ -1,0 +1,180 @@
+For Simple-1-1(128, 128):
+Model: "model"
+__________________________________________________________________________________________________
+ Layer (type)                   Output Shape         Param #     Connected to
+==================================================================================================
+ image (InputLayer)             [(None, 128, 128, 3  0           []
+                                )]
+
+ conv2d (Conv2D)                (None, 128, 128, 64  9472        ['image[0][0]']
+                                )
+
+ batch_normalization (BatchNorm  (None, 128, 128, 64  256        ['conv2d[0][0]']
+ alization)                     )
+
+ conv2d_1 (Conv2D)              (None, 128, 128, 12  204928      ['batch_normalization[0][0]']
+                                8)
+
+ batch_normalization_1 (BatchNo  (None, 128, 128, 12  512        ['conv2d_1[0][0]']
+ rmalization)                   8)
+
+ max_pooling2d (MaxPooling2D)   (None, 42, 42, 128)  0           ['batch_normalization_1[0][0]']
+
+ conv2d_2 (Conv2D)              (None, 42, 42, 64)   204864      ['max_pooling2d[0][0]']
+
+ batch_normalization_2 (BatchNo  (None, 42, 42, 64)  256         ['conv2d_2[0][0]']
+ rmalization)
+
+ conv2d_3 (Conv2D)              (None, 42, 42, 32)   18464       ['batch_normalization_2[0][0]']
+
+ batch_normalization_3 (BatchNo  (None, 42, 42, 32)  128         ['conv2d_3[0][0]']
+ rmalization)
+
+ max_pooling2d_1 (MaxPooling2D)  (None, 14, 14, 32)  0           ['batch_normalization_3[0][0]']
+
+ flatten (Flatten)              (None, 6272)         0           ['max_pooling2d_1[0][0]']
+
+ info (InputLayer)              [(None, 5)]          0           []
+
+ concatenate (Concatenate)      (None, 6277)         0           ['flatten[0][0]',
+                                                                  'info[0][0]']
+
+ dense (Dense)                  (None, 256)          1607168     ['concatenate[0][0]']
+
+ batch_normalization_4 (BatchNo  (None, 256)         1024        ['dense[0][0]']
+ rmalization)
+
+ dense_1 (Dense)                (None, 128)          32896       ['batch_normalization_4[0][0]']
+
+ batch_normalization_5 (BatchNo  (None, 128)         512         ['dense_1[0][0]']
+ rmalization)
+
+ dense_2 (Dense)                (None, 64)           8256        ['batch_normalization_5[0][0]']
+
+ batch_normalization_6 (BatchNo  (None, 64)          256         ['dense_2[0][0]']
+ rmalization)
+
+ pixel_prediction (Dense)       (None, 2)            130         ['batch_normalization_6[0][0]']
+
+==================================================================================================
+Total params: 2,089,122
+Trainable params: 2,087,650
+Non-trainable params: 1,472
+__________________________________________________________________________________________________
+Epoch 1/5
+2024-05-25 22:57:11.274556: I tensorflow/stream_executor/cuda/cuda_dnn.cc:384] Loaded cuDNN version 8100
+2024-05-25 22:57:17.787489: W tensorflow/core/common_runtime/bfc_allocator.cc:290] Allocator (GPU_0_bfc) ran out of memory trying to allocate 2.38GiB with freed_by_count=0. The caller indicates that this is not a failure, but this may mean that there could be performance gains if more memory were available.
+2024-05-25 22:57:17.788376: W tensorflow/core/common_runtime/bfc_allocator.cc:290] Allocator (GPU_0_bfc) ran out of memory trying to allocate 2.38GiB with freed_by_count=0. The caller indicates that this is not a failure, but this may mean that there could be performance gains if more memory were available.
+233/266 [=========================>....] - ETA: 38s - loss: 0.6117 - mean_squared_error: 0.61172024-05-25 23:01:47.372906: W tensorflow/core/common_runtime/bfc_allocator.cc:290] Allocator (GPU_0_bfc) ran out of memory trying to allocate 4.74GiB with freed_by_count=0. The caller indicates that this is not a failure, but this may mean that there could be performance gains if more memory were available.
+2024-05-25 23:01:47.373657: W tensorflow/core/common_runtime/bfc_allocator.cc:290] Allocator (GPU_0_bfc) ran out of memory trying to allocate 4.74GiB with freed_by_count=0. The caller indicates that this is not a failure, but this may mean that there could be performance gains if more memory were available.
+2024-05-25 23:01:47.550082: W tensorflow/core/common_runtime/bfc_allocator.cc:290] Allocator (GPU_0_bfc) ran out of memory trying to allocate 4.13GiB with freed_by_count=0. The caller indicates that this is not a failure, but this may mean that there could be performance gains if more memory were available.
+2024-05-25 23:01:47.550807: W tensorflow/core/common_runtime/bfc_allocator.cc:290] Allocator (GPU_0_bfc) ran out of memory trying to allocate 4.13GiB with freed_by_count=0. The caller indicates that this is not a failure, but this may mean that there could be performance gains if more memory were available.
+266/266 [==============================] - ETA: 0s - loss: 0.5724 - mean_squared_error: 0.5724
+Epoch 1: val_loss improved from inf to 20.48437, saving model to Models\Simple-1-(128, 128).h5
+266/266 [==============================] - 347s 1s/step - loss: 0.5724 - mean_squared_error: 0.5724 - val_loss: 20.4844 - val_mean_squared_error: 20.4844
+Epoch 2/5
+266/266 [==============================] - ETA: 0s - loss: 0.1801 - mean_squared_error: 0.1801
+Epoch 2: val_loss improved from 20.48437 to 4.80259, saving model to Models\Simple-1-(128, 128).h5
+266/266 [==============================] - 334s 1s/step - loss: 0.1801 - mean_squared_error: 0.1801 - val_loss: 4.8026 - val_mean_squared_error: 4.8026
+Epoch 3/5
+266/266 [==============================] - ETA: 0s - loss: 0.1087 - mean_squared_error: 0.1087
+Epoch 3: val_loss did not improve from 4.80259
+266/266 [==============================] - 356s 1s/step - loss: 0.1087 - mean_squared_error: 0.1087 - val_loss: 9.8065 - val_mean_squared_error: 9.8065
+Epoch 4/5
+266/266 [==============================] - ETA: 0s - loss: 0.0867 - mean_squared_error: 0.0867
+Epoch 4: val_loss did not improve from 4.80259
+266/266 [==============================] - 388s 1s/step - loss: 0.0867 - mean_squared_error: 0.0867 - val_loss: 6.0587 - val_mean_squared_error: 6.0587
+Epoch 5/5
+266/266 [==============================] - ETA: 0s - loss: 0.0748 - mean_squared_error: 0.0748
+Epoch 5: val_loss did not improve from 4.80259
+266/266 [==============================] - 359s 1s/step - loss: 0.0748 - mean_squared_error: 0.0748 - val_loss: 9.8690 - val_mean_squared_error: 9.8690
+
+For Simple-1-(128, 128):
+For pog corrected train3.csv mse_loss: 3.7427
+For pog corrected validation3.csv mse_loss: 4.8026
+For pog corrected test3.csv mse_loss: 4.9070
+
+------------------------------
+Model: "model"
+__________________________________________________________________________________________________
+ Layer (type)                   Output Shape         Param #     Connected to
+==================================================================================================
+ image (InputLayer)             [(None, 128, 128, 3  0           []
+                                )]
+
+ gaussian_noise (GaussianNoise)  (None, 128, 128, 3)  0          ['image[0][0]']
+
+ conv2d (Conv2D)                (None, 128, 128, 64  9472        ['gaussian_noise[0][0]']
+                                )
+
+ batch_normalization (BatchNorm  (None, 128, 128, 64  256        ['conv2d[0][0]']
+ alization)                     )
+
+ conv2d_1 (Conv2D)              (None, 128, 128, 12  204928      ['batch_normalization[0][0]']
+                                8)
+
+ batch_normalization_1 (BatchNo  (None, 128, 128, 12  512        ['conv2d_1[0][0]']
+ rmalization)                   8)
+
+ max_pooling2d (MaxPooling2D)   (None, 42, 42, 128)  0           ['batch_normalization_1[0][0]']
+
+ conv2d_2 (Conv2D)              (None, 42, 42, 64)   204864      ['max_pooling2d[0][0]']
+
+ batch_normalization_2 (BatchNo  (None, 42, 42, 64)  256         ['conv2d_2[0][0]']
+ rmalization)
+
+ conv2d_3 (Conv2D)              (None, 42, 42, 32)   18464       ['batch_normalization_2[0][0]']
+
+ batch_normalization_3 (BatchNo  (None, 42, 42, 32)  128         ['conv2d_3[0][0]']
+ rmalization)
+
+ max_pooling2d_1 (MaxPooling2D)  (None, 14, 14, 32)  0           ['batch_normalization_3[0][0]']
+
+ flatten (Flatten)              (None, 6272)         0           ['max_pooling2d_1[0][0]']
+
+ info (InputLayer)              [(None, 5)]          0           []
+
+ concatenate (Concatenate)      (None, 6277)         0           ['flatten[0][0]',
+                                                                  'info[0][0]']
+
+ dense (Dense)                  (None, 256)          1607168     ['concatenate[0][0]']
+
+ batch_normalization_4 (BatchNo  (None, 256)         1024        ['dense[0][0]']
+ rmalization)
+
+ dense_1 (Dense)                (None, 128)          32896       ['batch_normalization_4[0][0]']
+
+ batch_normalization_5 (BatchNo  (None, 128)         512         ['dense_1[0][0]']
+ rmalization)
+
+ dense_2 (Dense)                (None, 64)           8256        ['batch_normalization_5[0][0]']
+
+ batch_normalization_6 (BatchNo  (None, 64)          256         ['dense_2[0][0]']
+ rmalization)
+
+ pixel_prediction (Dense)       (None, 2)            130         ['batch_normalization_6[0][0]']
+
+==================================================================================================
+Total params: 2,089,122
+Trainable params: 2,087,650
+Non-trainable params: 1,472
+__________________________________________________________________________________________________
+2024-05-25 23:50:14.163606: I tensorflow/stream_executor/cuda/cuda_dnn.cc:384] Loaded cuDNN version 8100
+ 94/266 [=========>....................] - ETA: 3:34 - loss: 0.2857 - mean_squared_error: 0.28572024-05-25 23:52:17.171792: W tensorflow/core/common_runtime/bfc_allocator.cc:290] Allocator (GPU_0_bfc) ran out of memory trying to allocate 4.39GiB with freed_by_count=0. The caller indicates that this is not a failure, but this may mean that there could be performance gains if more memory were available.
+2024-05-25 23:52:17.172439: W tensorflow/core/common_runtime/bfc_allocator.cc:290] Allocator (GPU_0_bfc) ran out of memory trying to allocate 4.39GiB with freed_by_count=0. The caller indicates that this is not a failure, but this may mean that there could be performance gains if more memory were available.
+2024-05-25 23:52:17.573435: W tensorflow/core/common_runtime/bfc_allocator.cc:290] Allocator (GPU_0_bfc) ran out of memory trying to allocate 4.74GiB with freed_by_count=0. The caller indicates that this is not a failure, but this may mean that there could be performance gains if more memory were available.
+2024-05-25 23:52:17.574100: W tensorflow/core/common_runtime/bfc_allocator.cc:290] Allocator (GPU_0_bfc) ran out of memory trying to allocate 4.74GiB with freed_by_count=0. The caller indicates that this is not a failure, but this may mean that there could be performance gains if more memory were available.
+2024-05-25 23:52:17.757647: W tensorflow/core/common_runtime/bfc_allocator.cc:290] Allocator (GPU_0_bfc) ran out of memory trying to allocate 4.13GiB with freed_by_count=0. The caller indicates that this is not a failure, but this may mean that there could be performance gains if more memory were available.
+2024-05-25 23:52:17.758347: W tensorflow/core/common_runtime/bfc_allocator.cc:290] Allocator (GPU_0_bfc) ran out of memory trying to allocate 4.13GiB with freed_by_count=0. The caller indicates that this is not a failure, but this may mean that there could be performance gains if more memory were available.
+266/266 [==============================] - ETA: 0s - loss: 0.1602 - mean_squared_error: 0.16022024-05-25 23:56:24.865981: W tensorflow/core/common_runtime/bfc_allocator.cc:290] Allocator (GPU_0_bfc) ran out of memory trying to allocate 4.90GiB with freed_by_count=0. The caller indicates that this is not a failure, but this may mean that there could be performance gains if more memory were available.
+2024-05-25 23:56:24.866699: W tensorflow/core/common_runtime/bfc_allocator.cc:290] Allocator (GPU_0_bfc) ran out of memory trying to allocate 4.90GiB with freed_by_count=0. The caller indicates that this is not a failure, but this may mean that there could be performance gains if more memory were available.
+2024-05-25 23:56:24.867378: W tensorflow/core/common_runtime/bfc_allocator.cc:290] Allocator (GPU_0_bfc) ran out of memory trying to allocate 5.62GiB with freed_by_count=0. The caller indicates that this is not a failure, but this may mean that there could be performance gains if more memory were available.
+2024-05-25 23:56:24.868064: W tensorflow/core/common_runtime/bfc_allocator.cc:290] Allocator (GPU_0_bfc) ran out of memory trying to allocate 5.62GiB with freed_by_count=0. The caller indicates that this is not a failure, but this may mean that there could be performance gains if more memory were available.
+
+Epoch 1: val_loss improved from inf to 0.13881, saving model to Models\Simple-2-(128, 128).h5
+266/266 [==============================] - 374s 1s/step - loss: 0.1602 - mean_squared_error: 0.1602 - val_loss: 0.1388 - val_mean_squared_error: 0.1388
+
+For Simple-2-(128, 128):
+For pog corrected train3.csv mse_loss: 0.1327
+For pog corrected validation3.csv mse_loss: 0.1388
+For pog corrected test3.csv mse_loss: 0.1439
