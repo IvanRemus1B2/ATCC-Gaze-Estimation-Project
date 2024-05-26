@@ -12,6 +12,9 @@ from keras.preprocessing.image import ImageDataGenerator
 from keras.utils import img_to_array
 from keras.utils import load_img
 from keras.metrics import MSE
+from keras.metrics import MAE
+from keras.losses import MeanSquaredError
+from keras.losses import MeanAbsoluteError
 
 from typing import Union
 from keras import models
@@ -173,9 +176,10 @@ def see_predictions_on(model_name: str):
     for index in range(my_range[0], my_range[1] + 1):
         print(index, " - ", y_val[index], y_pred[index - my_range[0]])
 
-    print(np.mean(np.sum(np.square(y_pred - y_val[my_range[0]: my_range[1] + 1]), axis=1)))
+    print("MSE", np.mean(np.sum(np.square(y_pred - y_val[my_range[0]: my_range[1] + 1]), axis=1)))
 
-    print(np.mean(MSE(y_pred, y_val[my_range[0]: my_range[1] + 1])))
+    # print(MeanSquaredError(y_pred, y_val[my_range[0]: my_range[1] + 1]))
+    # print(MeanAbsoluteError(y_pred, y_val[my_range[0]: my_range[1] + 1]))
     # for image_name in image_names:
     #     image = read_image(image_name)
     #     plot_image(image)
@@ -291,7 +295,7 @@ def read_dataset(archive, dataset_file_name: str, image_resize_shape: tuple[int,
 if __name__ == '__main__':
     # see_predictions_on("Test_VGG_1M_Regularized_ELU-1-(128, 128)")
     # see_predictions_on("Test_VGG_4M_2-1-(156, 156)")
-    see_predictions_on("Simple-2-(128, 128)")
+    see_predictions_on("Simple-4-(128, 128)")
 
     # zip_file_name = "PoG Dataset.zip"
     # archive = zipfile.ZipFile(zip_file_name, "r")

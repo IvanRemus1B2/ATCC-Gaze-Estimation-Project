@@ -172,18 +172,22 @@ def get_model(model_type: ModelType, image_shape, info_shape: int):
                                        kernel_initializer='he_normal')(image_features)
         image_features = layers.BatchNormalization()(image_features)
         image_features = layers.Conv2D(32, (3, 3), padding='same', activation=layers.ELU(),
-                                       kernel_initializer='he_normal')(image_features)
+                                       kernel_initializer='he_normal', kernel_regularizer=regularizers.L2(1e-2))(
+            image_features)
         image_features = layers.BatchNormalization()(image_features)
         image_features = layers.MaxPooling2D(pool_size=(3, 3))(image_features)
         image_features = layers.Dropout(0.2)(image_features)
 
         x = layers.Flatten()(image_features)
         x = layers.concatenate([x, info_input])
-        x = layers.Dense(256, activation=layers.ELU(), kernel_initializer='he_normal')(x)
+        x = layers.Dense(256, activation=layers.ELU(), kernel_initializer='he_normal',
+                         kernel_regularizer=regularizers.L2(1e-2))(x)
         x = layers.BatchNormalization()(x)
-        x = layers.Dense(128, activation=layers.ELU(), kernel_initializer='he_normal')(x)
+        x = layers.Dense(128, activation=layers.ELU(), kernel_initializer='he_normal',
+                         kernel_regularizer=regularizers.L2(1e-2))(x)
         x = layers.BatchNormalization()(x)
-        x = layers.Dense(64, activation=layers.ELU(), kernel_initializer='he_normal')(x)
+        x = layers.Dense(64, activation=layers.ELU(), kernel_initializer='he_normal',
+                         kernel_regularizer=regularizers.L2(1e-2))(x)
         x = layers.BatchNormalization()(x)
 
     pixel_prediction = layers.Dense(2, name="pixel_prediction")(x)

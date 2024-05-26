@@ -16,9 +16,10 @@ human_distance_cm = 50
 cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, width_pixels)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height_pixels)
+frame_delay = 1000
 
 model_folder = "Models"
-model_name = "Test_VGG_4M_2-1-(156, 156)"
+model_name = "Simple-4-(128, 128)"
 
 # TODO:Check whether this resizing is done properly when not equal dimensions
 height_resize, width_resize = list(map(int, model_name.split("-")[2][1:-1].split(",")))
@@ -32,7 +33,7 @@ with Listener() as listener:
         ret, frame = cap.read()
         image_input = img_to_array(frame)
 
-        # # TODO:Maybe the channels are BGR and the model was trained in RGB?
+        # TODO:Maybe the channels are BGR and the model was trained in RGB?
         # image_copy = copy.deepcopy(image_input)
         # image_input[:, :, 0] = image_copy[:, :, 2]
         # image_input[:, :, 2] = image_copy[:, :, 0]
@@ -44,6 +45,7 @@ with Listener() as listener:
             (1, -1))
 
         y_pred = np.squeeze(model.predict([image_input, info_input], verbose=0)["pixel_prediction"])
+        y_pred = np.clip(y_pred, 0, 1)
 
         print(y_pred)
 
@@ -51,10 +53,13 @@ with Listener() as listener:
         y_pos = int(y_pred[1] * height_pixels)
 
         blank_image = np.zeros((height_pixels, width_pixels, 3), np.uint8)
-        cv2.circle(blank_image, (y_pos, x_pos), 10, (255, 255, 255), -1)
+        cv2.circle(blank_image, (x_pos, y_pos), 10, (255, 255, 255), -1)
+
+        cv2.namedWindow("Window", cv2.WINDOW_NORMAL)
+        cv2.setWindowProperty("Window", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
         cv2.imshow('Window', blank_image)
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
+        if cv2.waitKey(frame_delay) & 0xFF == ord('q'):
             break
 
     cap.release()
@@ -62,3 +67,27 @@ with Listener() as listener:
     listener.join()
 
     exit(1)
+
+# def test2():
+#     index_count = 0
+#     x_values = [0, 1, 1, 0, 0.5]
+#     y_values = [0, 0, 1, 1, 0.5]
+#
+#     while True:
+#         x_pos = int(width_pixels * x_values[index_count % 5])
+#         y_pos = int(height_pixels * y_values[index_count % 5])
+#         print(x_pos, "-", y_pos)
+#         index_count += 1
+#
+#         blank_image = np.zeros((height_pixels, width_pixels, 3), np.uint8)
+#         cv2.circle(blank_image, (x_pos, y_pos), 10, (255, 255, 255), -1)
+#
+#         cv2.namedWindow("Window", cv2.WINDOW_NORMAL)
+#         cv2.setWindowProperty("Window", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+#         cv2.imshow('Window', blank_image)
+#
+#         if cv2.waitKey(1) & 0xFF == ord('q'):
+#             break
+#
+#
+# test2()

@@ -17,7 +17,9 @@ from models import *
 
 from keras.preprocessing.image import ImageDataGenerator
 from keras.utils import img_to_array
+from keras import metrics
 from keras.utils import load_img
+from keras import losses
 
 
 # TODO:Use Jupiter Notebook with Pycharm to save time
@@ -362,14 +364,14 @@ def main():
 
     info_length = 5
 
-    no_epochs = 1
+    no_epochs = 100
     train_batch_size = 64
     val_batch_size = test_batch_size = 64
 
     model_type = ModelType.Simple
 
     model_folder = "Models"
-    model_name = str(model_type).split(".")[1] + "-2-" + str(image_size)
+    model_name = str(model_type).split(".")[1] + "-4-" + str(image_size)
     model_path = ("" if model_folder == "" else model_folder + "/") + model_name
 
     # verbose = False
@@ -385,7 +387,7 @@ def main():
 
     model.summary()
 
-    model.compile(optimizer='adam', loss='mean_squared_error', metrics=['MeanSquaredError'])
+    model.compile(optimizer='adam', loss=losses.Huber(delta=1.0), metrics=[metrics.MeanAbsoluteError()])
 
     # callbacks = Callback_MSE(model_path + ".h5", x_val, y_val, interval=1)
 
@@ -403,7 +405,7 @@ def main():
     val_generator = MyCustomGenerator(archive, "pog corrected validation3.csv", val_batch_size, image_size)
 
     callbacks = ModelCheckpoint(filepath=model_path + ".h5",
-                                monitor='val_loss',
+                                monitor='val_mean_absolute_error',
                                 verbose=1,
                                 save_best_only=True,
                                 save_weights_only=False,
