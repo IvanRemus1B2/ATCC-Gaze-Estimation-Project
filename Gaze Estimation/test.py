@@ -22,10 +22,14 @@ from keras import models
 import zipfile
 import zipfile2
 
+import cv2
+
+from mtcnn.mtcnn import MTCNN
+
 
 class MyCustomGenerator(keras.utils.Sequence):
     def __init__(self, archive, dataset_name: str, batch_size: int,
-                 image_resize_shape,
+                 image_resize_shape: Union[tuple[int, int], None],
                  augmentation_generator: Union[ImageDataGenerator, None] = None,
                  verbose: bool = False):
         self.batch_size = batch_size
@@ -112,17 +116,22 @@ class MyCustomGenerator(keras.utils.Sequence):
                     if self.augmentation_generator is not None:
                         image_array = self.augmentation_generator.random_transform(image_array)
 
-                    image_array = np.array(
-                        tf.expand_dims(tf.image.resize(image_array, self.image_resize_shape), 0))
+                    if self.image_resize_shape is not None:
+                        image_array = np.array(
+                            tf.expand_dims(tf.image.resize(image_array, self.image_resize_shape), 0))
+                    else:
+                        image_array = np.array(
+                            tf.expand_dims(image_array, 0))
 
                     if batch_images is None:
                         batch_images = image_array
                     else:
                         batch_images = np.concatenate([batch_images, image_array], axis=0)
 
-        batch_images /= 255
+        # batch_images /= 255
 
-        return (batch_images, batch_images_info), batch_targets
+        return batch_images[0], file_names[0]
+        # return (batch_images, batch_images_info), batch_targets
 
 
 def read_image(image_name):
@@ -185,6 +194,48 @@ def see_predictions_on(model_name: str):
     # for image_name in image_names:
     #     image = read_image(image_name)
     #     plot_image(image)
+
+
+def show_face_box(dataset_name):
+    zip_file_name = "PoG Dataset.zip"
+    archive = zipfile2.ZipFile(zip_file_name, "r")
+
+    dataset_generator = MyCustomGenerator(archive, dataset_name, 1, None, None, False)
+    no_instances = dataset_generator.__len__()
+
+    index_range = (0, no_instances - 1)
+
+    detector = MTCNN()
+    abnormal_files = []
+
+    for index in range(index_range[0], min(index_range[1] + 1, no_instances + 1)):
+        image, file_name = dataset_generator.__getitem__(index)
+
+        # detect faces in the image
+        faces = detector.detect_faces(image)
+        if len(faces) > 1 or faces[0]['confidence'] <= 0.5:
+            abnormal_files.append(file_name)
+
+        if index % 100 == 0:
+            print(f"At {index}")
+
+            # continue
+
+        # # get coordinates
+        # x, y, width, height = faces[0]['box']
+        #
+        # start_point = (x, y)
+        # end_point = (x + width, y + height)
+        #
+        # color = (0, 0, 255)
+        #
+        # thickness = 2
+        #
+        # image = cv2.rectangle(image, start_point, end_point, color, thickness)
+        #
+        # plot_image(image)
+
+    print(f"For {dataset_name}: {abnormal_files}")
 
 
 def read_dataset(archive, dataset_file_name: str, image_resize_shape: tuple[int, int],
@@ -298,7 +349,13 @@ if __name__ == '__main__':
     # see_predictions_on("Test_VGG_1M_Regularized_ELU-1-(128, 128)")
     # see_predictions_on("Test_VGG_4M_2-1-(156, 156)")
     # see_predictions_on("Simple-4-(128, 128)")
-    see_predictions_on("Simple-5-(128, 128)")
+    # see_predictions_on("Simple-5-(128, 128)")
+    # show_face_box("pog corrected validation3.csv")
+
+    show_face_box("pog corrected validation3.csv")
+    # ['an482.jpg', 'an489.jpg', 'an509.jpg', 'ARA_529.jpg', 'ARA_549.jpg', 'MD580.jpg', 'ei531.jpg']
+
+    show_face_box("pog corrected test3.csv")
 
     # zip_file_name = "PoG Dataset.zip"
     # archive = zipfile.ZipFile(zip_file_name, "r")
