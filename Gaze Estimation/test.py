@@ -145,6 +145,7 @@ def plot_image(image):
 def see_predictions_on(model_name: str):
     height_resize, width_resize = list(map(int, model_name.split("-")[2][1:-1].split(",")))
     image_resize_shape = (height_resize, width_resize)
+    image_resize_shape = (256, 256)
 
     # image_names = ["ivanremus619", "ivanremus611"]
     # info_inputs = np.array([[1920, 1080, 380, 215, 50], [1920, 1080, 380, 215, 50]])
@@ -170,13 +171,14 @@ def see_predictions_on(model_name: str):
     verbose = False
 
     x_val, y_val = read_dataset(archive, "pog corrected validation3.csv", image_resize_shape, max_dataset_size, verbose)
-    my_range = [196, 250]
-    y_pred = model.predict([x_val[0][my_range[0]: my_range[1] + 1], x_val[1][my_range[0]: my_range[1] + 1]], verbose=0)[
-        "pixel_prediction"]
+    my_range = [150, 250]
+    # y_pred = model.predict([x_val[0][my_range[0]: my_range[1] + 1], x_val[1][my_range[0]: my_range[1] + 1]], verbose=0)[
+    #     "pixel_prediction"]
     for index in range(my_range[0], my_range[1] + 1):
-        print(index, " - ", y_val[index], y_pred[index - my_range[0]])
+        plot_image(x_val[0][index])
+        # print(index, " - ", y_val[index], y_pred[index - my_range[0]])
 
-    print("MSE", np.mean(np.sum(np.square(y_pred - y_val[my_range[0]: my_range[1] + 1]), axis=1)))
+    # print("MSE", np.mean(np.sum(np.square(y_pred - y_val[my_range[0]: my_range[1] + 1]), axis=1)))
 
     # print(MeanSquaredError(y_pred, y_val[my_range[0]: my_range[1] + 1]))
     # print(MeanAbsoluteError(y_pred, y_val[my_range[0]: my_range[1] + 1]))
@@ -288,14 +290,15 @@ def read_dataset(archive, dataset_file_name: str, image_resize_shape: tuple[int,
     #
     # print(f"Modified: {len(modified_files)}")
     # print(f"Percentage modified files:{len(modified_files) / (len(lines) - 1):.2f}")
-
-    return (images / 255, images_info), targets
+    # images /= 255
+    return (images, images_info), targets
 
 
 if __name__ == '__main__':
     # see_predictions_on("Test_VGG_1M_Regularized_ELU-1-(128, 128)")
     # see_predictions_on("Test_VGG_4M_2-1-(156, 156)")
-    see_predictions_on("Simple-4-(128, 128)")
+    # see_predictions_on("Simple-4-(128, 128)")
+    see_predictions_on("Simple-5-(128, 128)")
 
     # zip_file_name = "PoG Dataset.zip"
     # archive = zipfile.ZipFile(zip_file_name, "r")

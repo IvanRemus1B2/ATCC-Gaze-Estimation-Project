@@ -364,14 +364,14 @@ def main():
 
     info_length = 5
 
-    no_epochs = 100
+    no_epochs = 125
     train_batch_size = 64
     val_batch_size = test_batch_size = 64
 
     model_type = ModelType.Simple
 
     model_folder = "Models"
-    model_name = str(model_type).split(".")[1] + "-4-" + str(image_size)
+    model_name = str(model_type).split(".")[1] + "-5-" + str(image_size)
     model_path = ("" if model_folder == "" else model_folder + "/") + model_name
 
     # verbose = False
@@ -387,7 +387,7 @@ def main():
 
     model.summary()
 
-    model.compile(optimizer='adam', loss=losses.Huber(delta=1.0), metrics=[metrics.MeanAbsoluteError()])
+    model.compile(optimizer='adam', loss=losses.MeanAbsoluteError(), metrics=[metrics.MeanAbsoluteError()])
 
     # callbacks = Callback_MSE(model_path + ".h5", x_val, y_val, interval=1)
 
