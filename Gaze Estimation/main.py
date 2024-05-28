@@ -329,7 +329,7 @@ class MyCustomGeneratorV2(keras.utils.Sequence):
                 with Image.open(io.BytesIO(zip_image.read())) as image:
                     box_x, box_y, box_width, box_height = self.face_boxes[position]
                     # TODO:Check whether this is the right way to slice
-                    image_array = img_to_array(image)[box_x:box_x + box_width, box_y:box_y + box_height, :]
+                    image_array = img_to_array(image)[box_y:box_y + box_height, box_x:box_x + box_width, :]
                     if self.augmentation_generator is not None:
                         image_array = self.augmentation_generator.random_transform(image_array)
 

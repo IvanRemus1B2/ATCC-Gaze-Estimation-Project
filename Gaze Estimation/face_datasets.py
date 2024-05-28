@@ -242,7 +242,7 @@ if __name__ == '__main__':
     # create_dataset("pog corrected train3.csv", "face detection train", index_range=(12_501, 15_000))
     # Found:['mrg247.jpg', 'mrg248.jpg']
 
-    # create_dataset("pog corrected train3.csv", "face detection train", index_range=(15_001, 17_000))
+    create_dataset("pog corrected train3.csv", "face detection train", index_range=(15_001, 17_000))
     # Found:['ei216.jpg', 'ei388.jpg', 'ei401.jpg', 'ei428.jpg', 'ei434.jpg']
 
     # All found problematic:
