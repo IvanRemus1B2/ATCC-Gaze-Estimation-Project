@@ -274,7 +274,7 @@ class MyCustomGeneratorV2(keras.utils.Sequence):
         # Create an array
         all_face_box_info = None
         all_face_info = None
-        with open(fd_dataset_name + ".csv", mode='r') as file:
+        with open(fd_dataset_name, mode='r') as file:
             reader = csv.reader(file)
             header = reader.__next__()
             # file_name,box_x,box_y,box_width,box_height,confidence,left_eye_x,left_eye_y,right_eye_x,right_eye_y,nose_x,nose_y,mouth_left_x,mouth_left_y,mouth_right_x,mouth_right_y
@@ -284,6 +284,9 @@ class MyCustomGeneratorV2(keras.utils.Sequence):
 
                 face_info = list(map(np.float32, line[6:]))
                 image_width, image_height = images_file_info[index, 0:2]
+                for index2 in range(2 * 5):
+                    face_info[index2] /= (image_width if index2 % 2 == 0 else image_height)
+
                 # Add face distance from left and right
                 face_info.append(box_x / image_width)
                 face_info.append((image_width - min(box_x + box_width, image_width)) / image_width)
@@ -293,8 +296,6 @@ class MyCustomGeneratorV2(keras.utils.Sequence):
                 face_info.append((image_height - min(box_y + box_height, image_height)) / image_height)
 
                 face_info = np.array(face_info).reshape((1, -1))
-                for index2 in range(2 * 5):
-                    face_info[index2] /= (image_width if index2 % 2 == 0 else image_height)
 
                 if all_face_info is None:
                     all_face_box_info = box_info
@@ -506,7 +507,96 @@ def test_model(model_name: str,
     print_mse_loss(model, "pog corrected test3.csv", test_generator, test_batch_size)
 
 
-def main():
+def run_fd_model():
+    zip_file_name = "PoG Dataset.zip"
+    archive = zipfile2.ZipFile(zip_file_name, "r")
+    #
+    # # Create datasets as tuples of (image,info),target
+    # file_names = ["pog corrected test3.csv", "pog corrected train3.csv", "pog corrected validation3.csv"]
+    image_size = (128, 128)
+    no_channels = 3
+
+    info_length = 5 + 4 + 10
+
+    no_epochs = 2
+    train_batch_size = 64
+    val_batch_size = test_batch_size = 64
+
+    model_type = ModelType.Simple
+
+    model_folder = "Models"
+    model_name = "FD " + str(model_type).split(".")[1] + "-6-" + str(image_size)
+    model_path = ("" if model_folder == "" else model_folder + "/") + model_name
+
+    # verbose = False
+    # max_dataset_size = 2000
+    # x_train, y_train = read_dataset(archive, "pog corrected train3.csv", image_size, max_dataset_size, verbose)
+    # x_val, y_val = read_dataset(archive, "pog corrected validation3.csv", image_size, max_dataset_size, verbose)
+    # x_test, y_test = read_dataset(archive, "pog corrected test3.csv", image_size, max_dataset_size, verbose)
+
+    image_shape = list(image_size)
+    image_shape.append(no_channels)
+    image_shape = tuple(image_shape)
+    model = get_model(model_type, image_shape, info_length)
+
+    model.summary()
+
+    model.compile(optimizer='adam', loss=losses.MeanAbsoluteError(), metrics=[metrics.MeanAbsoluteError()])
+
+    # callbacks = Callback_MSE(model_path + ".h5", x_val, y_val, interval=1)
+
+    train_augmentation_generator = None
+    # train_augmentation_generator = ImageDataGenerator(
+    #     rotation_range=5,  # randomly rotate images in the range (degrees, 0 to 180)
+    #     # randomly shift images horizontally (fraction of total width)
+    #     width_shift_range=0.05,
+    #     # randomly shift images vertically (fraction of total height)
+    #     height_shift_range=0.05,
+    # )
+
+    # train_generator = MyCustomGenerator(archive, "pog corrected train3.csv", train_batch_size, image_size,
+    # train_augmentation_generator)
+    train_generator = MyCustomGeneratorV2(archive, "pog corrected train3.csv", "face detection train.csv",
+                                          train_batch_size, image_size)
+
+    # val_generator = MyCustomGenerator(archive, "pog corrected validation3.csv", val_batch_size, image_size)
+    val_generator = MyCustomGeneratorV2(archive, "pog corrected validation3.csv", "face detection validation.csv",
+                                        val_batch_size, image_size)
+
+    callbacks = ModelCheckpoint(filepath=model_path + ".h5",
+                                monitor='val_mean_absolute_error',
+                                verbose=1,
+                                save_best_only=True,
+                                save_weights_only=False,
+                                mode='auto',
+                                save_freq='epoch')
+
+    # history = model.fit(
+    #     {"image": x_train[0], "info": x_train[1]},
+    #     {"pixel_prediction": y_train},
+    #     validation_data=([x_val[0], x_val[1]], y_val),
+    #     epochs=no_epochs,
+    #     batch_size=train_batch_size,
+    #     callbacks=[callbacks]
+    # )
+
+    history = model.fit(
+        x=train_generator, validation_data=val_generator,
+        epochs=no_epochs,
+        callbacks=[callbacks]
+    )
+
+    visualize_plots(history, model_path)
+
+    # test_generator = MyCustomGenerator(archive, "pog corrected test3.csv", test_batch_size, image_size)
+    test_generator = MyCustomGeneratorV2(archive, "pog corrected test3.csv", "face detection test.csv", test_batch_size,
+                                         image_size)
+
+    test_model(model_name, train_batch_size, val_batch_size, test_batch_size,
+               train_generator, val_generator, test_generator)
+
+
+def run_base_model():
     zip_file_name = "PoG Dataset.zip"
     archive = zipfile2.ZipFile(zip_file_name, "r")
     #
@@ -555,7 +645,12 @@ def main():
 
     train_generator = MyCustomGenerator(archive, "pog corrected train3.csv", train_batch_size, image_size,
                                         train_augmentation_generator)
+    # train_generator = MyCustomGeneratorV2(archive, "pog corrected train3.csv", "face detection train.csv",
+    #                                       train_batch_size, image_size)
+
     val_generator = MyCustomGenerator(archive, "pog corrected validation3.csv", val_batch_size, image_size)
+    # val_generator = MyCustomGeneratorV2(archive, "pog corrected validation3.csv", "face detection validation.csv",
+    #                                     val_batch_size, image_size)
 
     callbacks = ModelCheckpoint(filepath=model_path + ".h5",
                                 monitor='val_mean_absolute_error',
@@ -583,9 +678,13 @@ def main():
     visualize_plots(history, model_path)
 
     test_generator = MyCustomGenerator(archive, "pog corrected test3.csv", test_batch_size, image_size)
+    # test_generator = MyCustomGeneratorV2(archive, "pog corrected test3.csv", "face detection test.csv", test_batch_size,
+    #                                      image_size)
+
     test_model(model_name, train_batch_size, val_batch_size, test_batch_size,
                train_generator, val_generator, test_generator)
 
 
 if __name__ == '__main__':
-    main()
+    # run_base_model()
+    run_fd_model()

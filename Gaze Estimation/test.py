@@ -440,7 +440,7 @@ if __name__ == '__main__':
     # show_face_box("pog corrected validation3.csv")
     image_size = (128, 128)
 
-    # file_names = ['an482.jpg', 'an489.jpg', 'an509.jpg', 'ARA_529.jpg', 'ARA_549.jpg', 'MD580.jpg', 'ei531.jpg']
+    file_names = ['an482.jpg', 'an489.jpg', 'an509.jpg', 'ARA_529.jpg', 'ARA_549.jpg', 'MD580.jpg', 'ei531.jpg']
     # file_names=['an456.jpg', 'an475.jpg', 'ichim658.jpg', 'ichim586.jpg', 'HDM747.jpg', 'MD510.jpg', 'MD516.jpg', 'MD548.jpg']
     # file_names=['an8.jpg', 'an16.jpg', 'an58.jpg', 'an63.jpg', 'an112.jpg', 'an123.jpg', 'an141.jpg', 'an147.jpg', 'an158.jpg', 'an172.jpg', 'an180.jpg', 'an194.jpg', 'an222.jpg', 'an233.jpg', 'an234.jpg', 'an248.jpg', 'an249.jpg', 'an270.jpg', 'an277.jpg', 'an278.jpg', 'an293.jpg', 'an309.jpg', 'an314.jpg', 'an322.jpg', 'an329.jpg', 'an384.jpg', 'an410.jpg', 'an417.jpg', 'ichim590.jpg', 'ichim769.jpg', 'ichim545.jpg', 'ichim194.jpg', 'mihai_bojescu_1711116742.9454212.png', 'mihai_bojescu_1711116826.216444.png']
     # file_names = ["ichim545.jpg", "ichim769.jpg"] <------- only for these 2 it can't find a face...
@@ -458,9 +458,9 @@ if __name__ == '__main__':
     # file_names=['DG460.jpg', 'MD65.jpg', 'MD87.jpg', 'MD101.jpg', 'MD143.jpg', 'MD200.jpg', 'MD213.jpg', 'MD473.jpg', 'MD495.jpg', 'MD499.jpg']
     # file_names=['mrg247.jpg', 'mrg248.jpg']
     # file_names=['ei216.jpg', 'ei388.jpg', 'ei401.jpg', 'ei428.jpg', 'ei434.jpg']
-    # show_face_box_for(file_names, False, image_size)
+    show_face_box_for(file_names, False, image_size)
 
-    show_box_face_on(["ichim545.jpg", "ichim769.jpg"])
+    # show_box_face_on(["ichim545.jpg", "ichim769.jpg"])
 
     # show_face_box("pog corrected validation3.csv")
     # ['an482.jpg', 'an489.jpg', 'an509.jpg', 'ARA_529.jpg', 'ARA_549.jpg', 'MD580.jpg', 'ei531.jpg']
