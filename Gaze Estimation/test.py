@@ -1,3 +1,4 @@
+import csv
 import zipfile
 import numpy as np
 import matplotlib.pyplot as plt
@@ -236,6 +237,53 @@ def show_face_box(dataset_name):
         # plot_image(image)
 
     print(f"For {dataset_name}: {abnormal_files}")
+
+
+def get_image_face_detection_info(file_names: list[str]):
+    dataset_names = ["pog corrected test3", "pog corrected validation3", "pog corrected train3"]
+    all_file_info = {}
+    for dataset_name in dataset_names:
+        with open(dataset_name + ".csv", mode='r') as file:
+            reader = csv.reader(file)
+            header = reader.__next__()
+            for line in reader:
+                file_name = line[0]
+                if file_name in file_names:
+                    file_info = {}
+                    for index in range(1, len(header)):
+                        file_info[header[index]] = line[index]
+                    all_file_info[file_name] = file_info
+    return all_file_info
+
+
+def show_face_box_for(file_names: list[str], show_box: bool, image_size: Union[tuple[int, int], None]):
+    zip_file_name = "PoG Dataset.zip"
+    archive = zipfile2.ZipFile(zip_file_name, "r")
+
+    all_file_info = get_image_face_detection_info(file_names)
+
+    for file_name in file_names:
+        file_info = all_file_info[file_name]
+        box_x, box_y, box_width, box_height = int(file_info["box_x"]), int(file_info["box_y"]), int(
+            file_info["box_width"]), int(file_info[
+                                             "box_height"])
+        with archive.open("PoG Dataset/" + file_name) as zip_image:
+            with Image.open(io.BytesIO(zip_image.read())) as image:
+                # TODO:Consider making the dataset without an initial resizing
+                image = img_to_array(image)
+                if show_box:
+                    start_point = (box_x, box_y)
+                    end_point = (box_x + box_width, box_y + box_height)
+
+                    color = (0, 0, 255)
+
+                    thickness = 2
+
+                    image = cv2.rectangle(image, start_point, end_point, color, thickness)
+                else:
+                    image = tf.image.resize(image[box_x:box_x + box_width, box_y:box_y + box_height, :], image_size)
+
+                plot_image(image)
 
 
 def read_dataset(archive, dataset_file_name: str, image_resize_shape: tuple[int, int],

@@ -1,3 +1,4 @@
+import csv
 import zipfile
 import zipfile2
 
@@ -193,6 +194,158 @@ def visualize_plots(history, model_path: str):
     plt.savefig(model_path + ".png")
 
     plt.show()
+
+
+# Use the face detection datasets in order to give as input the face resized
+class MyCustomGeneratorV2(keras.utils.Sequence):
+    def __init__(self, archive, dataset_name: str, fd_dataset_name: str,
+                 batch_size: int, image_resize_shape: tuple[int, int],
+                 augmentation_generator: Union[ImageDataGenerator, None] = None,
+                 verbose: bool = False):
+        self.batch_size = batch_size
+        self.image_resize_shape = image_resize_shape
+
+        self.archive = archive
+        self.augmentation_generator = augmentation_generator
+
+        self.images_names, self.images_info, self.face_boxes, self.targets = self.read_lines(dataset_name,
+                                                                                             fd_dataset_name, verbose)
+
+        self.length = (np.ceil(len(self.images_names) / float(self.batch_size))).astype(np.int64)
+
+        self.no_instances = len(self.images_names)
+        self.count = 0
+        self.order = np.arange(self.no_instances)
+
+    def read_lines(self, dataset_name: str, fd_dataset_name: str, verbose: bool = False):
+        with self.archive.open(dataset_name, "r") as file:
+            lines = file.readlines()
+            if verbose:
+                print(f"\nFor {dataset_name}")
+
+                header = str(lines[0], 'utf-8').split(",")
+                header[-1] = header[-1][:-2]
+                print(f"File Header: {header}")
+
+            file_names = []
+            images_file_info, targets = None, None
+
+            for line in lines[1:]:
+                values = str(line, 'utf-8').split(",")
+                values[-1] = values[-1][:-2]
+
+                # class_name = get_class_name(values[0])
+                file_name = values[0]
+                file_names.append(file_name)
+
+                x_pixel_pos, y_pixel_pos = list(map(np.float32, values[1:3]))
+                width_pixels, height_pixels = list(map(np.float32, values[3:5]))
+
+                if not (0 <= x_pixel_pos <= width_pixels):
+                    x_pixel_pos = np.clip(x_pixel_pos, a_min=0, a_max=width_pixels)
+
+                if not (0 <= y_pixel_pos <= height_pixels):
+                    y_pixel_pos = np.clip(y_pixel_pos, a_min=0, a_max=height_pixels)
+
+                width_mm, height_mm = list(map(np.float32, values[5:7]))
+
+                human_distance_cm = values[7]
+                if human_distance_cm == "":
+                    human_distance_cm = 40
+
+                human_distance_cm = np.float32(human_distance_cm)
+                if human_distance_cm >= 80:
+                    human_distance_cm = human_distance_cm / 10
+
+                # TODO:Make sure that replacing this works the same way
+                x_norm, y_norm = np.float32(x_pixel_pos / width_pixels), np.float32(y_pixel_pos / height_pixels)
+
+                image_info = np.array([width_pixels, height_pixels, width_mm, height_mm, human_distance_cm]).reshape(
+                    (1, -1))
+                target = np.array([x_norm, y_norm]).reshape((1, -1))
+
+                if images_file_info is None:
+                    images_file_info = image_info
+                    targets = target
+                else:
+                    images_file_info = np.concatenate([images_file_info, image_info], axis=0)
+                    targets = np.concatenate([targets, target], axis=0)
+
+        # Create an array
+        all_face_box_info = None
+        all_face_info = None
+        with open(fd_dataset_name + ".csv", mode='r') as file:
+            reader = csv.reader(file)
+            header = reader.__next__()
+            # file_name,box_x,box_y,box_width,box_height,confidence,left_eye_x,left_eye_y,right_eye_x,right_eye_y,nose_x,nose_y,mouth_left_x,mouth_left_y,mouth_right_x,mouth_right_y
+            for index, line in enumerate(reader):
+                box_x, box_y, box_width, box_height = list(map(int, line[1:5]))
+                box_info = np.array([box_x, box_y, box_width, box_height], dtype=np.int32).reshape((1, -1))
+
+                face_info = list(map(np.float32, line[6:]))
+                image_width, image_height = images_file_info[index, 0:2]
+                # Add face distance from left and right
+                face_info.append(box_x / image_width)
+                face_info.append((image_width - min(box_x + box_width, image_width)) / image_width)
+
+                # Add face distance from top and down
+                face_info.append(box_y / image_height)
+                face_info.append((image_height - min(box_y + box_height, image_height)) / image_height)
+
+                face_info = np.array(face_info).reshape((1, -1))
+                for index2 in range(2 * 5):
+                    face_info[index2] /= (image_width if index2 % 2 == 0 else image_height)
+
+                if all_face_info is None:
+                    all_face_box_info = box_info
+                    all_face_info = face_info
+                else:
+                    all_face_box_info = np.concatenate([all_face_box_info, box_info], axis=0)
+                    all_face_info = np.concatenate([all_face_info, face_info], axis=0)
+
+        images_file_info = np.concatenate([images_file_info, all_face_info], axis=1)
+
+        return file_names, images_file_info, all_face_box_info, targets
+
+    def __len__(self):
+        return self.length
+
+    def __getitem__(self, index):
+        if self.count % self.no_instances == 0:
+            np.random.shuffle(self.order)
+
+        pos = index * self.batch_size
+
+        positions = self.order[pos:pos + self.batch_size]
+
+        batch_images_info = self.images_info[positions, :]
+        batch_targets = self.targets[positions, :]
+
+        batch_images = None
+        for position in positions:
+            file_name = self.images_names[position]
+            # Read images,assume they are jpg
+            with self.archive.open("PoG Dataset/" + file_name) as zip_image:
+                with Image.open(io.BytesIO(zip_image.read())) as image:
+                    box_x, box_y, box_width, box_height = self.face_boxes[position]
+                    # TODO:Check whether this is the right way to slice
+                    image_array = img_to_array(image)[box_x:box_x + box_width, box_y:box_y + box_height, :]
+                    if self.augmentation_generator is not None:
+                        image_array = self.augmentation_generator.random_transform(image_array)
+
+                    image_array = np.array(
+                        tf.expand_dims(tf.image.resize(image_array, self.image_resize_shape), 0))
+
+                    if batch_images is None:
+                        batch_images = image_array
+                    else:
+                        batch_images = np.concatenate([batch_images, image_array], axis=0)
+
+        batch_images /= 255
+
+        self.count += 1
+
+        return (batch_images, batch_images_info), batch_targets
 
 
 class MyCustomGenerator(keras.utils.Sequence):
