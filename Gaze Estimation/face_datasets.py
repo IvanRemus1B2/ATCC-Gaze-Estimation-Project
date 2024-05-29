@@ -8,7 +8,7 @@ import csv
 from PIL import Image
 
 import keras
-from models import *
+from my_models import *
 from keras.preprocessing.image import ImageDataGenerator
 from keras.utils import img_to_array
 from keras.utils import load_img

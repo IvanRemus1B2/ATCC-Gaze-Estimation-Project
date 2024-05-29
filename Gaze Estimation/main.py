@@ -14,7 +14,7 @@ import tensorflow as tf
 
 from typing import Union
 
-from models import *
+from my_models import *
 
 from keras.preprocessing.image import ImageDataGenerator
 from keras.utils import img_to_array
@@ -535,20 +535,20 @@ def train_model():
     #
     # # Create datasets as tuples of (image,info),target
     # file_names = ["pog corrected test3.csv", "pog corrected train3.csv", "pog corrected validation3.csv"]
-    image_size = (96, 96)
+    image_size = (128, 128)
     no_channels = 3
 
     no_epochs = 1
-    train_batch_size = 128
+    train_batch_size = 64
     val_batch_size = test_batch_size = 64
 
     model_type = ModelType.PretrainedFaceDetection
     info_length = 5 if model_type == ModelType.Basic else 5 + 4 + 10
 
-    model_architecture_type = ModelArchitectureType.Simple
+    model_architecture_type = ModelArchitectureType.ResNet_4M_RELU
 
     model_folder = "Models/" + str(model_type).split(".")[1]
-    model_name = str(model_architecture_type).split(".")[1] + "-7-" + str(image_size)
+    model_name = str(model_architecture_type).split(".")[1] + "-8-" + str(image_size)
     model_path = ("" if model_folder == "" else model_folder + "/") + model_name
 
     # verbose = False
@@ -653,8 +653,8 @@ def get_model_metrics():
 
 if __name__ == '__main__':
     # run_base_model()
-    # train_model()
-    get_model_metrics()
+    train_model()
+    # get_model_metrics()
 
 # def run_base_model():
 #     zip_file_name = "PoG Dataset.zip"
