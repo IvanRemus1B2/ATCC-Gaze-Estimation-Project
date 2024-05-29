@@ -663,3 +663,502 @@ For pog corrected train3.csv mse_loss: 0.0082
 For pog corrected validation3.csv mse_loss: 0.0331
 For pog corrected test3.csv mse_loss: 0.0310
 
+For model Simple V6
+Model: "model"
+__________________________________________________________________________________________________
+ Layer (type)                   Output Shape         Param #     Connected to
+==================================================================================================
+ image (InputLayer)             [(None, 128, 128, 3  0           []
+                                )]
+
+ gaussian_noise (GaussianNoise)  (None, 128, 128, 3)  0          ['image[0][0]']
+
+ conv2d (Conv2D)                (None, 126, 126, 64  1792        ['gaussian_noise[0][0]']
+                                )
+
+ batch_normalization (BatchNorm  (None, 126, 126, 64  256        ['conv2d[0][0]']
+ alization)                     )
+
+ conv2d_1 (Conv2D)              (None, 122, 122, 12  204928      ['batch_normalization[0][0]']
+                                8)
+
+ batch_normalization_1 (BatchNo  (None, 122, 122, 12  512        ['conv2d_1[0][0]']
+ rmalization)                   8)
+
+ conv2d_2 (Conv2D)              (None, 122, 122, 96  12384       ['batch_normalization_1[0][0]']
+                                )
+
+ batch_normalization_2 (BatchNo  (None, 122, 122, 96  384        ['conv2d_2[0][0]']
+ rmalization)                   )
+
+ max_pooling2d (MaxPooling2D)   (None, 60, 60, 96)   0           ['batch_normalization_2[0][0]']
+
+ dropout (Dropout)              (None, 60, 60, 96)   0           ['max_pooling2d[0][0]']
+
+ conv2d_3 (Conv2D)              (None, 58, 58, 64)   55360       ['dropout[0][0]']
+
+ batch_normalization_3 (BatchNo  (None, 58, 58, 64)  256         ['conv2d_3[0][0]']
+ rmalization)
+
+ conv2d_4 (Conv2D)              (None, 28, 28, 128)  73856       ['batch_normalization_3[0][0]']
+
+ batch_normalization_4 (BatchNo  (None, 28, 28, 128)  512        ['conv2d_4[0][0]']
+ rmalization)
+
+ conv2d_5 (Conv2D)              (None, 28, 28, 64)   8256        ['batch_normalization_4[0][0]']
+
+ batch_normalization_5 (BatchNo  (None, 28, 28, 64)  256         ['conv2d_5[0][0]']
+ rmalization)
+
+ max_pooling2d_1 (MaxPooling2D)  (None, 9, 9, 64)    0           ['batch_normalization_5[0][0]']
+
+ dropout_1 (Dropout)            (None, 9, 9, 64)     0           ['max_pooling2d_1[0][0]']
+
+ flatten (Flatten)              (None, 5184)         0           ['dropout_1[0][0]']
+
+ info (InputLayer)              [(None, 19)]         0           []
+
+ concatenate (Concatenate)      (None, 5203)         0           ['flatten[0][0]',
+                                                                  'info[0][0]']
+
+ dense (Dense)                  (None, 256)          1332224     ['concatenate[0][0]']
+
+ dropout_2 (Dropout)            (None, 256)          0           ['dense[0][0]']
+
+ batch_normalization_6 (BatchNo  (None, 256)         1024        ['dropout_2[0][0]']
+ rmalization)
+
+ dense_1 (Dense)                (None, 128)          32896       ['batch_normalization_6[0][0]']
+
+ batch_normalization_7 (BatchNo  (None, 128)         512         ['dense_1[0][0]']
+ rmalization)
+
+ dense_2 (Dense)                (None, 64)           8256        ['batch_normalization_7[0][0]']
+
+ batch_normalization_8 (BatchNo  (None, 64)          256         ['dense_2[0][0]']
+ rmalization)
+
+ pixel_prediction (Dense)       (None, 2)            130         ['batch_normalization_8[0][0]']
+
+==================================================================================================
+Total params: 1,734,050
+Trainable params: 1,732,066
+Non-trainable params: 1,984
+__________________________________________________________________________________________________
+Epoch 1/100
+2024-05-29 02:45:39.678940: I tensorflow/stream_executor/cuda/cuda_dnn.cc:384] Loaded cuDNN version 8100
+2024-05-29 02:45:41.706118: W tensorflow/core/common_runtime/bfc_allocator.cc:290] Allocator (GPU_0_bfc) ran out of memory trying to allocate 5.69GiB with freed_by_count=0. The caller indicates that this is not a failure, but this may mean that there could be performance gains if more memory were available.
+2024-05-29 02:45:41.706929: W tensorflow/core/common_runtime/bfc_allocator.cc:290] Allocator (GPU_0_bfc) ran out of memory trying to allocate 5.69GiB with freed_by_count=0. The caller indicates that this is not a failure, but this may mean that there could be performance gains if more memory were available.
+2024-05-29 02:45:42.012264: W tensorflow/core/common_runtime/bfc_allocator.cc:290] Allocator (GPU_0_bfc) ran out of memory trying to allocate 2.55GiB with freed_by_count=0. The caller indicates that this is not a failure, but this may mean that there could be performance gains if more memory were available.
+2024-05-29 02:45:42.013191: W tensorflow/core/common_runtime/bfc_allocator.cc:290] Allocator (GPU_0_bfc) ran out of memory trying to allocate 2.55GiB with freed_by_count=0. The caller indicates that this is not a failure, but this may mean that there could be performance gains if more memory were available.
+2024-05-29 02:45:42.701871: W tensorflow/core/common_runtime/bfc_allocator.cc:290] Allocator (GPU_0_bfc) ran out of memory trying to allocate 481.26MiB with freed_by_count=0. The caller indicates that this is not a failure, but this may mean that there could be performance gains if more memory were available.
+2024-05-29 02:45:42.702460: W tensorflow/core/common_runtime/bfc_allocator.cc:290] Allocator (GPU_0_bfc) ran out of memory trying to allocate 481.26MiB with freed_by_count=0. The caller indicates that this is not a failure, but this may mean that there could be performance gains if more memory were available.
+2024-05-29 02:45:42.703035: W tensorflow/core/common_runtime/bfc_allocator.cc:290] Allocator (GPU_0_bfc) ran out of memory trying to allocate 2.30GiB with freed_by_count=0. The caller indicates that this is not a failure, but this may mean that there could be performance gains if more memory were available.
+2024-05-29 02:45:42.703686: W tensorflow/core/common_runtime/bfc_allocator.cc:290] Allocator (GPU_0_bfc) ran out of memory trying to allocate 2.30GiB with freed_by_count=0. The caller indicates that this is not a failure, but this may mean that there could be performance gains if more memory were available.
+2024-05-29 02:45:42.704258: W tensorflow/core/common_runtime/bfc_allocator.cc:290] Allocator (GPU_0_bfc) ran out of memory trying to allocate 471.28MiB with freed_by_count=0. The caller indicates that this is not a failure, but this may mean that there could be performance gains if more memory were available.
+2024-05-29 02:45:42.704829: W tensorflow/core/common_runtime/bfc_allocator.cc:290] Allocator (GPU_0_bfc) ran out of memory trying to allocate 471.28MiB with freed_by_count=0. The caller indicates that this is not a failure, but this may mean that there could be performance gains if more memory were available.
+266/266 [==============================] - ETA: 0s - loss: 3.4126 - mean_absolute_error: 0.4160
+Epoch 1: val_mean_absolute_error improved from inf to 0.30376, saving model to Models\FD Simple-6-(128, 128).h5
+266/266 [==============================] - 330s 1s/step - loss: 3.4126 - mean_absolute_error: 0.4160 - val_loss: 1.2473 - val_mean_absolute_error: 0.3038
+Epoch 2/100
+266/266 [==============================] - ETA: 0s - loss: 0.8002 - mean_absolute_error: 0.2733
+Epoch 2: val_mean_absolute_error improved from 0.30376 to 0.27945, saving model to Models\FD Simple-6-(128, 128).h5
+266/266 [==============================] - 306s 1s/step - loss: 0.8002 - mean_absolute_error: 0.2733 - val_loss: 0.5650 - val_mean_absolute_error: 0.2795
+Epoch 3/100
+266/266 [==============================] - ETA: 0s - loss: 0.4316 - mean_absolute_error: 0.2449
+Epoch 3: val_mean_absolute_error improved from 0.27945 to 0.25256, saving model to Models\FD Simple-6-(128, 128).h5
+266/266 [==============================] - 306s 1s/step - loss: 0.4316 - mean_absolute_error: 0.2449 - val_loss: 0.3862 - val_mean_absolute_error: 0.2526
+Epoch 4/100
+266/266 [==============================] - ETA: 0s - loss: 0.3365 - mean_absolute_error: 0.2308
+Epoch 4: val_mean_absolute_error did not improve from 0.25256
+266/266 [==============================] - 308s 1s/step - loss: 0.3365 - mean_absolute_error: 0.2308 - val_loss: 0.3418 - val_mean_absolute_error: 0.2538
+Epoch 5/100
+266/266 [==============================] - ETA: 0s - loss: 0.2966 - mean_absolute_error: 0.2138
+Epoch 5: val_mean_absolute_error improved from 0.25256 to 0.20940, saving model to Models\FD Simple-6-(128, 128).h5
+266/266 [==============================] - 309s 1s/step - loss: 0.2966 - mean_absolute_error: 0.2138 - val_loss: 0.2841 - val_mean_absolute_error: 0.2094
+Epoch 6/100
+266/266 [==============================] - ETA: 0s - loss: 0.2702 - mean_absolute_error: 0.1972
+Epoch 6: val_mean_absolute_error did not improve from 0.20940
+266/266 [==============================] - 310s 1s/step - loss: 0.2702 - mean_absolute_error: 0.1972 - val_loss: 0.3084 - val_mean_absolute_error: 0.2400
+Epoch 7/100
+266/266 [==============================] - ETA: 0s - loss: 0.2489 - mean_absolute_error: 0.1855
+Epoch 7: val_mean_absolute_error improved from 0.20940 to 0.20075, saving model to Models\FD Simple-6-(128, 128).h5
+266/266 [==============================] - 313s 1s/step - loss: 0.2489 - mean_absolute_error: 0.1855 - val_loss: 0.2616 - val_mean_absolute_error: 0.2007
+Epoch 8/100
+266/266 [==============================] - ETA: 0s - loss: 0.2311 - mean_absolute_error: 0.1728
+Epoch 8: val_mean_absolute_error improved from 0.20075 to 0.17396, saving model to Models\FD Simple-6-(128, 128).h5
+266/266 [==============================] - 311s 1s/step - loss: 0.2311 - mean_absolute_error: 0.1728 - val_loss: 0.2340 - val_mean_absolute_error: 0.1740
+Epoch 9/100
+266/266 [==============================] - ETA: 0s - loss: 0.2239 - mean_absolute_error: 0.1679
+Epoch 9: val_mean_absolute_error did not improve from 0.17396
+266/266 [==============================] - 311s 1s/step - loss: 0.2239 - mean_absolute_error: 0.1679 - val_loss: 0.2481 - val_mean_absolute_error: 0.1962
+Epoch 10/100
+266/266 [==============================] - ETA: 0s - loss: 0.2189 - mean_absolute_error: 0.1648
+Epoch 10: val_mean_absolute_error did not improve from 0.17396
+266/266 [==============================] - 312s 1s/step - loss: 0.2189 - mean_absolute_error: 0.1648 - val_loss: 0.2599 - val_mean_absolute_error: 0.1953
+Epoch 11/100
+266/266 [==============================] - ETA: 0s - loss: 0.2139 - mean_absolute_error: 0.1596
+Epoch 11: val_mean_absolute_error did not improve from 0.17396
+266/266 [==============================] - 314s 1s/step - loss: 0.2139 - mean_absolute_error: 0.1596 - val_loss: 0.2321 - val_mean_absolute_error: 0.1818
+Epoch 12/100
+266/266 [==============================] - ETA: 0s - loss: 0.2089 - mean_absolute_error: 0.1574
+Epoch 12: val_mean_absolute_error did not improve from 0.17396
+266/266 [==============================] - 310s 1s/step - loss: 0.2089 - mean_absolute_error: 0.1574 - val_loss: 0.2284 - val_mean_absolute_error: 0.1805
+Epoch 13/100
+266/266 [==============================] - ETA: 0s - loss: 0.2037 - mean_absolute_error: 0.1533
+Epoch 13: val_mean_absolute_error improved from 0.17396 to 0.15949, saving model to Models\FD Simple-6-(128, 128).h5
+266/266 [==============================] - 311s 1s/step - loss: 0.2037 - mean_absolute_error: 0.1533 - val_loss: 0.2062 - val_mean_absolute_error: 0.1595
+Epoch 14/100
+266/266 [==============================] - ETA: 0s - loss: 0.2014 - mean_absolute_error: 0.1512
+Epoch 14: val_mean_absolute_error did not improve from 0.15949
+266/266 [==============================] - 314s 1s/step - loss: 0.2014 - mean_absolute_error: 0.1512 - val_loss: 0.2116 - val_mean_absolute_error: 0.1610
+Epoch 15/100
+266/266 [==============================] - ETA: 0s - loss: 0.2005 - mean_absolute_error: 0.1499
+Epoch 15: val_mean_absolute_error did not improve from 0.15949
+266/266 [==============================] - 309s 1s/step - loss: 0.2005 - mean_absolute_error: 0.1499 - val_loss: 0.2334 - val_mean_absolute_error: 0.1849
+Epoch 16/100
+266/266 [==============================] - ETA: 0s - loss: 0.1963 - mean_absolute_error: 0.1474
+Epoch 16: val_mean_absolute_error improved from 0.15949 to 0.14387, saving model to Models\FD Simple-6-(128, 128).h5
+266/266 [==============================] - 312s 1s/step - loss: 0.1963 - mean_absolute_error: 0.1474 - val_loss: 0.1900 - val_mean_absolute_error: 0.1439
+Epoch 17/100
+266/266 [==============================] - ETA: 0s - loss: 0.1941 - mean_absolute_error: 0.1462
+Epoch 17: val_mean_absolute_error did not improve from 0.14387
+266/266 [==============================] - 314s 1s/step - loss: 0.1941 - mean_absolute_error: 0.1462 - val_loss: 0.2070 - val_mean_absolute_error: 0.1585
+Epoch 18/100
+266/266 [==============================] - ETA: 0s - loss: 0.1908 - mean_absolute_error: 0.1438
+Epoch 18: val_mean_absolute_error did not improve from 0.14387
+266/266 [==============================] - 309s 1s/step - loss: 0.1908 - mean_absolute_error: 0.1438 - val_loss: 0.2478 - val_mean_absolute_error: 0.2046
+Epoch 19/100
+266/266 [==============================] - ETA: 0s - loss: 0.1929 - mean_absolute_error: 0.1434
+Epoch 19: val_mean_absolute_error did not improve from 0.14387
+266/266 [==============================] - 315s 1s/step - loss: 0.1929 - mean_absolute_error: 0.1434 - val_loss: 0.2079 - val_mean_absolute_error: 0.1607
+Epoch 20/100
+266/266 [==============================] - ETA: 0s - loss: 0.1874 - mean_absolute_error: 0.1403
+Epoch 20: val_mean_absolute_error did not improve from 0.14387
+266/266 [==============================] - 314s 1s/step - loss: 0.1874 - mean_absolute_error: 0.1403 - val_loss: 0.2030 - val_mean_absolute_error: 0.1563
+Epoch 21/100
+266/266 [==============================] - ETA: 0s - loss: 0.1855 - mean_absolute_error: 0.1390
+Epoch 21: val_mean_absolute_error did not improve from 0.14387
+266/266 [==============================] - 310s 1s/step - loss: 0.1855 - mean_absolute_error: 0.1390 - val_loss: 0.2151 - val_mean_absolute_error: 0.1638
+Epoch 22/100
+266/266 [==============================] - ETA: 0s - loss: 0.1877 - mean_absolute_error: 0.1395
+Epoch 22: val_mean_absolute_error improved from 0.14387 to 0.14235, saving model to Models\FD Simple-6-(128, 128).h5
+266/266 [==============================] - 313s 1s/step - loss: 0.1877 - mean_absolute_error: 0.1395 - val_loss: 0.1894 - val_mean_absolute_error: 0.1424
+Epoch 23/100
+266/266 [==============================] - ETA: 0s - loss: 0.1823 - mean_absolute_error: 0.1377
+Epoch 23: val_mean_absolute_error did not improve from 0.14235
+266/266 [==============================] - 316s 1s/step - loss: 0.1823 - mean_absolute_error: 0.1377 - val_loss: 0.1919 - val_mean_absolute_error: 0.1476
+Epoch 24/100
+266/266 [==============================] - ETA: 0s - loss: 0.1804 - mean_absolute_error: 0.1375
+Epoch 24: val_mean_absolute_error did not improve from 0.14235
+266/266 [==============================] - 310s 1s/step - loss: 0.1804 - mean_absolute_error: 0.1375 - val_loss: 0.1865 - val_mean_absolute_error: 0.1448
+Epoch 25/100
+266/266 [==============================] - ETA: 0s - loss: 0.1796 - mean_absolute_error: 0.1355
+Epoch 25: val_mean_absolute_error did not improve from 0.14235
+266/266 [==============================] - 313s 1s/step - loss: 0.1796 - mean_absolute_error: 0.1355 - val_loss: 0.2069 - val_mean_absolute_error: 0.1630
+Epoch 26/100
+266/266 [==============================] - ETA: 0s - loss: 0.1782 - mean_absolute_error: 0.1337
+Epoch 26: val_mean_absolute_error did not improve from 0.14235
+266/266 [==============================] - 316s 1s/step - loss: 0.1782 - mean_absolute_error: 0.1337 - val_loss: 0.2314 - val_mean_absolute_error: 0.1896
+Epoch 27/100
+266/266 [==============================] - ETA: 0s - loss: 0.1763 - mean_absolute_error: 0.1335
+Epoch 27: val_mean_absolute_error did not improve from 0.14235
+266/266 [==============================] - 310s 1s/step - loss: 0.1763 - mean_absolute_error: 0.1335 - val_loss: 0.1930 - val_mean_absolute_error: 0.1505
+Epoch 28/100
+266/266 [==============================] - ETA: 0s - loss: 0.1747 - mean_absolute_error: 0.1334
+Epoch 28: val_mean_absolute_error did not improve from 0.14235
+266/266 [==============================] - 313s 1s/step - loss: 0.1747 - mean_absolute_error: 0.1334 - val_loss: 0.2279 - val_mean_absolute_error: 0.1877
+Epoch 29/100
+266/266 [==============================] - ETA: 0s - loss: 0.1738 - mean_absolute_error: 0.1315
+Epoch 29: val_mean_absolute_error did not improve from 0.14235
+266/266 [==============================] - 315s 1s/step - loss: 0.1738 - mean_absolute_error: 0.1315 - val_loss: 0.1910 - val_mean_absolute_error: 0.1527
+Epoch 30/100
+266/266 [==============================] - ETA: 0s - loss: 0.1712 - mean_absolute_error: 0.1293
+Epoch 30: val_mean_absolute_error did not improve from 0.14235
+266/266 [==============================] - 309s 1s/step - loss: 0.1712 - mean_absolute_error: 0.1293 - val_loss: 0.2063 - val_mean_absolute_error: 0.1653
+Epoch 31/100
+266/266 [==============================] - ETA: 0s - loss: 0.1708 - mean_absolute_error: 0.1289
+Epoch 31: val_mean_absolute_error did not improve from 0.14235
+266/266 [==============================] - 309s 1s/step - loss: 0.1708 - mean_absolute_error: 0.1289 - val_loss: 0.2190 - val_mean_absolute_error: 0.1827
+Epoch 32/100
+266/266 [==============================] - ETA: 0s - loss: 0.1673 - mean_absolute_error: 0.1283
+Epoch 32: val_mean_absolute_error did not improve from 0.14235
+266/266 [==============================] - 314s 1s/step - loss: 0.1673 - mean_absolute_error: 0.1283 - val_loss: 0.2020 - val_mean_absolute_error: 0.1590
+Epoch 33/100
+266/266 [==============================] - ETA: 0s - loss: 0.1647 - mean_absolute_error: 0.1272
+Epoch 33: val_mean_absolute_error improved from 0.14235 to 0.13871, saving model to Models\FD Simple-6-(128, 128).h5
+266/266 [==============================] - 314s 1s/step - loss: 0.1647 - mean_absolute_error: 0.1272 - val_loss: 0.1751 - val_mean_absolute_error: 0.1387
+Epoch 34/100
+266/266 [==============================] - ETA: 0s - loss: 0.1641 - mean_absolute_error: 0.1265
+Epoch 34: val_mean_absolute_error did not improve from 0.13871
+266/266 [==============================] - 312s 1s/step - loss: 0.1641 - mean_absolute_error: 0.1265 - val_loss: 0.1974 - val_mean_absolute_error: 0.1624
+Epoch 35/100
+266/266 [==============================] - ETA: 0s - loss: 0.1646 - mean_absolute_error: 0.1265
+Epoch 35: val_mean_absolute_error did not improve from 0.13871
+266/266 [==============================] - 314s 1s/step - loss: 0.1646 - mean_absolute_error: 0.1265 - val_loss: 0.2044 - val_mean_absolute_error: 0.1691
+Epoch 36/100
+266/266 [==============================] - ETA: 0s - loss: 0.1630 - mean_absolute_error: 0.1250
+Epoch 36: val_mean_absolute_error did not improve from 0.13871
+266/266 [==============================] - 310s 1s/step - loss: 0.1630 - mean_absolute_error: 0.1250 - val_loss: 0.1756 - val_mean_absolute_error: 0.1394
+Epoch 37/100
+266/266 [==============================] - ETA: 0s - loss: 0.1630 - mean_absolute_error: 0.1250
+Epoch 37: val_mean_absolute_error improved from 0.13871 to 0.13417, saving model to Models\FD Simple-6-(128, 128).h5
+266/266 [==============================] - 310s 1s/step - loss: 0.1630 - mean_absolute_error: 0.1250 - val_loss: 0.1689 - val_mean_absolute_error: 0.1342
+Epoch 38/100
+266/266 [==============================] - ETA: 0s - loss: 0.1617 - mean_absolute_error: 0.1246
+Epoch 38: val_mean_absolute_error did not improve from 0.13417
+266/266 [==============================] - 315s 1s/step - loss: 0.1617 - mean_absolute_error: 0.1246 - val_loss: 0.2160 - val_mean_absolute_error: 0.1797
+Epoch 39/100
+266/266 [==============================] - ETA: 0s - loss: 0.1596 - mean_absolute_error: 0.1233
+Epoch 39: val_mean_absolute_error did not improve from 0.13417
+266/266 [==============================] - 312s 1s/step - loss: 0.1596 - mean_absolute_error: 0.1233 - val_loss: 0.1771 - val_mean_absolute_error: 0.1412
+Epoch 40/100
+266/266 [==============================] - ETA: 0s - loss: 0.1579 - mean_absolute_error: 0.1226
+Epoch 40: val_mean_absolute_error did not improve from 0.13417
+266/266 [==============================] - 313s 1s/step - loss: 0.1579 - mean_absolute_error: 0.1226 - val_loss: 0.1700 - val_mean_absolute_error: 0.1365
+Epoch 41/100
+266/266 [==============================] - ETA: 0s - loss: 0.1581 - mean_absolute_error: 0.1224
+Epoch 41: val_mean_absolute_error did not improve from 0.13417
+266/266 [==============================] - 314s 1s/step - loss: 0.1581 - mean_absolute_error: 0.1224 - val_loss: 0.1831 - val_mean_absolute_error: 0.1461
+Epoch 42/100
+266/266 [==============================] - ETA: 0s - loss: 0.1554 - mean_absolute_error: 0.1208
+Epoch 42: val_mean_absolute_error did not improve from 0.13417
+266/266 [==============================] - 312s 1s/step - loss: 0.1554 - mean_absolute_error: 0.1208 - val_loss: 0.1937 - val_mean_absolute_error: 0.1584
+Epoch 43/100
+266/266 [==============================] - ETA: 0s - loss: 0.1547 - mean_absolute_error: 0.1207
+Epoch 43: val_mean_absolute_error improved from 0.13417 to 0.13268, saving model to Models\FD Simple-6-(128, 128).h5
+266/266 [==============================] - 314s 1s/step - loss: 0.1547 - mean_absolute_error: 0.1207 - val_loss: 0.1667 - val_mean_absolute_error: 0.1327
+Epoch 44/100
+266/266 [==============================] - ETA: 0s - loss: 0.1572 - mean_absolute_error: 0.1213
+Epoch 44: val_mean_absolute_error did not improve from 0.13268
+266/266 [==============================] - 318s 1s/step - loss: 0.1572 - mean_absolute_error: 0.1213 - val_loss: 0.1708 - val_mean_absolute_error: 0.1334
+Epoch 45/100
+266/266 [==============================] - ETA: 0s - loss: 0.1542 - mean_absolute_error: 0.1203
+Epoch 45: val_mean_absolute_error did not improve from 0.13268
+266/266 [==============================] - 312s 1s/step - loss: 0.1542 - mean_absolute_error: 0.1203 - val_loss: 0.1705 - val_mean_absolute_error: 0.1405
+Epoch 46/100
+266/266 [==============================] - ETA: 0s - loss: 0.1534 - mean_absolute_error: 0.1198
+Epoch 46: val_mean_absolute_error did not improve from 0.13268
+266/266 [==============================] - 317s 1s/step - loss: 0.1534 - mean_absolute_error: 0.1198 - val_loss: 0.1796 - val_mean_absolute_error: 0.1458
+Epoch 47/100
+266/266 [==============================] - ETA: 0s - loss: 0.1531 - mean_absolute_error: 0.1193
+Epoch 47: val_mean_absolute_error did not improve from 0.13268
+266/266 [==============================] - 317s 1s/step - loss: 0.1531 - mean_absolute_error: 0.1193 - val_loss: 0.1676 - val_mean_absolute_error: 0.1349
+Epoch 48/100
+266/266 [==============================] - ETA: 0s - loss: 0.1517 - mean_absolute_error: 0.1189
+Epoch 48: val_mean_absolute_error improved from 0.13268 to 0.13259, saving model to Models\FD Simple-6-(128, 128).h5
+266/266 [==============================] - 312s 1s/step - loss: 0.1517 - mean_absolute_error: 0.1189 - val_loss: 0.1658 - val_mean_absolute_error: 0.1326
+Epoch 49/100
+266/266 [==============================] - ETA: 0s - loss: 0.1512 - mean_absolute_error: 0.1187
+Epoch 49: val_mean_absolute_error improved from 0.13259 to 0.13076, saving model to Models\FD Simple-6-(128, 128).h5
+266/266 [==============================] - 316s 1s/step - loss: 0.1512 - mean_absolute_error: 0.1187 - val_loss: 0.1657 - val_mean_absolute_error: 0.1308
+Epoch 50/100
+266/266 [==============================] - ETA: 0s - loss: 0.1508 - mean_absolute_error: 0.1181
+Epoch 50: val_mean_absolute_error did not improve from 0.13076
+266/266 [==============================] - 312s 1s/step - loss: 0.1508 - mean_absolute_error: 0.1181 - val_loss: 0.1643 - val_mean_absolute_error: 0.1340
+Epoch 51/100
+266/266 [==============================] - ETA: 0s - loss: 0.1499 - mean_absolute_error: 0.1181
+Epoch 51: val_mean_absolute_error did not improve from 0.13076
+266/266 [==============================] - 312s 1s/step - loss: 0.1499 - mean_absolute_error: 0.1181 - val_loss: 0.1732 - val_mean_absolute_error: 0.1409
+Epoch 52/100
+266/266 [==============================] - ETA: 0s - loss: 0.1508 - mean_absolute_error: 0.1181
+Epoch 52: val_mean_absolute_error improved from 0.13076 to 0.12934, saving model to Models\FD Simple-6-(128, 128).h5
+266/266 [==============================] - 315s 1s/step - loss: 0.1508 - mean_absolute_error: 0.1181 - val_loss: 0.1598 - val_mean_absolute_error: 0.1293
+Epoch 53/100
+266/266 [==============================] - ETA: 0s - loss: 0.1469 - mean_absolute_error: 0.1159
+Epoch 53: val_mean_absolute_error improved from 0.12934 to 0.12637, saving model to Models\FD Simple-6-(128, 128).h5
+266/266 [==============================] - 318s 1s/step - loss: 0.1469 - mean_absolute_error: 0.1159 - val_loss: 0.1582 - val_mean_absolute_error: 0.1264
+Epoch 54/100
+266/266 [==============================] - ETA: 0s - loss: 0.1493 - mean_absolute_error: 0.1170
+Epoch 54: val_mean_absolute_error did not improve from 0.12637
+266/266 [==============================] - 311s 1s/step - loss: 0.1493 - mean_absolute_error: 0.1170 - val_loss: 0.1636 - val_mean_absolute_error: 0.1299
+Epoch 55/100
+266/266 [==============================] - ETA: 0s - loss: 0.1491 - mean_absolute_error: 0.1180
+Epoch 55: val_mean_absolute_error did not improve from 0.12637
+266/266 [==============================] - 315s 1s/step - loss: 0.1491 - mean_absolute_error: 0.1180 - val_loss: 0.1855 - val_mean_absolute_error: 0.1504
+Epoch 56/100
+266/266 [==============================] - ETA: 0s - loss: 0.1463 - mean_absolute_error: 0.1157
+Epoch 56: val_mean_absolute_error did not improve from 0.12637
+266/266 [==============================] - 322s 1s/step - loss: 0.1463 - mean_absolute_error: 0.1157 - val_loss: 0.1617 - val_mean_absolute_error: 0.1280
+Epoch 57/100
+266/266 [==============================] - ETA: 0s - loss: 0.1470 - mean_absolute_error: 0.1159
+Epoch 57: val_mean_absolute_error did not improve from 0.12637
+266/266 [==============================] - 314s 1s/step - loss: 0.1470 - mean_absolute_error: 0.1159 - val_loss: 0.1756 - val_mean_absolute_error: 0.1452
+Epoch 58/100
+266/266 [==============================] - ETA: 0s - loss: 0.1456 - mean_absolute_error: 0.1156
+Epoch 58: val_mean_absolute_error did not improve from 0.12637
+266/266 [==============================] - 316s 1s/step - loss: 0.1456 - mean_absolute_error: 0.1156 - val_loss: 0.1600 - val_mean_absolute_error: 0.1306
+Epoch 59/100
+266/266 [==============================] - ETA: 0s - loss: 0.1443 - mean_absolute_error: 0.1146
+Epoch 59: val_mean_absolute_error improved from 0.12637 to 0.12172, saving model to Models\FD Simple-6-(128, 128).h5
+266/266 [==============================] - 320s 1s/step - loss: 0.1443 - mean_absolute_error: 0.1146 - val_loss: 0.1521 - val_mean_absolute_error: 0.1217
+Epoch 60/100
+266/266 [==============================] - ETA: 0s - loss: 0.1431 - mean_absolute_error: 0.1138
+Epoch 60: val_mean_absolute_error did not improve from 0.12172
+266/266 [==============================] - 312s 1s/step - loss: 0.1431 - mean_absolute_error: 0.1138 - val_loss: 0.1660 - val_mean_absolute_error: 0.1366
+Epoch 61/100
+266/266 [==============================] - ETA: 0s - loss: 0.1432 - mean_absolute_error: 0.1142
+Epoch 61: val_mean_absolute_error did not improve from 0.12172
+266/266 [==============================] - 318s 1s/step - loss: 0.1432 - mean_absolute_error: 0.1142 - val_loss: 0.1616 - val_mean_absolute_error: 0.1344
+Epoch 62/100
+266/266 [==============================] - ETA: 0s - loss: 0.1446 - mean_absolute_error: 0.1136
+Epoch 62: val_mean_absolute_error did not improve from 0.12172
+266/266 [==============================] - 321s 1s/step - loss: 0.1446 - mean_absolute_error: 0.1136 - val_loss: 0.1604 - val_mean_absolute_error: 0.1311
+Epoch 63/100
+266/266 [==============================] - ETA: 0s - loss: 0.1430 - mean_absolute_error: 0.1135
+Epoch 63: val_mean_absolute_error did not improve from 0.12172
+266/266 [==============================] - 313s 1s/step - loss: 0.1430 - mean_absolute_error: 0.1135 - val_loss: 0.1649 - val_mean_absolute_error: 0.1323
+Epoch 64/100
+266/266 [==============================] - ETA: 0s - loss: 0.1430 - mean_absolute_error: 0.1135
+Epoch 64: val_mean_absolute_error did not improve from 0.12172
+266/266 [==============================] - 315s 1s/step - loss: 0.1430 - mean_absolute_error: 0.1135 - val_loss: 0.1673 - val_mean_absolute_error: 0.1351
+Epoch 65/100
+266/266 [==============================] - ETA: 0s - loss: 0.1427 - mean_absolute_error: 0.1133
+Epoch 65: val_mean_absolute_error did not improve from 0.12172
+266/266 [==============================] - 316s 1s/step - loss: 0.1427 - mean_absolute_error: 0.1133 - val_loss: 0.1656 - val_mean_absolute_error: 0.1357
+Epoch 66/100
+266/266 [==============================] - ETA: 0s - loss: 0.1409 - mean_absolute_error: 0.1124
+Epoch 66: val_mean_absolute_error did not improve from 0.12172
+266/266 [==============================] - 316s 1s/step - loss: 0.1409 - mean_absolute_error: 0.1124 - val_loss: 0.1626 - val_mean_absolute_error: 0.1342
+Epoch 67/100
+266/266 [==============================] - ETA: 0s - loss: 0.1419 - mean_absolute_error: 0.1130
+Epoch 67: val_mean_absolute_error improved from 0.12172 to 0.11891, saving model to Models\FD Simple-6-(128, 128).h5
+266/266 [==============================] - 318s 1s/step - loss: 0.1419 - mean_absolute_error: 0.1130 - val_loss: 0.1470 - val_mean_absolute_error: 0.1189
+Epoch 68/100
+266/266 [==============================] - ETA: 0s - loss: 0.1412 - mean_absolute_error: 0.1126
+Epoch 68: val_mean_absolute_error did not improve from 0.11891
+266/266 [==============================] - 321s 1s/step - loss: 0.1412 - mean_absolute_error: 0.1126 - val_loss: 0.1548 - val_mean_absolute_error: 0.1283
+Epoch 69/100
+266/266 [==============================] - ETA: 0s - loss: 0.1398 - mean_absolute_error: 0.1110
+Epoch 69: val_mean_absolute_error did not improve from 0.11891
+266/266 [==============================] - 313s 1s/step - loss: 0.1398 - mean_absolute_error: 0.1110 - val_loss: 0.1481 - val_mean_absolute_error: 0.1194
+Epoch 70/100
+266/266 [==============================] - ETA: 0s - loss: 0.1389 - mean_absolute_error: 0.1111
+Epoch 70: val_mean_absolute_error did not improve from 0.11891
+266/266 [==============================] - 316s 1s/step - loss: 0.1389 - mean_absolute_error: 0.1111 - val_loss: 0.1660 - val_mean_absolute_error: 0.1363
+Epoch 71/100
+266/266 [==============================] - ETA: 0s - loss: 0.1394 - mean_absolute_error: 0.1107
+Epoch 71: val_mean_absolute_error did not improve from 0.11891
+266/266 [==============================] - 320s 1s/step - loss: 0.1394 - mean_absolute_error: 0.1107 - val_loss: 0.1578 - val_mean_absolute_error: 0.1284
+Epoch 72/100
+266/266 [==============================] - ETA: 0s - loss: 0.1384 - mean_absolute_error: 0.1106
+Epoch 72: val_mean_absolute_error did not improve from 0.11891
+266/266 [==============================] - 312s 1s/step - loss: 0.1384 - mean_absolute_error: 0.1106 - val_loss: 0.1695 - val_mean_absolute_error: 0.1433
+Epoch 73/100
+266/266 [==============================] - ETA: 0s - loss: 0.1377 - mean_absolute_error: 0.1104
+Epoch 73: val_mean_absolute_error did not improve from 0.11891
+266/266 [==============================] - 318s 1s/step - loss: 0.1377 - mean_absolute_error: 0.1104 - val_loss: 0.1515 - val_mean_absolute_error: 0.1245
+Epoch 74/100
+266/266 [==============================] - ETA: 0s - loss: 0.1384 - mean_absolute_error: 0.1106
+Epoch 74: val_mean_absolute_error did not improve from 0.11891
+266/266 [==============================] - 319s 1s/step - loss: 0.1384 - mean_absolute_error: 0.1106 - val_loss: 0.1486 - val_mean_absolute_error: 0.1226
+Epoch 75/100
+266/266 [==============================] - ETA: 0s - loss: 0.1377 - mean_absolute_error: 0.1096
+Epoch 75: val_mean_absolute_error did not improve from 0.11891
+266/266 [==============================] - 313s 1s/step - loss: 0.1377 - mean_absolute_error: 0.1096 - val_loss: 0.1799 - val_mean_absolute_error: 0.1518
+Epoch 76/100
+266/266 [==============================] - ETA: 0s - loss: 0.1383 - mean_absolute_error: 0.1101
+Epoch 76: val_mean_absolute_error did not improve from 0.11891
+266/266 [==============================] - 318s 1s/step - loss: 0.1383 - mean_absolute_error: 0.1101 - val_loss: 0.1740 - val_mean_absolute_error: 0.1471
+Epoch 77/100
+266/266 [==============================] - ETA: 0s - loss: 0.1370 - mean_absolute_error: 0.1096
+Epoch 77: val_mean_absolute_error did not improve from 0.11891
+266/266 [==============================] - 319s 1s/step - loss: 0.1370 - mean_absolute_error: 0.1096 - val_loss: 0.1534 - val_mean_absolute_error: 0.1279
+Epoch 78/100
+266/266 [==============================] - ETA: 0s - loss: 0.1375 - mean_absolute_error: 0.1096
+Epoch 78: val_mean_absolute_error did not improve from 0.11891
+266/266 [==============================] - 313s 1s/step - loss: 0.1375 - mean_absolute_error: 0.1096 - val_loss: 0.1640 - val_mean_absolute_error: 0.1348
+Epoch 79/100
+266/266 [==============================] - ETA: 0s - loss: 0.1373 - mean_absolute_error: 0.1101
+Epoch 79: val_mean_absolute_error did not improve from 0.11891
+266/266 [==============================] - 317s 1s/step - loss: 0.1373 - mean_absolute_error: 0.1101 - val_loss: 0.1475 - val_mean_absolute_error: 0.1209
+Epoch 80/100
+266/266 [==============================] - ETA: 0s - loss: 0.1355 - mean_absolute_error: 0.1089
+Epoch 80: val_mean_absolute_error did not improve from 0.11891
+266/266 [==============================] - 316s 1s/step - loss: 0.1355 - mean_absolute_error: 0.1089 - val_loss: 0.1552 - val_mean_absolute_error: 0.1280
+Epoch 81/100
+266/266 [==============================] - ETA: 0s - loss: 0.1358 - mean_absolute_error: 0.1093
+Epoch 81: val_mean_absolute_error did not improve from 0.11891
+266/266 [==============================] - 313s 1s/step - loss: 0.1358 - mean_absolute_error: 0.1093 - val_loss: 0.1594 - val_mean_absolute_error: 0.1337
+Epoch 82/100
+266/266 [==============================] - ETA: 0s - loss: 0.1357 - mean_absolute_error: 0.1090
+Epoch 82: val_mean_absolute_error did not improve from 0.11891
+266/266 [==============================] - 316s 1s/step - loss: 0.1357 - mean_absolute_error: 0.1090 - val_loss: 0.1516 - val_mean_absolute_error: 0.1234
+Epoch 83/100
+266/266 [==============================] - ETA: 0s - loss: 0.1362 - mean_absolute_error: 0.1080
+Epoch 83: val_mean_absolute_error did not improve from 0.11891
+266/266 [==============================] - 319s 1s/step - loss: 0.1362 - mean_absolute_error: 0.1080 - val_loss: 0.1510 - val_mean_absolute_error: 0.1245
+Epoch 84/100
+266/266 [==============================] - ETA: 0s - loss: 0.1364 - mean_absolute_error: 0.1088
+Epoch 84: val_mean_absolute_error did not improve from 0.11891
+266/266 [==============================] - 314s 1s/step - loss: 0.1364 - mean_absolute_error: 0.1088 - val_loss: 0.1697 - val_mean_absolute_error: 0.1411
+Epoch 85/100
+266/266 [==============================] - ETA: 0s - loss: 0.1358 - mean_absolute_error: 0.1079
+Epoch 85: val_mean_absolute_error did not improve from 0.11891
+266/266 [==============================] - 316s 1s/step - loss: 0.1358 - mean_absolute_error: 0.1079 - val_loss: 0.1565 - val_mean_absolute_error: 0.1287
+Epoch 86/100
+266/266 [==============================] - ETA: 0s - loss: 0.1345 - mean_absolute_error: 0.1071
+Epoch 86: val_mean_absolute_error did not improve from 0.11891
+266/266 [==============================] - 319s 1s/step - loss: 0.1345 - mean_absolute_error: 0.1071 - val_loss: 0.1554 - val_mean_absolute_error: 0.1280
+Epoch 87/100
+266/266 [==============================] - ETA: 0s - loss: 0.1354 - mean_absolute_error: 0.1077
+Epoch 87: val_mean_absolute_error improved from 0.11891 to 0.11880, saving model to Models\FD Simple-6-(128, 128).h5
+266/266 [==============================] - 313s 1s/step - loss: 0.1354 - mean_absolute_error: 0.1077 - val_loss: 0.1473 - val_mean_absolute_error: 0.1188
+Epoch 88/100
+266/266 [==============================] - ETA: 0s - loss: 0.1352 - mean_absolute_error: 0.1078
+Epoch 88: val_mean_absolute_error did not improve from 0.11880
+266/266 [==============================] - 316s 1s/step - loss: 0.1352 - mean_absolute_error: 0.1078 - val_loss: 0.1557 - val_mean_absolute_error: 0.1280
+Epoch 89/100
+266/266 [==============================] - ETA: 0s - loss: 0.1332 - mean_absolute_error: 0.1071
+Epoch 89: val_mean_absolute_error did not improve from 0.11880
+266/266 [==============================] - 320s 1s/step - loss: 0.1332 - mean_absolute_error: 0.1071 - val_loss: 0.1490 - val_mean_absolute_error: 0.1255
+Epoch 90/100
+266/266 [==============================] - ETA: 0s - loss: 0.1328 - mean_absolute_error: 0.1063
+Epoch 90: val_mean_absolute_error did not improve from 0.11880
+266/266 [==============================] - 314s 1s/step - loss: 0.1328 - mean_absolute_error: 0.1063 - val_loss: 0.1477 - val_mean_absolute_error: 0.1190
+Epoch 91/100
+266/266 [==============================] - ETA: 0s - loss: 0.1341 - mean_absolute_error: 0.1062
+Epoch 91: val_mean_absolute_error did not improve from 0.11880
+266/266 [==============================] - 316s 1s/step - loss: 0.1341 - mean_absolute_error: 0.1062 - val_loss: 0.1554 - val_mean_absolute_error: 0.1293
+Epoch 92/100
+266/266 [==============================] - ETA: 0s - loss: 0.1335 - mean_absolute_error: 0.1074
+Epoch 92: val_mean_absolute_error did not improve from 0.11880
+266/266 [==============================] - 320s 1s/step - loss: 0.1335 - mean_absolute_error: 0.1074 - val_loss: 0.1485 - val_mean_absolute_error: 0.1222
+Epoch 93/100
+266/266 [==============================] - ETA: 0s - loss: 0.1330 - mean_absolute_error: 0.1062
+Epoch 93: val_mean_absolute_error improved from 0.11880 to 0.11880, saving model to Models\FD Simple-6-(128, 128).h5
+266/266 [==============================] - 313s 1s/step - loss: 0.1330 - mean_absolute_error: 0.1062 - val_loss: 0.1459 - val_mean_absolute_error: 0.1188
+Epoch 94/100
+266/266 [==============================] - ETA: 0s - loss: 0.1329 - mean_absolute_error: 0.1064
+Epoch 94: val_mean_absolute_error did not improve from 0.11880
+266/266 [==============================] - 316s 1s/step - loss: 0.1329 - mean_absolute_error: 0.1064 - val_loss: 0.1550 - val_mean_absolute_error: 0.1281
+Epoch 95/100
+266/266 [==============================] - ETA: 0s - loss: 0.1329 - mean_absolute_error: 0.1061
+Epoch 95: val_mean_absolute_error did not improve from 0.11880
+266/266 [==============================] - 319s 1s/step - loss: 0.1329 - mean_absolute_error: 0.1061 - val_loss: 0.1520 - val_mean_absolute_error: 0.1253
+Epoch 96/100
+266/266 [==============================] - ETA: 0s - loss: 0.1319 - mean_absolute_error: 0.1058
+Epoch 96: val_mean_absolute_error did not improve from 0.11880
+266/266 [==============================] - 317s 1s/step - loss: 0.1319 - mean_absolute_error: 0.1058 - val_loss: 0.1538 - val_mean_absolute_error: 0.1299
+Epoch 97/100
+266/266 [==============================] - ETA: 0s - loss: 0.1317 - mean_absolute_error: 0.1049
+Epoch 97: val_mean_absolute_error did not improve from 0.11880
+266/266 [==============================] - 390s 1s/step - loss: 0.1317 - mean_absolute_error: 0.1049 - val_loss: 0.1515 - val_mean_absolute_error: 0.1229
+Epoch 98/100
+266/266 [==============================] - ETA: 0s - loss: 0.1331 - mean_absolute_error: 0.1052
+Epoch 98: val_mean_absolute_error did not improve from 0.11880
+266/266 [==============================] - 383s 1s/step - loss: 0.1331 - mean_absolute_error: 0.1052 - val_loss: 0.1578 - val_mean_absolute_error: 0.1282
+Epoch 99/100
+266/266 [==============================] - ETA: 0s - loss: 0.1328 - mean_absolute_error: 0.1052
+Epoch 99: val_mean_absolute_error did not improve from 0.11880
+266/266 [==============================] - 319s 1s/step - loss: 0.1328 - mean_absolute_error: 0.1052 - val_loss: 0.1505 - val_mean_absolute_error: 0.1227
+Epoch 100/100
+266/266 [==============================] - ETA: 0s - loss: 0.1315 - mean_absolute_error: 0.1045
+Epoch 100: val_mean_absolute_error improved from 0.11880 to 0.11699, saving model to Models\FD Simple-6-(128, 128).h5
+266/266 [==============================] - 315s 1s/step - loss: 0.1315 - mean_absolute_error: 0.1045 - val_loss: 0.1442 - val_mean_absolute_error: 0.1170
+
+For FD Simple-6-(128, 128):
+For pog corrected train3.csv mse_loss: 0.0128
+For pog corrected validation3.csv mse_loss: 0.0274
+For pog corrected test3.csv mse_loss: 0.0250
+
