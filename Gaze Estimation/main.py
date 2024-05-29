@@ -464,24 +464,31 @@ class MyCustomGenerator(keras.utils.Sequence):
         return (batch_images, batch_images_info), batch_targets
 
 
-def print_mse_loss(model, dataset_name: str, dataset_generator: keras.utils.Sequence, batch_size):
-    total_loss = 0.0
+def print_metrics(model, dataset_name: str, dataset_generator: keras.utils.Sequence, batch_size):
+    mse_error = 0.0
+    mae_error = 0.0
     no_instances = 0
 
     for index in range(len(dataset_generator)):
         x_batch, target = dataset_generator.__getitem__(index)
         prediction = model.predict_on_batch(x_batch)['pixel_prediction']
 
-        total_loss += keras.losses.MeanSquaredError(reduction='sum')(prediction, target)
+        mse_error += keras.losses.MeanSquaredError(reduction='sum')(prediction, target)
+        mae_error += keras.losses.MeanAbsoluteError(reduction='sum')(prediction, target)
+
         no_instances += target.shape[0]
 
-    total_loss /= no_instances
+    mse_error /= no_instances
+    mae_error /= no_instances
 
-    print(f"For {dataset_name} mse_loss: {total_loss:.4f}")
+    # TODO:Consider using Dice score?
+
+    print(f"{dataset_name}:\nMSE Loss: {mse_error:.4f} , MAE Loss: {mae_error:.4f}")
 
 
 def test_model(model_folder: str,
                model_name: str,
+               model_type: ModelType,
                train_batch_size: int, val_batch_size: int, test_batch_size: int,
                train_generator=None, val_generator=None, test_generator=None):
     print(f"\nFor {model_name}:")
@@ -492,19 +499,25 @@ def test_model(model_folder: str,
     image_size = (height_resize, width_resize)
 
     if train_generator is None:
-        train_generator = MyCustomGenerator(archive, "pog corrected train3.csv", train_batch_size, image_size)
+        train_generator = get_generator(model_type, archive, "pog corrected train3.csv", "face detection train.csv",
+                                        train_batch_size,
+                                        image_size)
     if val_generator is None:
-        val_generator = MyCustomGenerator(archive, "pog corrected validation3.csv", val_batch_size, image_size)
+        val_generator = get_generator(model_type, archive, "pog corrected validation3.csv",
+                                      "face detection validation.csv",
+                                      val_batch_size, image_size)
     if test_generator is None:
-        test_generator = MyCustomGenerator(archive, "pog corrected test3.csv", test_batch_size, image_size)
+        test_generator = get_generator(model_type, archive, "pog corrected test3.csv", "face detection test.csv",
+                                       test_batch_size,
+                                       image_size)
 
     model_path = ("" if model_folder == "" else model_folder + "/") + model_name
 
     model = models.load_model(model_path + ".h5")
 
-    print_mse_loss(model, "pog corrected train3.csv", train_generator, train_batch_size)
-    print_mse_loss(model, "pog corrected validation3.csv", val_generator, val_batch_size)
-    print_mse_loss(model, "pog corrected test3.csv", test_generator, test_batch_size)
+    print_metrics(model, "pog corrected train3.csv", train_generator, train_batch_size)
+    print_metrics(model, "pog corrected validation3.csv", val_generator, val_batch_size)
+    print_metrics(model, "pog corrected test3.csv", test_generator, test_batch_size)
 
 
 def get_generator(model_type: ModelType, archive, dataset_name: str, fd_dataset_name: str, batch_size,
@@ -516,7 +529,7 @@ def get_generator(model_type: ModelType, archive, dataset_name: str, fd_dataset_
     return None
 
 
-def main():
+def train_model():
     zip_file_name = "PoG Dataset.zip"
     archive = zipfile2.ZipFile(zip_file_name, "r")
     #
@@ -599,14 +612,49 @@ def main():
                                    test_batch_size,
                                    image_size)
 
-    test_model(model_folder, model_name,
+    test_model(model_folder, model_name, model_type,
+               train_batch_size, val_batch_size, test_batch_size,
+               train_generator, val_generator, test_generator)
+
+
+def get_model_metrics():
+    zip_file_name = "PoG Dataset.zip"
+    archive = zipfile2.ZipFile(zip_file_name, "r")
+    #
+    # # Create datasets as tuples of (image,info),target
+    # file_names = ["pog corrected test3.csv", "pog corrected train3.csv", "pog corrected validation3.csv"]
+    no_channels = 3
+
+    train_batch_size = 64
+    val_batch_size = test_batch_size = 64
+
+    model_type = ModelType.PretrainedFaceDetection
+    model_name = "FD Simple-6-(128, 128)"
+
+    height_resize, width_resize = list(map(int, model_name.split("-")[2][1:-1].split(",")))
+    image_size = (height_resize, width_resize)
+
+    model_folder = "Models/" + str(model_type).split(".")[1]
+
+    train_generator = get_generator(model_type, archive, "pog corrected train3.csv", "face detection train.csv",
+                                    train_batch_size, image_size)
+
+    val_generator = get_generator(model_type, archive, "pog corrected validation3.csv", "face detection validation.csv",
+                                  val_batch_size, image_size)
+
+    test_generator = get_generator(model_type, archive, "pog corrected test3.csv", "face detection test.csv",
+                                   test_batch_size,
+                                   image_size)
+
+    test_model(model_folder, model_name, model_type,
                train_batch_size, val_batch_size, test_batch_size,
                train_generator, val_generator, test_generator)
 
 
 if __name__ == '__main__':
     # run_base_model()
-    main()
+    # train_model()
+    get_model_metrics()
 
 # def run_base_model():
 #     zip_file_name = "PoG Dataset.zip"
