@@ -29,6 +29,13 @@ def get_model(model_type: ModelArchitectureType, image_shape, info_shape: int):
         shape=(info_shape,), name="info"
     )
     x = None
+    # TODO:Check if/how to do inference without the Gaussian Noise layer
+    #  Also,find a suitable std for it
+
+    # TODO:Add a way to also take as input gray images...This might improve generalization by reducing the domain
+
+    # TODO:Add TTA with noise
+
     if model_type == ModelArchitectureType.Test_VGG_4M:
         image_features = layers.Conv2D(32, (3, 3), padding='same', activation='relu')(image_input)
         image_features = layers.BatchNormalization()(image_features)
