@@ -479,8 +479,16 @@ if __name__ == '__main__':
 
     # TODO:Sometimes the program ends before showing all images...preprocessing layers
     #  might be at fault?
-    show_face_box_for(file_names, False, image_size,
-                      std=0.025, brightness_factor=0.15)
+    # show_face_box_for(file_names, False, image_size,
+    #                   std=0.025, brightness_factor=0.15)
+
+    # device_name = tf.test.gpu_device_name()
+    # if "GPU" not in device_name:
+    #     print("GPU device not found")
+    # print('Found GPU at: {}'.format(device_name))
+
+    # TODO:Make tensorflow==2.14 realise i have a GPU...if only this version worked well where 2.10 did...
+    print(tf.config.list_physical_devices('GPU'))
 
     # show_box_face_on(["ichim545.jpg", "ichim769.jpg"])
 
