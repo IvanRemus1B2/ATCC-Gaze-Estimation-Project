@@ -13,6 +13,7 @@ class ModelArchitectureType(Enum):
     Test_VGG_1M_Regularized_ELU = 2,
     Test_VGG_4M_2 = 3,
     ResNet_4M_RELU = 4,
+    ResNet_4M_ELU = 5,
     Simple = 10
 
 
@@ -23,7 +24,7 @@ class ModelType(Enum):
 
 # ResNet architecture
 # From Kaggle Resnet+Keras(amazing)
-def identity_block(X: tf.Tensor, level: int, block: int, filters: list[int]) -> tf.Tensor:
+def identity_block(X: tf.Tensor, level: int, block: int, filters: list[int], activation_type: str) -> tf.Tensor:
     """
     Creates an identity block (see figure 3.1 from readme)
 
@@ -56,14 +57,14 @@ def identity_block(X: tf.Tensor, level: int, block: int, filters: list[int]) -> 
                       kernel_initializer='glorot_uniform')(X)
 
     X = layers.BatchNormalization(axis=3, name=conv_name.format(layer=1, type='bn'))(X)
-    X = layers.Activation('relu', name=conv_name.format(layer=1, type='relu'))(X)
+    X = layers.Activation(activation_type, name=conv_name.format(layer=1, type=activation_type))(X)
 
     # second convolutional layer
     X = layers.Conv2D(filters=f2, kernel_size=(3, 3), strides=(1, 1),
                       padding='same', name=conv_name.format(layer=2, type='conv'),
                       kernel_initializer='glorot_uniform')(X)
     X = layers.BatchNormalization(axis=3, name=conv_name.format(layer=2, type='bn'))(X)
-    X = layers.Activation('relu')(X)
+    X = layers.Activation(activation_type)(X)
 
     # third convolutional layer
     X = layers.Conv2D(filters=f3, kernel_size=(1, 1), strides=(1, 1),
@@ -75,12 +76,12 @@ def identity_block(X: tf.Tensor, level: int, block: int, filters: list[int]) -> 
     X = layers.Add()([X, X_shortcut])
 
     # relu activation at the end of the block
-    X = layers.Activation('relu', name=conv_name.format(layer=3, type='relu'))(X)
+    X = layers.Activation(activation_type, name=conv_name.format(layer=3, type=activation_type))(X)
 
     return X
 
 
-def convolutional_block(X: tf.Tensor, level: int, block: int, filters: list[int],
+def convolutional_block(X: tf.Tensor, level: int, block: int, filters: list[int], activation_type: str,
                         s: tuple[int, int] = (2, 2)) -> tf.Tensor:
     """
     Creates a convolutional block (see figure 3.1 from readme)
@@ -114,14 +115,14 @@ def convolutional_block(X: tf.Tensor, level: int, block: int, filters: list[int]
                       name=conv_name.format(layer=1, type='conv'),
                       kernel_initializer='glorot_uniform')(X)
     X = layers.BatchNormalization(axis=3, name=conv_name.format(layer=1, type='bn'))(X)
-    X = layers.Activation('relu', name=conv_name.format(layer=1, type='relu'))(X)
+    X = layers.Activation(activation_type, name=conv_name.format(layer=1, type=activation_type))(X)
 
     # second convolutional layer
     X = layers.Conv2D(filters=f2, kernel_size=(3, 3), strides=(1, 1), padding='same',
                       name=conv_name.format(layer=2, type='conv'),
                       kernel_initializer='glorot_uniform')(X)
     X = layers.BatchNormalization(axis=3, name=conv_name.format(layer=2, type='bn'))(X)
-    X = layers.Activation('relu', name=conv_name.format(layer=2, type='relu'))(X)
+    X = layers.Activation(activation_type, name=conv_name.format(layer=2, type=activation_type))(X)
 
     # third convolutional layer
     X = layers.Conv2D(filters=f3, kernel_size=(1, 1), strides=(1, 1), padding='valid',
@@ -139,12 +140,13 @@ def convolutional_block(X: tf.Tensor, level: int, block: int, filters: list[int]
     X = layers.Add()([X, X_shortcut])
 
     # nonlinearity
-    X = layers.Activation('relu', name=conv_name.format(layer=3, type='relu'))(X)
+    X = layers.Activation(activation_type, name=conv_name.format(layer=3, type=activation_type))(X)
 
     return X
 
 
 def MyResNet(image_shape: tuple[int, int, int], info_shape: int,
+             activation_type: str,
              std_dev: float = 0.025, brightness_factor: float = 0.15,
              value_range: tuple[float, float] = (0, 1)) -> keras.Model:
     """
@@ -181,7 +183,7 @@ def MyResNet(image_shape: tuple[int, int, int], info_shape: int,
                       name='conv1_1_1_conv',
                       kernel_initializer='glorot_uniform')(X)
     X = layers.BatchNormalization(axis=3, name='conv1_1_1_nb')(X)
-    X = layers.Activation('relu')(X)
+    X = layers.Activation(activation_type)(X)
 
     ### Level 2 ###
 
@@ -189,21 +191,21 @@ def MyResNet(image_shape: tuple[int, int, int], info_shape: int,
     X = layers.MaxPooling2D((3, 3), strides=(2, 2))(X)
 
     # 1x convolutional block
-    X = convolutional_block(X, level=2, block=1, filters=[64, 64, 256], s=(1, 1))
+    X = convolutional_block(X, level=2, block=1, activation_type=activation_type, filters=[64, 64, 256], s=(1, 1))
 
     # 2x identity blocks
-    X = identity_block(X, level=2, block=2, filters=[64, 64, 256])
-    X = identity_block(X, level=2, block=3, filters=[64, 64, 256])
+    X = identity_block(X, level=2, block=2, filters=[64, 64, 256], activation_type=activation_type)
+    X = identity_block(X, level=2, block=3, filters=[64, 64, 256], activation_type=activation_type)
 
     ### Level 3 ###
 
     # 1x convolutional block
-    X = convolutional_block(X, level=3, block=1, filters=[128, 128, 512], s=(2, 2))
+    X = convolutional_block(X, level=3, block=1, filters=[128, 128, 512], s=(2, 2), activation_type=activation_type)
 
     # 3x identity blocks
-    X = identity_block(X, level=3, block=2, filters=[128, 128, 512])
-    X = identity_block(X, level=3, block=3, filters=[128, 128, 512])
-    X = identity_block(X, level=3, block=4, filters=[128, 128, 512])
+    X = identity_block(X, level=3, block=2, filters=[128, 128, 512], activation_type=activation_type)
+    X = identity_block(X, level=3, block=3, filters=[128, 128, 512], activation_type=activation_type)
+    X = identity_block(X, level=3, block=4, filters=[128, 128, 512], activation_type=activation_type)
 
     # ### Level 4 ###
     # # 1x convolutional block
@@ -231,7 +233,7 @@ def MyResNet(image_shape: tuple[int, int, int], info_shape: int,
 
     X = layers.BatchNormalization()(X)
     X = layers.Dense(64)(X)
-    X = layers.Activation('relu', name='fc_1')(X)
+    X = layers.Activation(activation_type, name='fc_1')(X)
     pixel_prediction = layers.Dense(2, activation='linear', name="pixel_prediction")(X)
 
     # Create model
@@ -435,7 +437,9 @@ def get_model(model_type: ModelArchitectureType, image_shape, info_shape: int) -
         x = layers.BatchNormalization()(x)
     elif model_type == ModelArchitectureType.ResNet_4M_RELU:
         # TODO:Refactor together with the other models
-        return MyResNet(image_shape, info_shape)
+        return MyResNet(image_shape, info_shape, 'relu')
+    elif model_type == ModelArchitectureType.ResNet_4M_ELU:
+        return MyResNet(image_shape, info_shape, 'elu')
 
     pixel_prediction = layers.Dense(2, name="pixel_prediction")(x)
 
@@ -458,7 +462,8 @@ def test_model():
 
     info_length = 19
 
-    model = MyResNet(image_shape=(image_size[1], image_size[0], channels), info_shape=info_length)
+    model = MyResNet(image_shape=(image_size[1], image_size[0], channels), info_shape=info_length,
+                     activation_type='elu')
 
     model.summary()
 

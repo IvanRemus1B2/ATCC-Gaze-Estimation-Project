@@ -538,7 +538,7 @@ def train_model():
     image_size = (128, 128)
     no_channels = 3
 
-    no_epochs = 100
+    no_epochs = 1
     train_batch_size = 64
     val_batch_size = test_batch_size = 64
 
@@ -548,7 +548,7 @@ def train_model():
     model_architecture_type = ModelArchitectureType.ResNet_4M_RELU
 
     model_folder = "Models/" + str(model_type).split(".")[1]
-    model_name = str(model_architecture_type).split(".")[1] + "-9-" + str(image_size)
+    model_name = str(model_architecture_type).split(".")[1] + "-10-" + str(image_size)
     model_path = ("" if model_folder == "" else model_folder + "/") + model_name
 
     # verbose = False

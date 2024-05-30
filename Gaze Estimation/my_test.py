@@ -331,8 +331,9 @@ def show_face_box_for(file_names: list[str], show_box: bool, image_size: Union[t
             input_layer = tf.keras.layers.Input(shape=(128, 128, 3))
             X = keras.layers.GaussianNoise(std)(input_layer, training=True)
             # X = keras.layers.RandomContrast(factor=contrast_factor)(input_layer, training=True)
-            X = keras.layers.RandomBrightness(factor=brightness_factor, value_range=[0.0, 1.0])(X,
-                                                                                                training=True)
+            X = keras.layers.RandomBrightness(factor=brightness_factor,
+                                              value_range=[0.0, 1.0])(X,
+                                                                      training=True)
 
             model = tf.keras.models.Model(inputs=input_layer, outputs=X)
 
@@ -479,16 +480,11 @@ if __name__ == '__main__':
 
     # TODO:Sometimes the program ends before showing all images...preprocessing layers
     #  might be at fault?
-    # show_face_box_for(file_names, False, image_size,
-    #                   std=0.025, brightness_factor=0.15)
+    show_face_box_for(file_names, False, image_size,
+                      std=0.025, brightness_factor=0.15)
 
-    # device_name = tf.test.gpu_device_name()
-    # if "GPU" not in device_name:
-    #     print("GPU device not found")
-    # print('Found GPU at: {}'.format(device_name))
-
-    # TODO:Make tensorflow==2.14 realise i have a GPU...if only this version worked well where 2.10 did...
-    print(tf.config.list_physical_devices('GPU'))
+    # # TODO:Make tensorflow==2.14 realise i have a GPU...if only this version worked well where 2.10 did...
+    # print(tf.config.list_physical_devices('GPU'))
 
     # show_box_face_on(["ichim545.jpg", "ichim769.jpg"])
 
