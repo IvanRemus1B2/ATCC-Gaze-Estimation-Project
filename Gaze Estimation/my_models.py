@@ -174,8 +174,7 @@ def MyResNet(image_shape: tuple[int, int, int], info_shape: int,
     ### Level 1 ###
 
     # padding
-    X = layers.ZeroPadding2D((3, 3))(
-        image_input)
+    X = layers.ZeroPadding2D((3, 3))(X)
 
     # convolutional layer, followed by batch normalization and relu activation
     X = layers.Conv2D(filters=64, kernel_size=(7, 7), strides=(2, 2),
