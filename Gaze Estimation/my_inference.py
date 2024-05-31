@@ -12,6 +12,8 @@ from keras.utils import img_to_array
 import matplotlib.pyplot as plt
 from my_models import ModelType
 from mtcnn.mtcnn import MTCNN
+from keras import layers
+from keras_cv.layers import RandAugment
 
 
 def plot_image(image):
@@ -92,11 +94,16 @@ width_mm, height_mm = 380, 215
 human_distance_cm = 50
 
 # -- Parameters to set for model and time delay
-frame_delay = 750
+frame_delay = 1
 model_type = ModelType.PretrainedFaceDetection
-model_name = "ResNet_4M_ELU-10-(128, 128)"
+model_name = "ResNet_4M_ELU-11-(96, 160)"
 circle_radius_cm = 4.35
+no_channels = 3
 
+use_tta = True
+use_rand_augment = False
+tta_iterations = 30
+# ----------------------
 circle_radius_px = compute_distance_cm_to_px(circle_radius_cm, width_pixels, height_pixels, width_mm, height_mm)
 
 model_folder = "Models/" + str(model_type).split(".")[1]
@@ -108,6 +115,19 @@ video_capture.set(cv2.CAP_PROP_FRAME_WIDTH, width_pixels)
 video_capture.set(cv2.CAP_PROP_FRAME_HEIGHT, height_pixels)
 
 with Listener() as listener:
+    height_resize, width_resize = list(map(int, model_name.split("-")[2][1:-1].split(",")))
+    if use_tta:
+        input_layer = layers.Input(shape=(height_resize, width_resize, no_channels))
+        output, image_augmentation = None, None
+        if not use_rand_augment:
+            output = layers.GaussianNoise(stddev=0.025)(input_layer, training=True)
+            output = layers.RandomBrightness(factor=0.15, value_range=[0.0, 1.0])(output, training=True)
+        else:
+            output = RandAugment(value_range=[0, 1], geometric=False, magnitude=0.15, magnitude_stddev=0.15)(
+                input_layer, training=True)
+
+        image_augmentation = tf.keras.Model(inputs=input_layer, outputs=output)
+
     while True:
         ret, frame = video_capture.read()
 
@@ -118,8 +138,17 @@ with Listener() as listener:
             plot_image(image_input[0])
 
             image_input /= 255
+            y_pred = None
+            if use_tta:
+                augmented_images = np.clip(image_augmentation.predict(
+                    np.tile(image_input, (tta_iterations, 1, 1, 1)), verbose=0), 0, 1)
+                y_pred = np.squeeze(np.mean(
+                    model.predict(
+                        (augmented_images, np.tile(info_input, (tta_iterations, 1))), verbose=0)[
+                        'pixel_prediction'], axis=0))
+            else:
+                y_pred = np.squeeze(model.predict([image_input, info_input], verbose=0)["pixel_prediction"])
 
-            y_pred = np.squeeze(model.predict([image_input, info_input], verbose=0)["pixel_prediction"])
             y_pred = np.clip(y_pred, 0, 1)
 
             # print(y_pred)

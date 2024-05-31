@@ -6,12 +6,17 @@ MSE Loss: 0.0213 , MAE Loss: 0.0936 , Avg Cm: 4.0547
 pog corrected test3.csv:
 MSE Loss: 0.0182 , MAE Loss: 0.0888 , Avg Cm: 3.7150
 
-With TTA 10 repetitions:
-
-For ResNet_4M_ELU-11-(96, 160):
+For ResNet_4M_ELU-11-(96, 160)(TTA-10):
 
 pog corrected validation3.csv:
 MSE Loss: 0.0213 , MAE Loss: 0.0938 , Avg Cm: 4.0483
 
 pog corrected test3.csv:
 MSE Loss: 0.0182 , MAE Loss: 0.0889 , Avg Cm: 3.7078
+
+
+For ResNet_4M_ELU-11-(96, 160)(TTA-30):
+pog corrected validation3.csv:
+MSE Loss: 0.0213 , MAE Loss: 0.0937 , Avg Cm: 4.0443
+pog corrected test3.csv:
+MSE Loss: 0.0182 , MAE Loss: 0.0888 , Avg Cm: 3.7042

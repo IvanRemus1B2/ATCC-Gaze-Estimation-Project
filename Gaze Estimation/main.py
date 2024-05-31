@@ -534,7 +534,7 @@ def test_model(model_folder: str,
                train_batch_size: int, val_batch_size: int, test_batch_size: int,
                train_generator=None, val_generator=None, test_generator=None):
     use_tta = True
-    tta_iterations = 10
+    tta_iterations = 30
 
     print(f"\nFor {model_name}" + (f"(TTA-{tta_iterations})" if use_tta else "") + ":")
     zip_file_name = "PoG Dataset.zip"
@@ -560,7 +560,7 @@ def test_model(model_folder: str,
 
     model = models.load_model(model_path + ".h5")
 
-    # print_metrics(model, "pog corrected train3.csv", train_generator, train_batch_size, image_size)
+    print_metrics(model, "pog corrected train3.csv", train_generator, image_size, no_channels, use_tta, tta_iterations)
     print_metrics(model, "pog corrected validation3.csv", val_generator, image_size, no_channels, use_tta,
                   tta_iterations)
     print_metrics(model, "pog corrected test3.csv", test_generator, image_size, no_channels, use_tta,
