@@ -468,10 +468,27 @@ def print_metrics(model, dataset_name: str, dataset_generator: keras.utils.Seque
     mse_error = 0.0
     mae_error = 0.0
     no_instances = 0
+    cm_error = 0.0
 
     for index in range(len(dataset_generator)):
         x_batch, target = dataset_generator.__getitem__(index)
-        prediction = model.predict_on_batch(x_batch)['pixel_prediction']
+        prediction = np.clip(model.predict_on_batch(x_batch)['pixel_prediction'], 0, 1)
+
+        for index_batch in range(target.shape[0]):
+            width_pixels, height_pixels, width_mm, height_mm = x_batch[1][index_batch, 0:4]
+
+            diagonal_inches = np.sqrt(width_mm ** 2 + height_mm ** 2) / 25.4
+            ppi = np.sqrt(width_pixels ** 2 + height_pixels ** 2) / diagonal_inches
+
+            target_x, target_y = width_pixels * target[index_batch, 0], height_pixels * target[index_batch, 1]
+            prediction_x, prediction_y = width_pixels * prediction[index_batch, 0], height_pixels * prediction[
+                index_batch, 1]
+
+            distance_pixels = np.sqrt((target_x - prediction_x) ** 2 + (target_y - prediction_y) ** 2)
+
+            distance_cm = distance_pixels / ppi * 2.54
+
+            cm_error += distance_cm
 
         mse_error += keras.losses.MeanSquaredError(reduction='sum')(prediction, target)
         mae_error += keras.losses.MeanAbsoluteError(reduction='sum')(prediction, target)
@@ -480,10 +497,10 @@ def print_metrics(model, dataset_name: str, dataset_generator: keras.utils.Seque
 
     mse_error /= no_instances
     mae_error /= no_instances
+    cm_error /= no_instances
 
     # TODO:Consider using Dice score?
-
-    print(f"{dataset_name}:\nMSE Loss: {mse_error:.4f} , MAE Loss: {mae_error:.4f}")
+    print(f"{dataset_name}:\nMSE Loss: {mse_error:.4f} , MAE Loss: {mae_error:.4f} , Avg Cm: {cm_error:.4f}")
 
 
 def test_model(model_folder: str,
@@ -535,20 +552,20 @@ def train_model():
     #
     # # Create datasets as tuples of (image,info),target
     # file_names = ["pog corrected test3.csv", "pog corrected train3.csv", "pog corrected validation3.csv"]
-    image_size = (128, 128)
+    image_size = (96, 160)
     no_channels = 3
 
-    no_epochs = 1
+    no_epochs = 50
     train_batch_size = 64
     val_batch_size = test_batch_size = 64
 
     model_type = ModelType.PretrainedFaceDetection
     info_length = 5 if model_type == ModelType.Basic else 5 + 4 + 10
 
-    model_architecture_type = ModelArchitectureType.ResNet_4M_RELU
+    model_architecture_type = ModelArchitectureType.ResNet_5M_ELU_RA
 
     model_folder = "Models/" + str(model_type).split(".")[1]
-    model_name = str(model_architecture_type).split(".")[1] + "-10-" + str(image_size)
+    model_name = str(model_architecture_type).split(".")[1] + "-2-" + str(image_size)
     model_path = ("" if model_folder == "" else model_folder + "/") + model_name
 
     # verbose = False
@@ -629,7 +646,7 @@ def get_model_metrics():
     val_batch_size = test_batch_size = 64
 
     model_type = ModelType.PretrainedFaceDetection
-    model_name = "FD Simple-6-(128, 128)"
+    model_name = "ResNet_4M_ELU-11-(96, 160)"
 
     height_resize, width_resize = list(map(int, model_name.split("-")[2][1:-1].split(",")))
     image_size = (height_resize, width_resize)
