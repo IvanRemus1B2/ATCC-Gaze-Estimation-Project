@@ -336,19 +336,21 @@ def show_face_box_for(file_names: list[str], show_box: bool, image_size: Union[t
             # X = keras.layers.RandomContrast(factor=contrast_factor)(input_layer, training=True)
             # X = keras.layers.RandomBrightness(factor=brightness_factor,value_range=[0.0, 1.0])(X,training=True)
             X = RandAugment(value_range=[0, 1], geometric=False, magnitude=0.35, magnitude_stddev=0.15)(input_layer,
-            # X=Grayscale()(input_layer)                                                                              training=True)
+                                                                                                        training=True)
+
+            # X=Grayscale()(input_layer)
             #
             # model = tf.keras.models.Model(inputs=input_layer, outputs=X)
             #
 
             # noisy_image = model(image)
 
-            noisy_image = tf.keras.image.rgb_to_grayscale(image)
-            print(noisy_image.shape)
-            # noisy_image *= 255
-            np.clip(noisy_image, 0, 255)
-
-            plot_image(noisy_image[0])
+            # noisy_image = tf.keras.image.rgb_to_grayscale(image)
+            # print(noisy_image.shape)
+            # # noisy_image *= 255
+            # np.clip(noisy_image, 0, 255)
+            #
+            # plot_image(noisy_image[0])
 
 
 def read_dataset(archive, dataset_file_name: str, image_resize_shape: tuple[int, int],

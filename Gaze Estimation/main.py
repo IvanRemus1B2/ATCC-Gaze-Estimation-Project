@@ -534,9 +534,9 @@ def test_model(model_folder: str,
                train_batch_size: int, val_batch_size: int, test_batch_size: int,
                train_generator=None, val_generator=None, test_generator=None):
     use_tta = True
-    tta_iterations = 5
+    tta_iterations = 10
 
-    print(f"\nFor {model_name}:")
+    print(f"\nFor {model_name}" + (f"(TTA-{tta_iterations})" if use_tta else "") + ":")
     zip_file_name = "PoG Dataset.zip"
     archive = zipfile2.ZipFile(zip_file_name, "r")
 
@@ -694,7 +694,7 @@ def get_model_metrics():
                                    image_size)
 
     test_model(model_folder, model_name, model_type,
-               image_size, no_channels,
+               no_channels,
                train_batch_size, val_batch_size, test_batch_size,
                train_generator, val_generator, test_generator)
 
