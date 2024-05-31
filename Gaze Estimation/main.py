@@ -464,17 +464,41 @@ class MyCustomGenerator(keras.utils.Sequence):
         return (batch_images, batch_images_info), batch_targets
 
 
-def print_metrics(model, dataset_name: str, dataset_generator: keras.utils.Sequence, batch_size):
+def print_metrics(model, dataset_name: str, dataset_generator: keras.utils.Sequence,
+                  image_size: tuple[int, int], no_channels: int,
+                  use_tta: bool, tta_iterations: int):
     mse_error = 0.0
     mae_error = 0.0
     no_instances = 0
     cm_error = 0.0
 
+    image_augmenter = None
+    if use_tta:
+        input_layer = keras.Input(shape=(image_size[0], image_size[1], no_channels))
+        output = keras.layers.GaussianNoise(stddev=0.025)(input_layer, training=True)
+        output = keras.layers.RandomBrightness(factor=0.15, value_range=[0.0, 1.0])(output, training=True)
+
+        # output = RandAugment(value_range=[0, 1], geometric=False, magnitude=0.15, magnitude_stddev=0.15)(input_layer,
+        #                                                                                                  training=True)
+
+        image_augmenter = tf.keras.Model(inputs=input_layer, outputs=output)
+
     for index in range(len(dataset_generator)):
         x_batch, target = dataset_generator.__getitem__(index)
-        prediction = np.clip(model.predict_on_batch(x_batch)['pixel_prediction'], 0, 1)
 
-        for index_batch in range(target.shape[0]):
+        no_batch_instances = target.shape[0]
+        prediction = None
+        if use_tta:
+            prediction = np.zeros((no_batch_instances, 2))
+            for index2 in range(tta_iterations):
+                prediction += np.clip(
+                    model.predict_on_batch((image_augmenter.predict_on_batch(x_batch[0]), x_batch[1]))[
+                        'pixel_prediction'], 0, 1)
+            prediction /= tta_iterations
+        else:
+            prediction = np.clip(model.predict_on_batch(x_batch)['pixel_prediction'], 0, 1)
+
+        for index_batch in range(no_batch_instances):
             width_pixels, height_pixels, width_mm, height_mm = x_batch[1][index_batch, 0:4]
 
             diagonal_inches = np.sqrt(width_mm ** 2 + height_mm ** 2) / 25.4
@@ -506,8 +530,12 @@ def print_metrics(model, dataset_name: str, dataset_generator: keras.utils.Seque
 def test_model(model_folder: str,
                model_name: str,
                model_type: ModelType,
+               no_channels: int,
                train_batch_size: int, val_batch_size: int, test_batch_size: int,
                train_generator=None, val_generator=None, test_generator=None):
+    use_tta = True
+    tta_iterations = 5
+
     print(f"\nFor {model_name}:")
     zip_file_name = "PoG Dataset.zip"
     archive = zipfile2.ZipFile(zip_file_name, "r")
@@ -532,9 +560,11 @@ def test_model(model_folder: str,
 
     model = models.load_model(model_path + ".h5")
 
-    print_metrics(model, "pog corrected train3.csv", train_generator, train_batch_size)
-    print_metrics(model, "pog corrected validation3.csv", val_generator, val_batch_size)
-    print_metrics(model, "pog corrected test3.csv", test_generator, test_batch_size)
+    # print_metrics(model, "pog corrected train3.csv", train_generator, train_batch_size, image_size)
+    print_metrics(model, "pog corrected validation3.csv", val_generator, image_size, no_channels, use_tta,
+                  tta_iterations)
+    print_metrics(model, "pog corrected test3.csv", test_generator, image_size, no_channels, use_tta,
+                  tta_iterations)
 
 
 def get_generator(model_type: ModelType, archive, dataset_name: str, fd_dataset_name: str, batch_size,
@@ -629,7 +659,7 @@ def train_model():
                                    test_batch_size,
                                    image_size)
 
-    test_model(model_folder, model_name, model_type,
+    test_model(model_folder, model_name, model_type, no_channels,
                train_batch_size, val_batch_size, test_batch_size,
                train_generator, val_generator, test_generator)
 
@@ -664,14 +694,15 @@ def get_model_metrics():
                                    image_size)
 
     test_model(model_folder, model_name, model_type,
+               image_size, no_channels,
                train_batch_size, val_batch_size, test_batch_size,
                train_generator, val_generator, test_generator)
 
 
 if __name__ == '__main__':
     # run_base_model()
-    train_model()
-    # get_model_metrics()
+    # train_model()
+    get_model_metrics()
 
 # def run_base_model():
 #     zip_file_name = "PoG Dataset.zip"

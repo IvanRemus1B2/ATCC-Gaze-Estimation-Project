@@ -17,6 +17,7 @@ from keras.metrics import MAE
 from keras.losses import MeanSquaredError
 from keras.losses import MeanAbsoluteError
 
+from keras_cv.layers import Grayscale
 from keras_cv.layers import RandAugment
 
 from typing import Union
@@ -328,19 +329,23 @@ def show_face_box_for(file_names: list[str], show_box: bool, image_size: Union[t
             image = tf.expand_dims(
                 tf.image.resize(image[box_y:box_y + box_height, box_x:box_x + box_width, :], image_size), 0)
             plot_image(image[0])
-            image /= 255
+            # image /= 255
 
             input_layer = tf.keras.layers.Input(shape=(image_size[0], image_size[1], 3))
             # X = keras.layers.GaussianNoise(std)(input_layer, training=True)
             # X = keras.layers.RandomContrast(factor=contrast_factor)(input_layer, training=True)
             # X = keras.layers.RandomBrightness(factor=brightness_factor,value_range=[0.0, 1.0])(X,training=True)
             X = RandAugment(value_range=[0, 1], geometric=False, magnitude=0.35, magnitude_stddev=0.15)(input_layer,
-                                                                                                        training=True)
+            # X=Grayscale()(input_layer)                                                                              training=True)
+            #
+            # model = tf.keras.models.Model(inputs=input_layer, outputs=X)
+            #
 
-            model = tf.keras.models.Model(inputs=input_layer, outputs=X)
+            # noisy_image = model(image)
 
-            noisy_image = model(image)
-            noisy_image *= 255
+            noisy_image = tf.keras.image.rgb_to_grayscale(image)
+            print(noisy_image.shape)
+            # noisy_image *= 255
             np.clip(noisy_image, 0, 255)
 
             plot_image(noisy_image[0])
@@ -461,7 +466,8 @@ if __name__ == '__main__':
     # show_face_box("pog corrected validation3.csv")
     image_size = (96, 160)
 
-    file_names = ['an482.jpg', 'an489.jpg', 'an509.jpg', 'ARA_529.jpg', 'ARA_549.jpg', 'MD580.jpg', 'ei531.jpg']
+    file_names = ['ivanremus593.jpg']
+    # file_names = ['an482.jpg', 'an489.jpg', 'an509.jpg', 'ARA_529.jpg', 'ARA_549.jpg', 'MD580.jpg', 'ei531.jpg']
     # file_names=['an456.jpg', 'an475.jpg', 'ichim658.jpg', 'ichim586.jpg', 'HDM747.jpg', 'MD510.jpg', 'MD516.jpg', 'MD548.jpg']
     # file_names=['an8.jpg', 'an16.jpg', 'an58.jpg', 'an63.jpg', 'an112.jpg', 'an123.jpg', 'an141.jpg', 'an147.jpg', 'an158.jpg', 'an172.jpg', 'an180.jpg', 'an194.jpg', 'an222.jpg', 'an233.jpg', 'an234.jpg', 'an248.jpg', 'an249.jpg', 'an270.jpg', 'an277.jpg', 'an278.jpg', 'an293.jpg', 'an309.jpg', 'an314.jpg', 'an322.jpg', 'an329.jpg', 'an384.jpg', 'an410.jpg', 'an417.jpg', 'ichim590.jpg', 'ichim769.jpg', 'ichim545.jpg', 'ichim194.jpg', 'mihai_bojescu_1711116742.9454212.png', 'mihai_bojescu_1711116826.216444.png']
     # file_names = ["ichim545.jpg", "ichim769.jpg"] <------- only for these 2 it can't find a face...

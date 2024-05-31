@@ -23,12 +23,6 @@ def plot_image(image):
     plt.show()
 
 
-# Parameters chosen
-width_pixels, height_pixels = 1920, 1080
-width_mm, height_mm = 380, 215
-human_distance_cm = 50
-
-
 def preprocess_image(model_type: ModelType, model_name: str, frame):
     height_resize, width_resize = list(map(int, model_name.split("-")[2][1:-1].split(",")))
     image_input = img_to_array(frame)
@@ -79,21 +73,43 @@ def preprocess_image(model_type: ModelType, model_name: str, frame):
     return image_input, info_input
 
 
-cap = cv2.VideoCapture(0)
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, width_pixels)
-cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height_pixels)
-frame_delay = 750
+def compute_distance_cm_to_px(
+        distance_cm: float,
+        width_pixels1: float, height_pixels1: float,
+        width_mm1, height_mm1):
+    diagonal_inches = np.sqrt(width_mm1 ** 2 + height_mm1 ** 2) / 25.4
+    ppi = np.sqrt(width_pixels1 ** 2 + height_pixels1 ** 2) / diagonal_inches
 
+    distance_pixels = distance_cm * ppi / 2.54
+
+    return int(distance_pixels)
+
+
+# ------- Parameters to set
+# -- Parameters chosen for the device
+width_pixels, height_pixels = 1920, 1080
+width_mm, height_mm = 380, 215
+human_distance_cm = 50
+
+# -- Parameters to set for model and time delay
+frame_delay = 750
 model_type = ModelType.PretrainedFaceDetection
 model_name = "ResNet_4M_ELU-10-(128, 128)"
+circle_radius_cm = 4.35
+
+circle_radius_px = compute_distance_cm_to_px(circle_radius_cm, width_pixels, height_pixels, width_mm, height_mm)
 
 model_folder = "Models/" + str(model_type).split(".")[1]
 model_path = ("" if model_folder == "" else model_folder + "/") + model_name
 model = models.load_model(model_path + ".h5")
 
+video_capture = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+video_capture.set(cv2.CAP_PROP_FRAME_WIDTH, width_pixels)
+video_capture.set(cv2.CAP_PROP_FRAME_HEIGHT, height_pixels)
+
 with Listener() as listener:
     while True:
-        ret, frame = cap.read()
+        ret, frame = video_capture.read()
 
         image_input, info_input = preprocess_image(model_type, model_name, frame)
         if model_type == ModelType.PretrainedFaceDetection and image_input is None:
@@ -106,13 +122,16 @@ with Listener() as listener:
             y_pred = np.squeeze(model.predict([image_input, info_input], verbose=0)["pixel_prediction"])
             y_pred = np.clip(y_pred, 0, 1)
 
-            print(y_pred)
+            # print(y_pred)
 
             x_pos = int(y_pred[0] * width_pixels)
             y_pos = int(y_pred[1] * height_pixels)
+            # x_pos, y_pos = int(0.5 * width_pixels), int(0.5 * height_pixels)
 
             blank_image = np.zeros((height_pixels, width_pixels, 3), np.uint8)
-            cv2.circle(blank_image, (x_pos, y_pos), 10, (255, 255, 255), -1)
+
+            cv2.circle(blank_image, (x_pos, y_pos), color=(255, 255, 255), radius=circle_radius_px, thickness=1)
+            cv2.circle(blank_image, (x_pos, y_pos), color=(255, 255, 255), radius=10, thickness=-1)
 
             cv2.namedWindow("Window", cv2.WINDOW_NORMAL)
             cv2.setWindowProperty("Window", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
@@ -121,7 +140,7 @@ with Listener() as listener:
         if cv2.waitKey(frame_delay) & 0xFF == ord('q'):
             break
 
-    cap.release()
+    video_capture.release()
     cv2.destroyAllWindows()
     listener.join()
 
