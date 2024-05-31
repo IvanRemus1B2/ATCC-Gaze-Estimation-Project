@@ -85,7 +85,7 @@ cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height_pixels)
 frame_delay = 750
 
 model_type = ModelType.PretrainedFaceDetection
-model_name = "ResNet_4M_RELU-9-(128, 128)"
+model_name = "ResNet_4M_ELU-10-(128, 128)"
 
 model_folder = "Models/" + str(model_type).split(".")[1]
 model_path = ("" if model_folder == "" else model_folder + "/") + model_name
