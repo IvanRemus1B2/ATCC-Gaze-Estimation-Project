@@ -560,7 +560,7 @@ def get_model(model_type: ModelArchitectureType, image_shape, info_shape: int) -
     elif model_type == ModelArchitectureType.ResNet_5M_ELU_RA:
         return MyResNetRandAugment(image_shape, info_shape,
                                    activation_type='elu', kernel_initializer='he_uniform',
-                                   magnitude=0.35, magnitude_stddev=0.15)
+                                   magnitude=0.25, magnitude_stddev=0.15)
     elif model_type == ModelArchitectureType.ResNet_5M_RELU_RA:
         return MyResNetRandAugment(image_shape, info_shape,
                                    activation_type='relu', kernel_initializer='glorot_uniform',
