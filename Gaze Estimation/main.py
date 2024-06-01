@@ -21,6 +21,7 @@ from keras.utils import img_to_array
 from keras import metrics
 from keras.utils import load_img
 from keras import losses
+from keras import optimizers
 
 
 # TODO:Use Jupiter Notebook with Pycharm to save time
@@ -531,11 +532,9 @@ def test_model(model_folder: str,
                model_name: str,
                model_type: ModelType,
                no_channels: int,
+               use_tta: bool, tta_iterations: int,
                train_batch_size: int, val_batch_size: int, test_batch_size: int,
                train_generator=None, val_generator=None, test_generator=None):
-    use_tta = True
-    tta_iterations = 30
-
     print(f"\nFor {model_name}" + (f"(TTA-{tta_iterations})" if use_tta else "") + ":")
     zip_file_name = "PoG Dataset.zip"
     archive = zipfile2.ZipFile(zip_file_name, "r")
@@ -585,7 +584,7 @@ def train_model():
     image_size = (96, 160)
     no_channels = 3
 
-    no_epochs = 50
+    no_epochs = 100
     train_batch_size = 64
     val_batch_size = test_batch_size = 64
 
@@ -595,7 +594,7 @@ def train_model():
     model_architecture_type = ModelArchitectureType.ResNet_5M_ELU_RA
 
     model_folder = "Models/" + str(model_type).split(".")[1]
-    model_name = str(model_architecture_type).split(".")[1] + "-2-" + str(image_size)
+    model_name = str(model_architecture_type).split(".")[1] + "-4-" + str(image_size)
     model_path = ("" if model_folder == "" else model_folder + "/") + model_name
 
     # verbose = False
@@ -611,7 +610,8 @@ def train_model():
 
     model.summary()
 
-    model.compile(optimizer='adam', loss=losses.MeanAbsoluteError(), metrics=[metrics.MeanAbsoluteError()])
+    optimizer = optimizers.Adam(decay=0.005, clipvalue=2)
+    model.compile(optimizer=optimizer, loss=losses.MeanAbsoluteError(), metrics=[metrics.MeanAbsoluteError()])
 
     # callbacks = Callback_MSE(model_path + ".h5", x_val, y_val, interval=1)
 
@@ -660,6 +660,7 @@ def train_model():
                                    image_size)
 
     test_model(model_folder, model_name, model_type, no_channels,
+               False, 30,
                train_batch_size, val_batch_size, test_batch_size,
                train_generator, val_generator, test_generator)
 
@@ -671,6 +672,9 @@ def get_model_metrics():
     # # Create datasets as tuples of (image,info),target
     # file_names = ["pog corrected test3.csv", "pog corrected train3.csv", "pog corrected validation3.csv"]
     no_channels = 3
+
+    use_tta = False
+    tta_iterations = 10
 
     train_batch_size = 64
     val_batch_size = test_batch_size = 64
@@ -695,14 +699,15 @@ def get_model_metrics():
 
     test_model(model_folder, model_name, model_type,
                no_channels,
+               use_tta, tta_iterations,
                train_batch_size, val_batch_size, test_batch_size,
                train_generator, val_generator, test_generator)
 
 
 if __name__ == '__main__':
     # run_base_model()
-    # train_model()
-    get_model_metrics()
+    train_model()
+    # get_model_metrics()
 
 # def run_base_model():
 #     zip_file_name = "PoG Dataset.zip"
