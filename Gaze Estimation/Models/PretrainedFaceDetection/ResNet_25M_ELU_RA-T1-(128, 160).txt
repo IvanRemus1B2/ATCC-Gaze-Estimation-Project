@@ -1,0 +1,461 @@
+C:\Users\simio\AppData\Local\Programs\Python\Python310\python.exe "D:\Facultate\Master\Anul 1\Semestrul 2\Capitole Speciale de Vedere Artificiala\ATCC-Gaze-Estimation-Project\Gaze Estimation\main.py"
+Model: "ResNetLight"
+__________________________________________________________________________________________________
+ Layer (type)                   Output Shape         Param #     Connected to
+==================================================================================================
+ image (InputLayer)             [(None, 128, 160, 3  0           []
+                                )]
+
+ rand_augment (RandAugment)     (None, 128, 160, 3)  0           ['image[0][0]']
+
+ zero_padding2d (ZeroPadding2D)  (None, 134, 166, 3)  0          ['rand_augment[0][0]']
+
+ conv1_1_1_conv (Conv2D)        (None, 64, 80, 64)   9472        ['zero_padding2d[0][0]']
+
+ conv1_1_1_nb (BatchNormalizati  (None, 64, 80, 64)  256         ['conv1_1_1_conv[0][0]']
+ on)
+
+ activation (Activation)        (None, 64, 80, 64)   0           ['conv1_1_1_nb[0][0]']
+
+ max_pooling2d (MaxPooling2D)   (None, 31, 39, 64)   0           ['activation[0][0]']
+
+ conv2_1_1_conv (Conv2D)        (None, 31, 39, 64)   4160        ['max_pooling2d[0][0]']
+
+ conv2_1_1_bn (BatchNormalizati  (None, 31, 39, 64)  256         ['conv2_1_1_conv[0][0]']
+ on)
+
+ conv2_1_1_elu (Activation)     (None, 31, 39, 64)   0           ['conv2_1_1_bn[0][0]']
+
+ conv2_1_2_conv (Conv2D)        (None, 31, 39, 64)   36928       ['conv2_1_1_elu[0][0]']
+
+ conv2_1_2_bn (BatchNormalizati  (None, 31, 39, 64)  256         ['conv2_1_2_conv[0][0]']
+ on)
+
+ conv2_1_2_elu (Activation)     (None, 31, 39, 64)   0           ['conv2_1_2_bn[0][0]']
+
+ conv2_1_3_conv (Conv2D)        (None, 31, 39, 256)  16640       ['conv2_1_2_elu[0][0]']
+
+ conv2_1_short_conv (Conv2D)    (None, 31, 39, 256)  16640       ['max_pooling2d[0][0]']
+
+ conv2_1_3_bn (BatchNormalizati  (None, 31, 39, 256)  1024       ['conv2_1_3_conv[0][0]']
+ on)
+
+ conv2_1_short_bn (BatchNormali  (None, 31, 39, 256)  1024       ['conv2_1_short_conv[0][0]']
+ zation)
+
+ add (Add)                      (None, 31, 39, 256)  0           ['conv2_1_3_bn[0][0]',
+                                                                  'conv2_1_short_bn[0][0]']
+
+ conv2_1_3_elu (Activation)     (None, 31, 39, 256)  0           ['add[0][0]']
+
+ conv2_2_1_conv (Conv2D)        (None, 31, 39, 64)   16448       ['conv2_1_3_elu[0][0]']
+
+ conv2_2_1_bn (BatchNormalizati  (None, 31, 39, 64)  256         ['conv2_2_1_conv[0][0]']
+ on)
+
+ conv2_2_1_elu (Activation)     (None, 31, 39, 64)   0           ['conv2_2_1_bn[0][0]']
+
+ conv2_2_2_conv (Conv2D)        (None, 31, 39, 64)   36928       ['conv2_2_1_elu[0][0]']
+
+ conv2_2_2_bn (BatchNormalizati  (None, 31, 39, 64)  256         ['conv2_2_2_conv[0][0]']
+ on)
+
+ activation_1 (Activation)      (None, 31, 39, 64)   0           ['conv2_2_2_bn[0][0]']
+
+ conv2_2_3_conv (Conv2D)        (None, 31, 39, 256)  16640       ['activation_1[0][0]']
+
+ conv2_2_3_bn (BatchNormalizati  (None, 31, 39, 256)  1024       ['conv2_2_3_conv[0][0]']
+ on)
+
+ add_1 (Add)                    (None, 31, 39, 256)  0           ['conv2_2_3_bn[0][0]',
+                                                                  'conv2_1_3_elu[0][0]']
+
+ conv2_2_3_elu (Activation)     (None, 31, 39, 256)  0           ['add_1[0][0]']
+
+ conv2_3_1_conv (Conv2D)        (None, 31, 39, 64)   16448       ['conv2_2_3_elu[0][0]']
+
+ conv2_3_1_bn (BatchNormalizati  (None, 31, 39, 64)  256         ['conv2_3_1_conv[0][0]']
+ on)
+
+ conv2_3_1_elu (Activation)     (None, 31, 39, 64)   0           ['conv2_3_1_bn[0][0]']
+
+ conv2_3_2_conv (Conv2D)        (None, 31, 39, 64)   36928       ['conv2_3_1_elu[0][0]']
+
+ conv2_3_2_bn (BatchNormalizati  (None, 31, 39, 64)  256         ['conv2_3_2_conv[0][0]']
+ on)
+
+ activation_2 (Activation)      (None, 31, 39, 64)   0           ['conv2_3_2_bn[0][0]']
+
+ conv2_3_3_conv (Conv2D)        (None, 31, 39, 256)  16640       ['activation_2[0][0]']
+
+ conv2_3_3_bn (BatchNormalizati  (None, 31, 39, 256)  1024       ['conv2_3_3_conv[0][0]']
+ on)
+
+ add_2 (Add)                    (None, 31, 39, 256)  0           ['conv2_3_3_bn[0][0]',
+                                                                  'conv2_2_3_elu[0][0]']
+
+ conv2_3_3_elu (Activation)     (None, 31, 39, 256)  0           ['add_2[0][0]']
+
+ conv3_1_1_conv (Conv2D)        (None, 16, 20, 128)  32896       ['conv2_3_3_elu[0][0]']
+
+ conv3_1_1_bn (BatchNormalizati  (None, 16, 20, 128)  512        ['conv3_1_1_conv[0][0]']
+ on)
+
+ conv3_1_1_elu (Activation)     (None, 16, 20, 128)  0           ['conv3_1_1_bn[0][0]']
+
+ conv3_1_2_conv (Conv2D)        (None, 16, 20, 128)  147584      ['conv3_1_1_elu[0][0]']
+
+ conv3_1_2_bn (BatchNormalizati  (None, 16, 20, 128)  512        ['conv3_1_2_conv[0][0]']
+ on)
+
+ conv3_1_2_elu (Activation)     (None, 16, 20, 128)  0           ['conv3_1_2_bn[0][0]']
+
+ conv3_1_3_conv (Conv2D)        (None, 16, 20, 512)  66048       ['conv3_1_2_elu[0][0]']
+
+ conv3_1_short_conv (Conv2D)    (None, 16, 20, 512)  131584      ['conv2_3_3_elu[0][0]']
+
+ conv3_1_3_bn (BatchNormalizati  (None, 16, 20, 512)  2048       ['conv3_1_3_conv[0][0]']
+ on)
+
+ conv3_1_short_bn (BatchNormali  (None, 16, 20, 512)  2048       ['conv3_1_short_conv[0][0]']
+ zation)
+
+ add_3 (Add)                    (None, 16, 20, 512)  0           ['conv3_1_3_bn[0][0]',
+                                                                  'conv3_1_short_bn[0][0]']
+
+ conv3_1_3_elu (Activation)     (None, 16, 20, 512)  0           ['add_3[0][0]']
+
+ conv3_2_1_conv (Conv2D)        (None, 16, 20, 128)  65664       ['conv3_1_3_elu[0][0]']
+
+ conv3_2_1_bn (BatchNormalizati  (None, 16, 20, 128)  512        ['conv3_2_1_conv[0][0]']
+ on)
+
+ conv3_2_1_elu (Activation)     (None, 16, 20, 128)  0           ['conv3_2_1_bn[0][0]']
+
+ conv3_2_2_conv (Conv2D)        (None, 16, 20, 128)  147584      ['conv3_2_1_elu[0][0]']
+
+ conv3_2_2_bn (BatchNormalizati  (None, 16, 20, 128)  512        ['conv3_2_2_conv[0][0]']
+ on)
+
+ activation_3 (Activation)      (None, 16, 20, 128)  0           ['conv3_2_2_bn[0][0]']
+
+ conv3_2_3_conv (Conv2D)        (None, 16, 20, 512)  66048       ['activation_3[0][0]']
+
+ conv3_2_3_bn (BatchNormalizati  (None, 16, 20, 512)  2048       ['conv3_2_3_conv[0][0]']
+ on)
+
+ add_4 (Add)                    (None, 16, 20, 512)  0           ['conv3_2_3_bn[0][0]',
+                                                                  'conv3_1_3_elu[0][0]']
+
+ conv3_2_3_elu (Activation)     (None, 16, 20, 512)  0           ['add_4[0][0]']
+
+ conv3_3_1_conv (Conv2D)        (None, 16, 20, 128)  65664       ['conv3_2_3_elu[0][0]']
+
+ conv3_3_1_bn (BatchNormalizati  (None, 16, 20, 128)  512        ['conv3_3_1_conv[0][0]']
+ on)
+
+ conv3_3_1_elu (Activation)     (None, 16, 20, 128)  0           ['conv3_3_1_bn[0][0]']
+
+ conv3_3_2_conv (Conv2D)        (None, 16, 20, 128)  147584      ['conv3_3_1_elu[0][0]']
+
+ conv3_3_2_bn (BatchNormalizati  (None, 16, 20, 128)  512        ['conv3_3_2_conv[0][0]']
+ on)
+
+ activation_4 (Activation)      (None, 16, 20, 128)  0           ['conv3_3_2_bn[0][0]']
+
+ conv3_3_3_conv (Conv2D)        (None, 16, 20, 512)  66048       ['activation_4[0][0]']
+
+ conv3_3_3_bn (BatchNormalizati  (None, 16, 20, 512)  2048       ['conv3_3_3_conv[0][0]']
+ on)
+
+ add_5 (Add)                    (None, 16, 20, 512)  0           ['conv3_3_3_bn[0][0]',
+                                                                  'conv3_2_3_elu[0][0]']
+
+ conv3_3_3_elu (Activation)     (None, 16, 20, 512)  0           ['add_5[0][0]']
+
+ conv3_4_1_conv (Conv2D)        (None, 16, 20, 128)  65664       ['conv3_3_3_elu[0][0]']
+
+ conv3_4_1_bn (BatchNormalizati  (None, 16, 20, 128)  512        ['conv3_4_1_conv[0][0]']
+ on)
+
+ conv3_4_1_elu (Activation)     (None, 16, 20, 128)  0           ['conv3_4_1_bn[0][0]']
+
+ conv3_4_2_conv (Conv2D)        (None, 16, 20, 128)  147584      ['conv3_4_1_elu[0][0]']
+
+ conv3_4_2_bn (BatchNormalizati  (None, 16, 20, 128)  512        ['conv3_4_2_conv[0][0]']
+ on)
+
+ activation_5 (Activation)      (None, 16, 20, 128)  0           ['conv3_4_2_bn[0][0]']
+
+ conv3_4_3_conv (Conv2D)        (None, 16, 20, 512)  66048       ['activation_5[0][0]']
+
+ conv3_4_3_bn (BatchNormalizati  (None, 16, 20, 512)  2048       ['conv3_4_3_conv[0][0]']
+ on)
+
+ add_6 (Add)                    (None, 16, 20, 512)  0           ['conv3_4_3_bn[0][0]',
+                                                                  'conv3_3_3_elu[0][0]']
+
+ conv3_4_3_elu (Activation)     (None, 16, 20, 512)  0           ['add_6[0][0]']
+
+ conv4_1_1_conv (Conv2D)        (None, 8, 10, 256)   131328      ['conv3_4_3_elu[0][0]']
+
+ conv4_1_1_bn (BatchNormalizati  (None, 8, 10, 256)  1024        ['conv4_1_1_conv[0][0]']
+ on)
+
+ conv4_1_1_elu (Activation)     (None, 8, 10, 256)   0           ['conv4_1_1_bn[0][0]']
+
+ conv4_1_2_conv (Conv2D)        (None, 8, 10, 256)   590080      ['conv4_1_1_elu[0][0]']
+
+ conv4_1_2_bn (BatchNormalizati  (None, 8, 10, 256)  1024        ['conv4_1_2_conv[0][0]']
+ on)
+
+ conv4_1_2_elu (Activation)     (None, 8, 10, 256)   0           ['conv4_1_2_bn[0][0]']
+
+ conv4_1_3_conv (Conv2D)        (None, 8, 10, 1024)  263168      ['conv4_1_2_elu[0][0]']
+
+ conv4_1_short_conv (Conv2D)    (None, 8, 10, 1024)  525312      ['conv3_4_3_elu[0][0]']
+
+ conv4_1_3_bn (BatchNormalizati  (None, 8, 10, 1024)  4096       ['conv4_1_3_conv[0][0]']
+ on)
+
+ conv4_1_short_bn (BatchNormali  (None, 8, 10, 1024)  4096       ['conv4_1_short_conv[0][0]']
+ zation)
+
+ add_7 (Add)                    (None, 8, 10, 1024)  0           ['conv4_1_3_bn[0][0]',
+                                                                  'conv4_1_short_bn[0][0]']
+
+ conv4_1_3_elu (Activation)     (None, 8, 10, 1024)  0           ['add_7[0][0]']
+
+ conv4_2_1_conv (Conv2D)        (None, 8, 10, 256)   262400      ['conv4_1_3_elu[0][0]']
+
+ conv4_2_1_bn (BatchNormalizati  (None, 8, 10, 256)  1024        ['conv4_2_1_conv[0][0]']
+ on)
+
+ conv4_2_1_elu (Activation)     (None, 8, 10, 256)   0           ['conv4_2_1_bn[0][0]']
+
+ conv4_2_2_conv (Conv2D)        (None, 8, 10, 256)   590080      ['conv4_2_1_elu[0][0]']
+
+ conv4_2_2_bn (BatchNormalizati  (None, 8, 10, 256)  1024        ['conv4_2_2_conv[0][0]']
+ on)
+
+ activation_6 (Activation)      (None, 8, 10, 256)   0           ['conv4_2_2_bn[0][0]']
+
+ conv4_2_3_conv (Conv2D)        (None, 8, 10, 1024)  263168      ['activation_6[0][0]']
+
+ conv4_2_3_bn (BatchNormalizati  (None, 8, 10, 1024)  4096       ['conv4_2_3_conv[0][0]']
+ on)
+
+ add_8 (Add)                    (None, 8, 10, 1024)  0           ['conv4_2_3_bn[0][0]',
+                                                                  'conv4_1_3_elu[0][0]']
+
+ conv4_2_3_elu (Activation)     (None, 8, 10, 1024)  0           ['add_8[0][0]']
+
+ conv4_3_1_conv (Conv2D)        (None, 8, 10, 256)   262400      ['conv4_2_3_elu[0][0]']
+
+ conv4_3_1_bn (BatchNormalizati  (None, 8, 10, 256)  1024        ['conv4_3_1_conv[0][0]']
+ on)
+
+ conv4_3_1_elu (Activation)     (None, 8, 10, 256)   0           ['conv4_3_1_bn[0][0]']
+
+ conv4_3_2_conv (Conv2D)        (None, 8, 10, 256)   590080      ['conv4_3_1_elu[0][0]']
+
+ conv4_3_2_bn (BatchNormalizati  (None, 8, 10, 256)  1024        ['conv4_3_2_conv[0][0]']
+ on)
+
+ activation_7 (Activation)      (None, 8, 10, 256)   0           ['conv4_3_2_bn[0][0]']
+
+ conv4_3_3_conv (Conv2D)        (None, 8, 10, 1024)  263168      ['activation_7[0][0]']
+
+ conv4_3_3_bn (BatchNormalizati  (None, 8, 10, 1024)  4096       ['conv4_3_3_conv[0][0]']
+ on)
+
+ add_9 (Add)                    (None, 8, 10, 1024)  0           ['conv4_3_3_bn[0][0]',
+                                                                  'conv4_2_3_elu[0][0]']
+
+ conv4_3_3_elu (Activation)     (None, 8, 10, 1024)  0           ['add_9[0][0]']
+
+ conv4_4_1_conv (Conv2D)        (None, 8, 10, 256)   262400      ['conv4_3_3_elu[0][0]']
+
+ conv4_4_1_bn (BatchNormalizati  (None, 8, 10, 256)  1024        ['conv4_4_1_conv[0][0]']
+ on)
+
+ conv4_4_1_elu (Activation)     (None, 8, 10, 256)   0           ['conv4_4_1_bn[0][0]']
+
+ conv4_4_2_conv (Conv2D)        (None, 8, 10, 256)   590080      ['conv4_4_1_elu[0][0]']
+
+ conv4_4_2_bn (BatchNormalizati  (None, 8, 10, 256)  1024        ['conv4_4_2_conv[0][0]']
+ on)
+
+ activation_8 (Activation)      (None, 8, 10, 256)   0           ['conv4_4_2_bn[0][0]']
+
+ conv4_4_3_conv (Conv2D)        (None, 8, 10, 1024)  263168      ['activation_8[0][0]']
+
+ conv4_4_3_bn (BatchNormalizati  (None, 8, 10, 1024)  4096       ['conv4_4_3_conv[0][0]']
+ on)
+
+ add_10 (Add)                   (None, 8, 10, 1024)  0           ['conv4_4_3_bn[0][0]',
+                                                                  'conv4_3_3_elu[0][0]']
+
+ conv4_4_3_elu (Activation)     (None, 8, 10, 1024)  0           ['add_10[0][0]']
+
+ conv4_5_1_conv (Conv2D)        (None, 8, 10, 256)   262400      ['conv4_4_3_elu[0][0]']
+
+ conv4_5_1_bn (BatchNormalizati  (None, 8, 10, 256)  1024        ['conv4_5_1_conv[0][0]']
+ on)
+
+ conv4_5_1_elu (Activation)     (None, 8, 10, 256)   0           ['conv4_5_1_bn[0][0]']
+
+ conv4_5_2_conv (Conv2D)        (None, 8, 10, 256)   590080      ['conv4_5_1_elu[0][0]']
+
+ conv4_5_2_bn (BatchNormalizati  (None, 8, 10, 256)  1024        ['conv4_5_2_conv[0][0]']
+ on)
+
+ activation_9 (Activation)      (None, 8, 10, 256)   0           ['conv4_5_2_bn[0][0]']
+
+ conv4_5_3_conv (Conv2D)        (None, 8, 10, 1024)  263168      ['activation_9[0][0]']
+
+ conv4_5_3_bn (BatchNormalizati  (None, 8, 10, 1024)  4096       ['conv4_5_3_conv[0][0]']
+ on)
+
+ add_11 (Add)                   (None, 8, 10, 1024)  0           ['conv4_5_3_bn[0][0]',
+                                                                  'conv4_4_3_elu[0][0]']
+
+ conv4_5_3_elu (Activation)     (None, 8, 10, 1024)  0           ['add_11[0][0]']
+
+ conv4_6_1_conv (Conv2D)        (None, 8, 10, 256)   262400      ['conv4_5_3_elu[0][0]']
+
+ conv4_6_1_bn (BatchNormalizati  (None, 8, 10, 256)  1024        ['conv4_6_1_conv[0][0]']
+ on)
+
+ conv4_6_1_elu (Activation)     (None, 8, 10, 256)   0           ['conv4_6_1_bn[0][0]']
+
+ conv4_6_2_conv (Conv2D)        (None, 8, 10, 256)   590080      ['conv4_6_1_elu[0][0]']
+
+ conv4_6_2_bn (BatchNormalizati  (None, 8, 10, 256)  1024        ['conv4_6_2_conv[0][0]']
+ on)
+
+ activation_10 (Activation)     (None, 8, 10, 256)   0           ['conv4_6_2_bn[0][0]']
+
+ conv4_6_3_conv (Conv2D)        (None, 8, 10, 1024)  263168      ['activation_10[0][0]']
+
+ conv4_6_3_bn (BatchNormalizati  (None, 8, 10, 1024)  4096       ['conv4_6_3_conv[0][0]']
+ on)
+
+ add_12 (Add)                   (None, 8, 10, 1024)  0           ['conv4_6_3_bn[0][0]',
+                                                                  'conv4_5_3_elu[0][0]']
+
+ conv4_6_3_elu (Activation)     (None, 8, 10, 1024)  0           ['add_12[0][0]']
+
+ conv5_1_1_conv (Conv2D)        (None, 4, 5, 512)    524800      ['conv4_6_3_elu[0][0]']
+
+ conv5_1_1_bn (BatchNormalizati  (None, 4, 5, 512)   2048        ['conv5_1_1_conv[0][0]']
+ on)
+
+ conv5_1_1_elu (Activation)     (None, 4, 5, 512)    0           ['conv5_1_1_bn[0][0]']
+
+ conv5_1_2_conv (Conv2D)        (None, 4, 5, 512)    2359808     ['conv5_1_1_elu[0][0]']
+
+ conv5_1_2_bn (BatchNormalizati  (None, 4, 5, 512)   2048        ['conv5_1_2_conv[0][0]']
+ on)
+
+ conv5_1_2_elu (Activation)     (None, 4, 5, 512)    0           ['conv5_1_2_bn[0][0]']
+
+ conv5_1_3_conv (Conv2D)        (None, 4, 5, 2048)   1050624     ['conv5_1_2_elu[0][0]']
+
+ conv5_1_short_conv (Conv2D)    (None, 4, 5, 2048)   2099200     ['conv4_6_3_elu[0][0]']
+
+ conv5_1_3_bn (BatchNormalizati  (None, 4, 5, 2048)  8192        ['conv5_1_3_conv[0][0]']
+ on)
+
+ conv5_1_short_bn (BatchNormali  (None, 4, 5, 2048)  8192        ['conv5_1_short_conv[0][0]']
+ zation)
+
+ add_13 (Add)                   (None, 4, 5, 2048)   0           ['conv5_1_3_bn[0][0]',
+                                                                  'conv5_1_short_bn[0][0]']
+
+ conv5_1_3_elu (Activation)     (None, 4, 5, 2048)   0           ['add_13[0][0]']
+
+ conv5_2_1_conv (Conv2D)        (None, 4, 5, 512)    1049088     ['conv5_1_3_elu[0][0]']
+
+ conv5_2_1_bn (BatchNormalizati  (None, 4, 5, 512)   2048        ['conv5_2_1_conv[0][0]']
+ on)
+
+ conv5_2_1_elu (Activation)     (None, 4, 5, 512)    0           ['conv5_2_1_bn[0][0]']
+
+ conv5_2_2_conv (Conv2D)        (None, 4, 5, 512)    2359808     ['conv5_2_1_elu[0][0]']
+
+ conv5_2_2_bn (BatchNormalizati  (None, 4, 5, 512)   2048        ['conv5_2_2_conv[0][0]']
+ on)
+
+ activation_11 (Activation)     (None, 4, 5, 512)    0           ['conv5_2_2_bn[0][0]']
+
+ conv5_2_3_conv (Conv2D)        (None, 4, 5, 2048)   1050624     ['activation_11[0][0]']
+
+ conv5_2_3_bn (BatchNormalizati  (None, 4, 5, 2048)  8192        ['conv5_2_3_conv[0][0]']
+ on)
+
+ add_14 (Add)                   (None, 4, 5, 2048)   0           ['conv5_2_3_bn[0][0]',
+                                                                  'conv5_1_3_elu[0][0]']
+
+ conv5_2_3_elu (Activation)     (None, 4, 5, 2048)   0           ['add_14[0][0]']
+
+ conv5_3_1_conv (Conv2D)        (None, 4, 5, 512)    1049088     ['conv5_2_3_elu[0][0]']
+
+ conv5_3_1_bn (BatchNormalizati  (None, 4, 5, 512)   2048        ['conv5_3_1_conv[0][0]']
+ on)
+
+ conv5_3_1_elu (Activation)     (None, 4, 5, 512)    0           ['conv5_3_1_bn[0][0]']
+
+ conv5_3_2_conv (Conv2D)        (None, 4, 5, 512)    2359808     ['conv5_3_1_elu[0][0]']
+
+ conv5_3_2_bn (BatchNormalizati  (None, 4, 5, 512)   2048        ['conv5_3_2_conv[0][0]']
+ on)
+
+ activation_12 (Activation)     (None, 4, 5, 512)    0           ['conv5_3_2_bn[0][0]']
+
+ conv5_3_3_conv (Conv2D)        (None, 4, 5, 2048)   1050624     ['activation_12[0][0]']
+
+ conv5_3_3_bn (BatchNormalizati  (None, 4, 5, 2048)  8192        ['conv5_3_3_conv[0][0]']
+ on)
+
+ add_15 (Add)                   (None, 4, 5, 2048)   0           ['conv5_3_3_bn[0][0]',
+                                                                  'conv5_2_3_elu[0][0]']
+
+ conv5_3_3_elu (Activation)     (None, 4, 5, 2048)   0           ['add_15[0][0]']
+
+ avg_pool (AveragePooling2D)    (None, 2, 2, 2048)   0           ['conv5_3_3_elu[0][0]']
+
+ flatten (Flatten)              (None, 8192)         0           ['avg_pool[0][0]']
+
+ info (InputLayer)              [(None, 19)]         0           []
+
+ concatenate (Concatenate)      (None, 8211)         0           ['flatten[0][0]',
+                                                                  'info[0][0]']
+
+ batch_normalization (BatchNorm  (None, 8211)        32844       ['concatenate[0][0]']
+ alization)
+
+ dense (Dense)                  (None, 128)          1051136     ['batch_normalization[0][0]']
+
+ fc_1 (Activation)              (None, 128)          0           ['dense[0][0]']
+
+ pixel_prediction (Dense)       (None, 2)            258         ['fc_1[0][0]']
+
+==================================================================================================
+Total params: 24,671,950
+Trainable params: 24,602,408
+Non-trainable params: 69,542
+__________________________________________________________________________________________________
+531/531 [==============================] - ETA: 0s - loss: 1.3538 - mean_absolute_error: 1.3538
+Epoch 1: val_mean_absolute_error improved from inf to 0.97659, saving model to Models/PretrainedFaceDetection\ResNet_25M_ELU_RA-T1-(128, 160).h5
+531/531 [==============================] - 388s 707ms/step - loss: 1.3538 - mean_absolute_error: 1.3538 - val_loss: 0.9766 - val_mean_absolute_error: 0.9766
+
+For ResNet_25M_ELU_RA-T1-(128, 160):
+pog corrected train3.csv:
+MSE Loss: 0.1887 , MAE Loss: 0.3540 , Avg Cm: 15.7761
+pog corrected validation3.csv:
+MSE Loss: 0.1939 , MAE Loss: 0.3580 , Avg Cm: 16.1315
+pog corrected test3.csv:
+MSE Loss: 0.1978 , MAE Loss: 0.3682 , Avg Cm: 15.7737
+
+Process finished with exit code 0

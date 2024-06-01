@@ -2,6 +2,8 @@ import csv
 import zipfile
 import zipfile2
 
+from enum import Enum
+
 import keras.optimizers
 from keras.callbacks import ModelCheckpoint
 import numpy as np
@@ -575,26 +577,48 @@ def get_generator(model_type: ModelType, archive, dataset_name: str, fd_dataset_
     return None
 
 
+class LrSchedulerType(Enum):
+    CosineDecayRestarts = 0
+
+
+def get_lr_scheduler(lr_scheduler_type: LrSchedulerType, init_lr: float, first_decay_steps: int):
+    if lr_scheduler_type == LrSchedulerType.CosineDecayRestarts:
+        return keras.optimizers.schedules.CosineDecayRestarts(
+            init_lr,
+            first_decay_steps,
+            t_mul=2.0,
+            m_mul=1.0,
+            alpha=0.0,
+            name="SGDRDecay")
+
+
 def train_model():
     zip_file_name = "PoG Dataset.zip"
     archive = zipfile2.ZipFile(zip_file_name, "r")
     #
     # # Create datasets as tuples of (image,info),target
     # file_names = ["pog corrected test3.csv", "pog corrected train3.csv", "pog corrected validation3.csv"]
-    image_size = (96, 160)
+    image_size = (128, 160)
     no_channels = 3
 
     no_epochs = 100
-    train_batch_size = 64
-    val_batch_size = test_batch_size = 64
+    train_batch_size = 32
+    val_batch_size = test_batch_size = 32
+
+    init_learning_rate = 1e-3
+    decay_steps = 1000
+    lr_scheduler_type = LrSchedulerType.CosineDecayRestarts
+
+    weight_decay = 0.0005
 
     model_type = ModelType.PretrainedFaceDetection
     info_length = 5 if model_type == ModelType.Basic else 5 + 4 + 10
+    model_architecture_type = ModelArchitectureType.ResNet_25M_ELU_RA
 
-    model_architecture_type = ModelArchitectureType.ResNet_5M_ELU_RA
+    # --------------
 
     model_folder = "Models/" + str(model_type).split(".")[1]
-    model_name = str(model_architecture_type).split(".")[1] + "-4-" + str(image_size)
+    model_name = str(model_architecture_type).split(".")[1] + "-T2-" + str(image_size)
     model_path = ("" if model_folder == "" else model_folder + "/") + model_name
 
     # verbose = False
@@ -610,7 +634,10 @@ def train_model():
 
     model.summary()
 
-    optimizer = optimizers.Adam(decay=0.005, clipvalue=2)
+    # lr_scheduler = get_lr_scheduler(lr_scheduler_type, init_learning_rate, decay_steps)
+
+    optimizer = optimizers.Adam(lr=init_learning_rate, decay=weight_decay)
+
     model.compile(optimizer=optimizer, loss=losses.MeanAbsoluteError(), metrics=[metrics.MeanAbsoluteError()])
 
     # callbacks = Callback_MSE(model_path + ".h5", x_val, y_val, interval=1)
@@ -630,13 +657,13 @@ def train_model():
     val_generator = get_generator(model_type, archive, "pog corrected validation3.csv", "face detection validation.csv",
                                   val_batch_size, image_size)
 
-    callbacks = ModelCheckpoint(filepath=model_path + ".h5",
-                                monitor='val_mean_absolute_error',
-                                verbose=1,
-                                save_best_only=True,
-                                save_weights_only=False,
-                                mode='auto',
-                                save_freq='epoch')
+    checkpoint_callback = ModelCheckpoint(filepath=model_path + ".h5",
+                                          monitor='val_mean_absolute_error',
+                                          verbose=1,
+                                          save_best_only=True,
+                                          save_weights_only=False,
+                                          mode='auto',
+                                          save_freq='epoch')
 
     # history = model.fit(
     #     {"image": x_train[0], "info": x_train[1]},
@@ -650,7 +677,7 @@ def train_model():
     history = model.fit(
         x=train_generator, validation_data=val_generator,
         epochs=no_epochs,
-        callbacks=[callbacks]
+        callbacks=[checkpoint_callback]
     )
 
     visualize_plots(history, model_path)
