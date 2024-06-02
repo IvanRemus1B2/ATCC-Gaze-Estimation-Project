@@ -618,7 +618,7 @@ def train_model():
     # --------------
 
     model_folder = "Models/" + str(model_type).split(".")[1]
-    model_name = str(model_architecture_type).split(".")[1] + "-T2-" + str(image_size)
+    model_name = str(model_architecture_type).split(".")[1] + "-2-" + str(image_size)
     model_path = ("" if model_folder == "" else model_folder + "/") + model_name
 
     # verbose = False
@@ -636,7 +636,7 @@ def train_model():
 
     # lr_scheduler = get_lr_scheduler(lr_scheduler_type, init_learning_rate, decay_steps)
 
-    optimizer = optimizers.Adam(lr=init_learning_rate, decay=weight_decay)
+    optimizer = optimizers.Adam(learning_rate=init_learning_rate, decay=weight_decay)
 
     model.compile(optimizer=optimizer, loss=losses.MeanAbsoluteError(), metrics=[metrics.MeanAbsoluteError()])
 
