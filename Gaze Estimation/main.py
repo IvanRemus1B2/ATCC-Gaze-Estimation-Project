@@ -611,14 +611,28 @@ def train_model():
 
     weight_decay = 0.0005
 
+    use_tta = False
+    tta_iterations = 30
+
     model_type = ModelType.PretrainedFaceDetection
     info_length = 5 if model_type == ModelType.Basic else 5 + 4 + 10
-    model_architecture_type = ModelArchitectureType.ResNet_25M_ELU_RA
+    model_architecture_type = ModelArchitectureType.ResNet_5M_ELU_RA
 
+    loss_function = losses.MeanSquaredError()
+    loss_name = ("MAE" if loss_function == losses.MeanAbsoluteError() else "MSE")
+
+    # to_monitor = "val_mean_absolute_error"
+    to_monitor = "val_mean_squared_error"
     # --------------
 
+    print("Model hyper parameters:")
+    print(f"Image size:{image_size} , NoChannels:{no_channels}")
+    print(f"No epochs: {no_epochs} with batch size:{train_batch_size}")
+    print(f"Optimizer Adam , Learning rate:{init_learning_rate} , Weight Decay:{weight_decay}")
+    print(f"Loss function used:{loss_name} , monitor:{to_monitor}")
+
     model_folder = "Models/" + str(model_type).split(".")[1]
-    model_name = str(model_architecture_type).split(".")[1] + "-2-" + str(image_size)
+    model_name = str(model_architecture_type).split(".")[1] + "-3-" + str(image_size)
     model_path = ("" if model_folder == "" else model_folder + "/") + model_name
 
     # verbose = False
@@ -638,7 +652,8 @@ def train_model():
 
     optimizer = optimizers.Adam(learning_rate=init_learning_rate, decay=weight_decay)
 
-    model.compile(optimizer=optimizer, loss=losses.MeanAbsoluteError(), metrics=[metrics.MeanAbsoluteError()])
+    model.compile(optimizer=optimizer, loss=loss_function,
+                  metrics=[metrics.MeanAbsoluteError(), metrics.MeanSquaredError()])
 
     # callbacks = Callback_MSE(model_path + ".h5", x_val, y_val, interval=1)
 
@@ -658,7 +673,7 @@ def train_model():
                                   val_batch_size, image_size)
 
     checkpoint_callback = ModelCheckpoint(filepath=model_path + ".h5",
-                                          monitor='val_mean_absolute_error',
+                                          monitor=to_monitor,
                                           verbose=1,
                                           save_best_only=True,
                                           save_weights_only=False,
@@ -687,7 +702,7 @@ def train_model():
                                    image_size)
 
     test_model(model_folder, model_name, model_type, no_channels,
-               False, 30,
+               use_tta, tta_iterations,
                train_batch_size, val_batch_size, test_batch_size,
                train_generator, val_generator, test_generator)
 
