@@ -6,3 +6,5 @@ pog corrected validation3.csv
 Gaze Estimation/TestImages/ivanremus611.jpg
 Gaze Estimation/TestImages/ivanremus619.jpg
 Gaze Estimation/Models/PretrainedFaceDetection/ResNet_25M_ELU_RA-2-(128, 160).h5
+Gaze Estimation/Models/PretrainedFaceDetection/ResNet_25M_ELU_RA-1-(128, 160).h5
+Gaze Estimation/Models/PretrainedFaceDetection/ResNet_25M_ELU_RA-T1-(128, 160).h5
