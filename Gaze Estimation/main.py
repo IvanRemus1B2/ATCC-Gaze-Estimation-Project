@@ -618,7 +618,7 @@ def train_model():
     info_length = 5 if model_type == ModelType.Basic else 5 + 4 + 10
     model_architecture_type = ModelArchitectureType.ResNet_5M_ELU_RA
 
-    loss_function = losses.MeanSquaredError()
+    loss_function = losses.MeanAbsoluteError()
     loss_name = ("MAE" if loss_function == losses.MeanAbsoluteError() else "MSE")
 
     # to_monitor = "val_mean_absolute_error"
@@ -628,11 +628,15 @@ def train_model():
     print("Model hyper parameters:")
     print(f"Image size:{image_size} , NoChannels:{no_channels}")
     print(f"No epochs: {no_epochs} with batch size:{train_batch_size}")
-    print(f"Optimizer Adam , Learning rate:{init_learning_rate} , Weight Decay:{weight_decay}")
+
+    # optimizer = optimizers.Adam(learning_rate=init_learning_rate, decay=weight_decay)
+    optimizer = optimizers.Nadam(learning_rate=init_learning_rate, decay=weight_decay)
+    print(f"Optimizer {optimizer.name} , Learning rate:{init_learning_rate} , Weight Decay:{weight_decay}")
+
     print(f"Loss function used:{loss_name} , monitor:{to_monitor}")
 
     model_folder = "Models/" + str(model_type).split(".")[1]
-    model_name = str(model_architecture_type).split(".")[1] + "-3-" + str(image_size)
+    model_name = str(model_architecture_type).split(".")[1] + "-Nadam1-" + str(image_size)
     model_path = ("" if model_folder == "" else model_folder + "/") + model_name
 
     # verbose = False
@@ -649,8 +653,6 @@ def train_model():
     model.summary()
 
     # lr_scheduler = get_lr_scheduler(lr_scheduler_type, init_learning_rate, decay_steps)
-
-    optimizer = optimizers.Adam(learning_rate=init_learning_rate, decay=weight_decay)
 
     model.compile(optimizer=optimizer, loss=loss_function,
                   metrics=[metrics.MeanAbsoluteError(), metrics.MeanSquaredError()])
