@@ -1,0 +1,694 @@
+C:\Users\simio\AppData\Local\Programs\Python\Python310\python.exe "E:\Facultate\Anul 1M\ATCC-Gaze-Estimation-Project\Gaze Estimation\main.py"
+Model hyper parameters:
+Image size:(128, 160) , NoChannels:3
+No epochs: 100 with batch size:32
+Optimizer <keras.optimizers.optimizer_v2.nadam.Nadam> , Learning rate:0.001 , Weight Decay:0.0005
+Loss function used:MSE , monitor:val_mean_absolute_error
+2024-06-03 23:34:52.454050: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX AVX2
+To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2024-06-03 23:34:52.831270: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1616] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 3970 MB memory:  -> device: 0, name: NVIDIA GeForce GTX 1660 SUPER, pci bus id: 0000:01:00.0, compute capability: 7.5
+Model: "ResNetLight"
+__________________________________________________________________________________________________
+ Layer (type)                   Output Shape         Param #     Connected to
+==================================================================================================
+ image (InputLayer)             [(None, 128, 160, 3  0           []
+                                )]
+
+ rand_augment (RandAugment)     (None, 128, 160, 3)  0           ['image[0][0]']
+
+ zero_padding2d (ZeroPadding2D)  (None, 134, 166, 3)  0          ['rand_augment[0][0]']
+
+ conv1_1_1_conv (Conv2D)        (None, 64, 80, 64)   9472        ['zero_padding2d[0][0]']
+
+ conv1_1_1_nb (BatchNormalizati  (None, 64, 80, 64)  256         ['conv1_1_1_conv[0][0]']
+ on)
+
+ activation (Activation)        (None, 64, 80, 64)   0           ['conv1_1_1_nb[0][0]']
+
+ max_pooling2d (MaxPooling2D)   (None, 31, 39, 64)   0           ['activation[0][0]']
+
+ conv2_1_1_conv (Conv2D)        (None, 31, 39, 64)   4160        ['max_pooling2d[0][0]']
+
+ conv2_1_1_bn (BatchNormalizati  (None, 31, 39, 64)  256         ['conv2_1_1_conv[0][0]']
+ on)
+
+ conv2_1_1_elu (Activation)     (None, 31, 39, 64)   0           ['conv2_1_1_bn[0][0]']
+
+ conv2_1_2_conv (Conv2D)        (None, 31, 39, 64)   36928       ['conv2_1_1_elu[0][0]']
+
+ conv2_1_2_bn (BatchNormalizati  (None, 31, 39, 64)  256         ['conv2_1_2_conv[0][0]']
+ on)
+
+ conv2_1_2_elu (Activation)     (None, 31, 39, 64)   0           ['conv2_1_2_bn[0][0]']
+
+ conv2_1_3_conv (Conv2D)        (None, 31, 39, 256)  16640       ['conv2_1_2_elu[0][0]']
+
+ conv2_1_short_conv (Conv2D)    (None, 31, 39, 256)  16640       ['max_pooling2d[0][0]']
+
+ conv2_1_3_bn (BatchNormalizati  (None, 31, 39, 256)  1024       ['conv2_1_3_conv[0][0]']
+ on)
+
+ conv2_1_short_bn (BatchNormali  (None, 31, 39, 256)  1024       ['conv2_1_short_conv[0][0]']
+ zation)
+
+ add (Add)                      (None, 31, 39, 256)  0           ['conv2_1_3_bn[0][0]',
+                                                                  'conv2_1_short_bn[0][0]']
+
+ conv2_1_3_elu (Activation)     (None, 31, 39, 256)  0           ['add[0][0]']
+
+ conv2_2_1_conv (Conv2D)        (None, 31, 39, 64)   16448       ['conv2_1_3_elu[0][0]']
+
+ conv2_2_1_bn (BatchNormalizati  (None, 31, 39, 64)  256         ['conv2_2_1_conv[0][0]']
+ on)
+
+ conv2_2_1_elu (Activation)     (None, 31, 39, 64)   0           ['conv2_2_1_bn[0][0]']
+
+ conv2_2_2_conv (Conv2D)        (None, 31, 39, 64)   36928       ['conv2_2_1_elu[0][0]']
+
+ conv2_2_2_bn (BatchNormalizati  (None, 31, 39, 64)  256         ['conv2_2_2_conv[0][0]']
+ on)
+
+ activation_1 (Activation)      (None, 31, 39, 64)   0           ['conv2_2_2_bn[0][0]']
+
+ conv2_2_3_conv (Conv2D)        (None, 31, 39, 256)  16640       ['activation_1[0][0]']
+
+ conv2_2_3_bn (BatchNormalizati  (None, 31, 39, 256)  1024       ['conv2_2_3_conv[0][0]']
+ on)
+
+ add_1 (Add)                    (None, 31, 39, 256)  0           ['conv2_2_3_bn[0][0]',
+                                                                  'conv2_1_3_elu[0][0]']
+
+ conv2_2_3_elu (Activation)     (None, 31, 39, 256)  0           ['add_1[0][0]']
+
+ conv2_3_1_conv (Conv2D)        (None, 31, 39, 64)   16448       ['conv2_2_3_elu[0][0]']
+
+ conv2_3_1_bn (BatchNormalizati  (None, 31, 39, 64)  256         ['conv2_3_1_conv[0][0]']
+ on)
+
+ conv2_3_1_elu (Activation)     (None, 31, 39, 64)   0           ['conv2_3_1_bn[0][0]']
+
+ conv2_3_2_conv (Conv2D)        (None, 31, 39, 64)   36928       ['conv2_3_1_elu[0][0]']
+
+ conv2_3_2_bn (BatchNormalizati  (None, 31, 39, 64)  256         ['conv2_3_2_conv[0][0]']
+ on)
+
+ activation_2 (Activation)      (None, 31, 39, 64)   0           ['conv2_3_2_bn[0][0]']
+
+ conv2_3_3_conv (Conv2D)        (None, 31, 39, 256)  16640       ['activation_2[0][0]']
+
+ conv2_3_3_bn (BatchNormalizati  (None, 31, 39, 256)  1024       ['conv2_3_3_conv[0][0]']
+ on)
+
+ add_2 (Add)                    (None, 31, 39, 256)  0           ['conv2_3_3_bn[0][0]',
+                                                                  'conv2_2_3_elu[0][0]']
+
+ conv2_3_3_elu (Activation)     (None, 31, 39, 256)  0           ['add_2[0][0]']
+
+ conv3_1_1_conv (Conv2D)        (None, 16, 20, 128)  32896       ['conv2_3_3_elu[0][0]']
+
+ conv3_1_1_bn (BatchNormalizati  (None, 16, 20, 128)  512        ['conv3_1_1_conv[0][0]']
+ on)
+
+ conv3_1_1_elu (Activation)     (None, 16, 20, 128)  0           ['conv3_1_1_bn[0][0]']
+
+ conv3_1_2_conv (Conv2D)        (None, 16, 20, 128)  147584      ['conv3_1_1_elu[0][0]']
+
+ conv3_1_2_bn (BatchNormalizati  (None, 16, 20, 128)  512        ['conv3_1_2_conv[0][0]']
+ on)
+
+ conv3_1_2_elu (Activation)     (None, 16, 20, 128)  0           ['conv3_1_2_bn[0][0]']
+
+ conv3_1_3_conv (Conv2D)        (None, 16, 20, 512)  66048       ['conv3_1_2_elu[0][0]']
+
+ conv3_1_short_conv (Conv2D)    (None, 16, 20, 512)  131584      ['conv2_3_3_elu[0][0]']
+
+ conv3_1_3_bn (BatchNormalizati  (None, 16, 20, 512)  2048       ['conv3_1_3_conv[0][0]']
+ on)
+
+ conv3_1_short_bn (BatchNormali  (None, 16, 20, 512)  2048       ['conv3_1_short_conv[0][0]']
+ zation)
+
+ add_3 (Add)                    (None, 16, 20, 512)  0           ['conv3_1_3_bn[0][0]',
+                                                                  'conv3_1_short_bn[0][0]']
+
+ conv3_1_3_elu (Activation)     (None, 16, 20, 512)  0           ['add_3[0][0]']
+
+ conv3_2_1_conv (Conv2D)        (None, 16, 20, 128)  65664       ['conv3_1_3_elu[0][0]']
+
+ conv3_2_1_bn (BatchNormalizati  (None, 16, 20, 128)  512        ['conv3_2_1_conv[0][0]']
+ on)
+
+ conv3_2_1_elu (Activation)     (None, 16, 20, 128)  0           ['conv3_2_1_bn[0][0]']
+
+ conv3_2_2_conv (Conv2D)        (None, 16, 20, 128)  147584      ['conv3_2_1_elu[0][0]']
+
+ conv3_2_2_bn (BatchNormalizati  (None, 16, 20, 128)  512        ['conv3_2_2_conv[0][0]']
+ on)
+
+ activation_3 (Activation)      (None, 16, 20, 128)  0           ['conv3_2_2_bn[0][0]']
+
+ conv3_2_3_conv (Conv2D)        (None, 16, 20, 512)  66048       ['activation_3[0][0]']
+
+ conv3_2_3_bn (BatchNormalizati  (None, 16, 20, 512)  2048       ['conv3_2_3_conv[0][0]']
+ on)
+
+ add_4 (Add)                    (None, 16, 20, 512)  0           ['conv3_2_3_bn[0][0]',
+                                                                  'conv3_1_3_elu[0][0]']
+
+ conv3_2_3_elu (Activation)     (None, 16, 20, 512)  0           ['add_4[0][0]']
+
+ conv3_3_1_conv (Conv2D)        (None, 16, 20, 128)  65664       ['conv3_2_3_elu[0][0]']
+
+ conv3_3_1_bn (BatchNormalizati  (None, 16, 20, 128)  512        ['conv3_3_1_conv[0][0]']
+ on)
+
+ conv3_3_1_elu (Activation)     (None, 16, 20, 128)  0           ['conv3_3_1_bn[0][0]']
+
+ conv3_3_2_conv (Conv2D)        (None, 16, 20, 128)  147584      ['conv3_3_1_elu[0][0]']
+
+ conv3_3_2_bn (BatchNormalizati  (None, 16, 20, 128)  512        ['conv3_3_2_conv[0][0]']
+ on)
+
+ activation_4 (Activation)      (None, 16, 20, 128)  0           ['conv3_3_2_bn[0][0]']
+
+ conv3_3_3_conv (Conv2D)        (None, 16, 20, 512)  66048       ['activation_4[0][0]']
+
+ conv3_3_3_bn (BatchNormalizati  (None, 16, 20, 512)  2048       ['conv3_3_3_conv[0][0]']
+ on)
+
+ add_5 (Add)                    (None, 16, 20, 512)  0           ['conv3_3_3_bn[0][0]',
+                                                                  'conv3_2_3_elu[0][0]']
+
+ conv3_3_3_elu (Activation)     (None, 16, 20, 512)  0           ['add_5[0][0]']
+
+ conv3_4_1_conv (Conv2D)        (None, 16, 20, 128)  65664       ['conv3_3_3_elu[0][0]']
+
+ conv3_4_1_bn (BatchNormalizati  (None, 16, 20, 128)  512        ['conv3_4_1_conv[0][0]']
+ on)
+
+ conv3_4_1_elu (Activation)     (None, 16, 20, 128)  0           ['conv3_4_1_bn[0][0]']
+
+ conv3_4_2_conv (Conv2D)        (None, 16, 20, 128)  147584      ['conv3_4_1_elu[0][0]']
+
+ conv3_4_2_bn (BatchNormalizati  (None, 16, 20, 128)  512        ['conv3_4_2_conv[0][0]']
+ on)
+
+ activation_5 (Activation)      (None, 16, 20, 128)  0           ['conv3_4_2_bn[0][0]']
+
+ conv3_4_3_conv (Conv2D)        (None, 16, 20, 512)  66048       ['activation_5[0][0]']
+
+ conv3_4_3_bn (BatchNormalizati  (None, 16, 20, 512)  2048       ['conv3_4_3_conv[0][0]']
+ on)
+
+ add_6 (Add)                    (None, 16, 20, 512)  0           ['conv3_4_3_bn[0][0]',
+                                                                  'conv3_3_3_elu[0][0]']
+
+ conv3_4_3_elu (Activation)     (None, 16, 20, 512)  0           ['add_6[0][0]']
+
+ conv4_1_1_conv (Conv2D)        (None, 6, 7, 256)    131328      ['conv3_4_3_elu[0][0]']
+
+ conv4_1_1_bn (BatchNormalizati  (None, 6, 7, 256)   1024        ['conv4_1_1_conv[0][0]']
+ on)
+
+ conv4_1_1_elu (Activation)     (None, 6, 7, 256)    0           ['conv4_1_1_bn[0][0]']
+
+ conv4_1_2_conv (Conv2D)        (None, 6, 7, 256)    590080      ['conv4_1_1_elu[0][0]']
+
+ conv4_1_2_bn (BatchNormalizati  (None, 6, 7, 256)   1024        ['conv4_1_2_conv[0][0]']
+ on)
+
+ conv4_1_2_elu (Activation)     (None, 6, 7, 256)    0           ['conv4_1_2_bn[0][0]']
+
+ conv4_1_3_conv (Conv2D)        (None, 6, 7, 1024)   263168      ['conv4_1_2_elu[0][0]']
+
+ conv4_1_short_conv (Conv2D)    (None, 6, 7, 1024)   525312      ['conv3_4_3_elu[0][0]']
+
+ conv4_1_3_bn (BatchNormalizati  (None, 6, 7, 1024)  4096        ['conv4_1_3_conv[0][0]']
+ on)
+
+ conv4_1_short_bn (BatchNormali  (None, 6, 7, 1024)  4096        ['conv4_1_short_conv[0][0]']
+ zation)
+
+ add_7 (Add)                    (None, 6, 7, 1024)   0           ['conv4_1_3_bn[0][0]',
+                                                                  'conv4_1_short_bn[0][0]']
+
+ conv4_1_3_elu (Activation)     (None, 6, 7, 1024)   0           ['add_7[0][0]']
+
+ conv4_2_1_conv (Conv2D)        (None, 6, 7, 256)    262400      ['conv4_1_3_elu[0][0]']
+
+ conv4_2_1_bn (BatchNormalizati  (None, 6, 7, 256)   1024        ['conv4_2_1_conv[0][0]']
+ on)
+
+ conv4_2_1_elu (Activation)     (None, 6, 7, 256)    0           ['conv4_2_1_bn[0][0]']
+
+ conv4_2_2_conv (Conv2D)        (None, 6, 7, 256)    590080      ['conv4_2_1_elu[0][0]']
+
+ conv4_2_2_bn (BatchNormalizati  (None, 6, 7, 256)   1024        ['conv4_2_2_conv[0][0]']
+ on)
+
+ activation_6 (Activation)      (None, 6, 7, 256)    0           ['conv4_2_2_bn[0][0]']
+
+ conv4_2_3_conv (Conv2D)        (None, 6, 7, 1024)   263168      ['activation_6[0][0]']
+
+ conv4_2_3_bn (BatchNormalizati  (None, 6, 7, 1024)  4096        ['conv4_2_3_conv[0][0]']
+ on)
+
+ add_8 (Add)                    (None, 6, 7, 1024)   0           ['conv4_2_3_bn[0][0]',
+                                                                  'conv4_1_3_elu[0][0]']
+
+ conv4_2_3_elu (Activation)     (None, 6, 7, 1024)   0           ['add_8[0][0]']
+
+ avg_pool (AveragePooling2D)    (None, 3, 3, 1024)   0           ['conv4_2_3_elu[0][0]']
+
+ flatten (Flatten)              (None, 9216)         0           ['avg_pool[0][0]']
+
+ info (InputLayer)              [(None, 19)]         0           []
+
+ concatenate (Concatenate)      (None, 9235)         0           ['flatten[0][0]',
+                                                                  'info[0][0]']
+
+ batch_normalization (BatchNorm  (None, 9235)        36940       ['concatenate[0][0]']
+ alization)
+
+ dense (Dense)                  (None, 128)          1182208     ['batch_normalization[0][0]']
+
+ fc_1 (Activation)              (None, 128)          0           ['dense[0][0]']
+
+ pixel_prediction (Dense)       (None, 2)            258         ['fc_1[0][0]']
+
+==================================================================================================
+Total params: 5,321,422
+Trainable params: 5,284,648
+Non-trainable params: 36,774
+__________________________________________________________________________________________________
+Epoch 1/100
+2024-06-03 23:35:09.543613: I tensorflow/stream_executor/cuda/cuda_dnn.cc:384] Loaded cuDNN version 8100
+531/531 [==============================] - ETA: 0s - loss: 1.4381 - mean_absolute_error: 1.4381 - mean_squared_error: 8.1479
+Epoch 1: val_mean_absolute_error improved from inf to 0.24983, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_RA-Nadam1-(128, 160).h5
+531/531 [==============================] - 268s 476ms/step - loss: 1.4381 - mean_absolute_error: 1.4381 - mean_squared_error: 8.1479 - val_loss: 0.2498 - val_mean_absolute_error: 0.2498 - val_mean_squared_error: 0.0913
+Epoch 2/100
+531/531 [==============================] - ETA: 0s - loss: 0.2257 - mean_absolute_error: 0.2257 - mean_squared_error: 0.0768
+Epoch 2: val_mean_absolute_error improved from 0.24983 to 0.21109, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_RA-Nadam1-(128, 160).h5
+531/531 [==============================] - 249s 468ms/step - loss: 0.2257 - mean_absolute_error: 0.2257 - mean_squared_error: 0.0768 - val_loss: 0.2111 - val_mean_absolute_error: 0.2111 - val_mean_squared_error: 0.0681
+Epoch 3/100
+531/531 [==============================] - ETA: 0s - loss: 0.1905 - mean_absolute_error: 0.1905 - mean_squared_error: 0.0587
+Epoch 3: val_mean_absolute_error improved from 0.21109 to 0.17905, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_RA-Nadam1-(128, 160).h5
+531/531 [==============================] - 250s 469ms/step - loss: 0.1905 - mean_absolute_error: 0.1905 - mean_squared_error: 0.0587 - val_loss: 0.1791 - val_mean_absolute_error: 0.1791 - val_mean_squared_error: 0.0517
+Epoch 4/100
+531/531 [==============================] - ETA: 0s - loss: 0.1665 - mean_absolute_error: 0.1665 - mean_squared_error: 0.0469
+Epoch 4: val_mean_absolute_error improved from 0.17905 to 0.16070, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_RA-Nadam1-(128, 160).h5
+531/531 [==============================] - 240s 451ms/step - loss: 0.1665 - mean_absolute_error: 0.1665 - mean_squared_error: 0.0469 - val_loss: 0.1607 - val_mean_absolute_error: 0.1607 - val_mean_squared_error: 0.0455
+Epoch 5/100
+531/531 [==============================] - ETA: 0s - loss: 0.1536 - mean_absolute_error: 0.1536 - mean_squared_error: 0.0407
+Epoch 5: val_mean_absolute_error improved from 0.16070 to 0.14882, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_RA-Nadam1-(128, 160).h5
+531/531 [==============================] - 241s 454ms/step - loss: 0.1536 - mean_absolute_error: 0.1536 - mean_squared_error: 0.0407 - val_loss: 0.1488 - val_mean_absolute_error: 0.1488 - val_mean_squared_error: 0.0407
+Epoch 6/100
+531/531 [==============================] - ETA: 0s - loss: 0.1449 - mean_absolute_error: 0.1449 - mean_squared_error: 0.0368
+Epoch 6: val_mean_absolute_error did not improve from 0.14882
+531/531 [==============================] - 244s 459ms/step - loss: 0.1449 - mean_absolute_error: 0.1449 - mean_squared_error: 0.0368 - val_loss: 0.1582 - val_mean_absolute_error: 0.1582 - val_mean_squared_error: 0.0431
+Epoch 7/100
+531/531 [==============================] - ETA: 0s - loss: 0.1388 - mean_absolute_error: 0.1388 - mean_squared_error: 0.0352
+Epoch 7: val_mean_absolute_error improved from 0.14882 to 0.14059, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_RA-Nadam1-(128, 160).h5
+531/531 [==============================] - 244s 459ms/step - loss: 0.1388 - mean_absolute_error: 0.1388 - mean_squared_error: 0.0352 - val_loss: 0.1406 - val_mean_absolute_error: 0.1406 - val_mean_squared_error: 0.0348
+Epoch 8/100
+531/531 [==============================] - ETA: 0s - loss: 0.1351 - mean_absolute_error: 0.1351 - mean_squared_error: 0.0326
+Epoch 8: val_mean_absolute_error did not improve from 0.14059
+531/531 [==============================] - 249s 468ms/step - loss: 0.1351 - mean_absolute_error: 0.1351 - mean_squared_error: 0.0326 - val_loss: 0.1496 - val_mean_absolute_error: 0.1496 - val_mean_squared_error: 0.0377
+Epoch 9/100
+531/531 [==============================] - ETA: 0s - loss: 0.1287 - mean_absolute_error: 0.1287 - mean_squared_error: 0.0297
+Epoch 9: val_mean_absolute_error improved from 0.14059 to 0.12711, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_RA-Nadam1-(128, 160).h5
+531/531 [==============================] - 246s 462ms/step - loss: 0.1287 - mean_absolute_error: 0.1287 - mean_squared_error: 0.0297 - val_loss: 0.1271 - val_mean_absolute_error: 0.1271 - val_mean_squared_error: 0.0307
+Epoch 10/100
+531/531 [==============================] - ETA: 0s - loss: 0.1247 - mean_absolute_error: 0.1247 - mean_squared_error: 0.0281
+Epoch 10: val_mean_absolute_error did not improve from 0.12711
+531/531 [==============================] - 244s 459ms/step - loss: 0.1247 - mean_absolute_error: 0.1247 - mean_squared_error: 0.0281 - val_loss: 0.1340 - val_mean_absolute_error: 0.1340 - val_mean_squared_error: 0.0334
+Epoch 11/100
+531/531 [==============================] - ETA: 0s - loss: 0.1199 - mean_absolute_error: 0.1199 - mean_squared_error: 0.0259
+Epoch 11: val_mean_absolute_error improved from 0.12711 to 0.11815, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_RA-Nadam1-(128, 160).h5
+531/531 [==============================] - 245s 460ms/step - loss: 0.1199 - mean_absolute_error: 0.1199 - mean_squared_error: 0.0259 - val_loss: 0.1181 - val_mean_absolute_error: 0.1181 - val_mean_squared_error: 0.0278
+Epoch 12/100
+531/531 [==============================] - ETA: 0s - loss: 0.1213 - mean_absolute_error: 0.1213 - mean_squared_error: 0.0273
+Epoch 12: val_mean_absolute_error did not improve from 0.11815
+531/531 [==============================] - 243s 457ms/step - loss: 0.1213 - mean_absolute_error: 0.1213 - mean_squared_error: 0.0273 - val_loss: 0.1313 - val_mean_absolute_error: 0.1313 - val_mean_squared_error: 0.0336
+Epoch 13/100
+531/531 [==============================] - ETA: 0s - loss: 0.1137 - mean_absolute_error: 0.1137 - mean_squared_error: 0.0234
+Epoch 13: val_mean_absolute_error did not improve from 0.11815
+531/531 [==============================] - 242s 456ms/step - loss: 0.1137 - mean_absolute_error: 0.1137 - mean_squared_error: 0.0234 - val_loss: 0.1271 - val_mean_absolute_error: 0.1271 - val_mean_squared_error: 0.0319
+Epoch 14/100
+531/531 [==============================] - ETA: 0s - loss: 0.1112 - mean_absolute_error: 0.1112 - mean_squared_error: 0.0224
+Epoch 14: val_mean_absolute_error did not improve from 0.11815
+531/531 [==============================] - 242s 455ms/step - loss: 0.1112 - mean_absolute_error: 0.1112 - mean_squared_error: 0.0224 - val_loss: 0.1290 - val_mean_absolute_error: 0.1290 - val_mean_squared_error: 0.0325
+Epoch 15/100
+531/531 [==============================] - ETA: 0s - loss: 0.1074 - mean_absolute_error: 0.1074 - mean_squared_error: 0.0209
+Epoch 15: val_mean_absolute_error did not improve from 0.11815
+531/531 [==============================] - 243s 457ms/step - loss: 0.1074 - mean_absolute_error: 0.1074 - mean_squared_error: 0.0209 - val_loss: 0.1255 - val_mean_absolute_error: 0.1255 - val_mean_squared_error: 0.0306
+Epoch 16/100
+531/531 [==============================] - ETA: 0s - loss: 0.1056 - mean_absolute_error: 0.1056 - mean_squared_error: 0.0205
+Epoch 16: val_mean_absolute_error did not improve from 0.11815
+531/531 [==============================] - 246s 463ms/step - loss: 0.1056 - mean_absolute_error: 0.1056 - mean_squared_error: 0.0205 - val_loss: 0.1194 - val_mean_absolute_error: 0.1194 - val_mean_squared_error: 0.0300
+Epoch 17/100
+531/531 [==============================] - ETA: 0s - loss: 0.1047 - mean_absolute_error: 0.1047 - mean_squared_error: 0.0206
+Epoch 17: val_mean_absolute_error did not improve from 0.11815
+531/531 [==============================] - 246s 464ms/step - loss: 0.1047 - mean_absolute_error: 0.1047 - mean_squared_error: 0.0206 - val_loss: 0.1227 - val_mean_absolute_error: 0.1227 - val_mean_squared_error: 0.0277
+Epoch 18/100
+531/531 [==============================] - ETA: 0s - loss: 0.1022 - mean_absolute_error: 0.1022 - mean_squared_error: 0.0192
+Epoch 18: val_mean_absolute_error improved from 0.11815 to 0.11705, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_RA-Nadam1-(128, 160).h5
+531/531 [==============================] - 246s 464ms/step - loss: 0.1022 - mean_absolute_error: 0.1022 - mean_squared_error: 0.0192 - val_loss: 0.1171 - val_mean_absolute_error: 0.1171 - val_mean_squared_error: 0.0282
+Epoch 19/100
+531/531 [==============================] - ETA: 0s - loss: 0.0986 - mean_absolute_error: 0.0986 - mean_squared_error: 0.0180
+Epoch 19: val_mean_absolute_error improved from 0.11705 to 0.11252, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_RA-Nadam1-(128, 160).h5
+531/531 [==============================] - 248s 466ms/step - loss: 0.0986 - mean_absolute_error: 0.0986 - mean_squared_error: 0.0180 - val_loss: 0.1125 - val_mean_absolute_error: 0.1125 - val_mean_squared_error: 0.0264
+Epoch 20/100
+531/531 [==============================] - ETA: 0s - loss: 0.0978 - mean_absolute_error: 0.0978 - mean_squared_error: 0.0178
+Epoch 20: val_mean_absolute_error did not improve from 0.11252
+531/531 [==============================] - 246s 463ms/step - loss: 0.0978 - mean_absolute_error: 0.0978 - mean_squared_error: 0.0178 - val_loss: 0.1145 - val_mean_absolute_error: 0.1145 - val_mean_squared_error: 0.0267
+Epoch 21/100
+531/531 [==============================] - ETA: 0s - loss: 0.0958 - mean_absolute_error: 0.0958 - mean_squared_error: 0.0170
+Epoch 21: val_mean_absolute_error improved from 0.11252 to 0.11200, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_RA-Nadam1-(128, 160).h5
+531/531 [==============================] - 247s 465ms/step - loss: 0.0958 - mean_absolute_error: 0.0958 - mean_squared_error: 0.0170 - val_loss: 0.1120 - val_mean_absolute_error: 0.1120 - val_mean_squared_error: 0.0262
+Epoch 22/100
+531/531 [==============================] - ETA: 0s - loss: 0.0940 - mean_absolute_error: 0.0940 - mean_squared_error: 0.0165
+Epoch 22: val_mean_absolute_error did not improve from 0.11200
+531/531 [==============================] - 246s 462ms/step - loss: 0.0940 - mean_absolute_error: 0.0940 - mean_squared_error: 0.0165 - val_loss: 0.1122 - val_mean_absolute_error: 0.1122 - val_mean_squared_error: 0.0264
+Epoch 23/100
+531/531 [==============================] - ETA: 0s - loss: 0.0925 - mean_absolute_error: 0.0925 - mean_squared_error: 0.0160
+Epoch 23: val_mean_absolute_error did not improve from 0.11200
+531/531 [==============================] - 247s 464ms/step - loss: 0.0925 - mean_absolute_error: 0.0925 - mean_squared_error: 0.0160 - val_loss: 0.1123 - val_mean_absolute_error: 0.1123 - val_mean_squared_error: 0.0273
+Epoch 24/100
+531/531 [==============================] - ETA: 0s - loss: 0.0908 - mean_absolute_error: 0.0908 - mean_squared_error: 0.0155
+Epoch 24: val_mean_absolute_error did not improve from 0.11200
+531/531 [==============================] - 246s 462ms/step - loss: 0.0908 - mean_absolute_error: 0.0908 - mean_squared_error: 0.0155 - val_loss: 0.1291 - val_mean_absolute_error: 0.1291 - val_mean_squared_error: 0.0325
+Epoch 25/100
+531/531 [==============================] - ETA: 0s - loss: 0.0888 - mean_absolute_error: 0.0888 - mean_squared_error: 0.0148
+Epoch 25: val_mean_absolute_error improved from 0.11200 to 0.11077, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_RA-Nadam1-(128, 160).h5
+531/531 [==============================] - 247s 465ms/step - loss: 0.0888 - mean_absolute_error: 0.0888 - mean_squared_error: 0.0148 - val_loss: 0.1108 - val_mean_absolute_error: 0.1108 - val_mean_squared_error: 0.0263
+Epoch 26/100
+531/531 [==============================] - ETA: 0s - loss: 0.0878 - mean_absolute_error: 0.0878 - mean_squared_error: 0.0145
+Epoch 26: val_mean_absolute_error improved from 0.11077 to 0.10750, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_RA-Nadam1-(128, 160).h5
+531/531 [==============================] - 246s 462ms/step - loss: 0.0878 - mean_absolute_error: 0.0878 - mean_squared_error: 0.0145 - val_loss: 0.1075 - val_mean_absolute_error: 0.1075 - val_mean_squared_error: 0.0245
+Epoch 27/100
+531/531 [==============================] - ETA: 0s - loss: 0.0866 - mean_absolute_error: 0.0866 - mean_squared_error: 0.0141
+Epoch 27: val_mean_absolute_error did not improve from 0.10750
+531/531 [==============================] - 247s 465ms/step - loss: 0.0866 - mean_absolute_error: 0.0866 - mean_squared_error: 0.0141 - val_loss: 0.1224 - val_mean_absolute_error: 0.1224 - val_mean_squared_error: 0.0300
+Epoch 28/100
+531/531 [==============================] - ETA: 0s - loss: 0.0855 - mean_absolute_error: 0.0855 - mean_squared_error: 0.0139
+Epoch 28: val_mean_absolute_error improved from 0.10750 to 0.10200, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_RA-Nadam1-(128, 160).h5
+531/531 [==============================] - 247s 465ms/step - loss: 0.0855 - mean_absolute_error: 0.0855 - mean_squared_error: 0.0139 - val_loss: 0.1020 - val_mean_absolute_error: 0.1020 - val_mean_squared_error: 0.0239
+Epoch 29/100
+531/531 [==============================] - ETA: 0s - loss: 0.0843 - mean_absolute_error: 0.0843 - mean_squared_error: 0.0136
+Epoch 29: val_mean_absolute_error did not improve from 0.10200
+531/531 [==============================] - 246s 464ms/step - loss: 0.0843 - mean_absolute_error: 0.0843 - mean_squared_error: 0.0136 - val_loss: 0.1089 - val_mean_absolute_error: 0.1089 - val_mean_squared_error: 0.0261
+Epoch 30/100
+531/531 [==============================] - ETA: 0s - loss: 0.0829 - mean_absolute_error: 0.0829 - mean_squared_error: 0.0132
+Epoch 30: val_mean_absolute_error did not improve from 0.10200
+531/531 [==============================] - 244s 460ms/step - loss: 0.0829 - mean_absolute_error: 0.0829 - mean_squared_error: 0.0132 - val_loss: 0.1170 - val_mean_absolute_error: 0.1170 - val_mean_squared_error: 0.0286
+Epoch 31/100
+531/531 [==============================] - ETA: 0s - loss: 0.0823 - mean_absolute_error: 0.0823 - mean_squared_error: 0.0130
+Epoch 31: val_mean_absolute_error improved from 0.10200 to 0.10069, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_RA-Nadam1-(128, 160).h5
+531/531 [==============================] - 246s 463ms/step - loss: 0.0823 - mean_absolute_error: 0.0823 - mean_squared_error: 0.0130 - val_loss: 0.1007 - val_mean_absolute_error: 0.1007 - val_mean_squared_error: 0.0227
+Epoch 32/100
+531/531 [==============================] - ETA: 0s - loss: 0.0800 - mean_absolute_error: 0.0800 - mean_squared_error: 0.0122
+Epoch 32: val_mean_absolute_error did not improve from 0.10069
+531/531 [==============================] - 245s 461ms/step - loss: 0.0800 - mean_absolute_error: 0.0800 - mean_squared_error: 0.0122 - val_loss: 0.1097 - val_mean_absolute_error: 0.1097 - val_mean_squared_error: 0.0258
+Epoch 33/100
+531/531 [==============================] - ETA: 0s - loss: 0.0834 - mean_absolute_error: 0.0834 - mean_squared_error: 0.0137
+Epoch 33: val_mean_absolute_error improved from 0.10069 to 0.09918, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_RA-Nadam1-(128, 160).h5
+531/531 [==============================] - 245s 462ms/step - loss: 0.0834 - mean_absolute_error: 0.0834 - mean_squared_error: 0.0137 - val_loss: 0.0992 - val_mean_absolute_error: 0.0992 - val_mean_squared_error: 0.0227
+Epoch 34/100
+531/531 [==============================] - ETA: 0s - loss: 0.0815 - mean_absolute_error: 0.0815 - mean_squared_error: 0.0127
+Epoch 34: val_mean_absolute_error did not improve from 0.09918
+531/531 [==============================] - 245s 461ms/step - loss: 0.0815 - mean_absolute_error: 0.0815 - mean_squared_error: 0.0127 - val_loss: 0.0996 - val_mean_absolute_error: 0.0996 - val_mean_squared_error: 0.0226
+Epoch 35/100
+531/531 [==============================] - ETA: 0s - loss: 0.0803 - mean_absolute_error: 0.0803 - mean_squared_error: 0.0125
+Epoch 35: val_mean_absolute_error did not improve from 0.09918
+531/531 [==============================] - 245s 461ms/step - loss: 0.0803 - mean_absolute_error: 0.0803 - mean_squared_error: 0.0125 - val_loss: 0.1145 - val_mean_absolute_error: 0.1145 - val_mean_squared_error: 0.0274
+Epoch 36/100
+531/531 [==============================] - ETA: 0s - loss: 0.0790 - mean_absolute_error: 0.0790 - mean_squared_error: 0.0119
+Epoch 36: val_mean_absolute_error did not improve from 0.09918
+531/531 [==============================] - 245s 460ms/step - loss: 0.0790 - mean_absolute_error: 0.0790 - mean_squared_error: 0.0119 - val_loss: 0.1027 - val_mean_absolute_error: 0.1027 - val_mean_squared_error: 0.0244
+Epoch 37/100
+531/531 [==============================] - ETA: 0s - loss: 0.0785 - mean_absolute_error: 0.0785 - mean_squared_error: 0.0119
+Epoch 37: val_mean_absolute_error did not improve from 0.09918
+531/531 [==============================] - 245s 461ms/step - loss: 0.0785 - mean_absolute_error: 0.0785 - mean_squared_error: 0.0119 - val_loss: 0.1085 - val_mean_absolute_error: 0.1085 - val_mean_squared_error: 0.0256
+Epoch 38/100
+531/531 [==============================] - ETA: 0s - loss: 0.0762 - mean_absolute_error: 0.0762 - mean_squared_error: 0.0113
+Epoch 38: val_mean_absolute_error did not improve from 0.09918
+531/531 [==============================] - 244s 459ms/step - loss: 0.0762 - mean_absolute_error: 0.0762 - mean_squared_error: 0.0113 - val_loss: 0.1002 - val_mean_absolute_error: 0.1002 - val_mean_squared_error: 0.0226
+Epoch 39/100
+531/531 [==============================] - ETA: 0s - loss: 0.0764 - mean_absolute_error: 0.0764 - mean_squared_error: 0.0113
+Epoch 39: val_mean_absolute_error did not improve from 0.09918
+531/531 [==============================] - 244s 460ms/step - loss: 0.0764 - mean_absolute_error: 0.0764 - mean_squared_error: 0.0113 - val_loss: 0.1095 - val_mean_absolute_error: 0.1095 - val_mean_squared_error: 0.0268
+Epoch 40/100
+531/531 [==============================] - ETA: 0s - loss: 0.0750 - mean_absolute_error: 0.0750 - mean_squared_error: 0.0110
+Epoch 40: val_mean_absolute_error did not improve from 0.09918
+531/531 [==============================] - 243s 457ms/step - loss: 0.0750 - mean_absolute_error: 0.0750 - mean_squared_error: 0.0110 - val_loss: 0.1030 - val_mean_absolute_error: 0.1030 - val_mean_squared_error: 0.0233
+Epoch 41/100
+531/531 [==============================] - ETA: 0s - loss: 0.0737 - mean_absolute_error: 0.0737 - mean_squared_error: 0.0107
+Epoch 41: val_mean_absolute_error did not improve from 0.09918
+531/531 [==============================] - 244s 459ms/step - loss: 0.0737 - mean_absolute_error: 0.0737 - mean_squared_error: 0.0107 - val_loss: 0.1042 - val_mean_absolute_error: 0.1042 - val_mean_squared_error: 0.0235
+Epoch 42/100
+531/531 [==============================] - ETA: 0s - loss: 0.0728 - mean_absolute_error: 0.0728 - mean_squared_error: 0.0106
+Epoch 42: val_mean_absolute_error did not improve from 0.09918
+531/531 [==============================] - 244s 458ms/step - loss: 0.0728 - mean_absolute_error: 0.0728 - mean_squared_error: 0.0106 - val_loss: 0.1106 - val_mean_absolute_error: 0.1106 - val_mean_squared_error: 0.0253
+Epoch 43/100
+531/531 [==============================] - ETA: 0s - loss: 0.0723 - mean_absolute_error: 0.0723 - mean_squared_error: 0.0102
+Epoch 43: val_mean_absolute_error did not improve from 0.09918
+531/531 [==============================] - 245s 461ms/step - loss: 0.0723 - mean_absolute_error: 0.0723 - mean_squared_error: 0.0102 - val_loss: 0.1041 - val_mean_absolute_error: 0.1041 - val_mean_squared_error: 0.0242
+Epoch 44/100
+531/531 [==============================] - ETA: 0s - loss: 0.0711 - mean_absolute_error: 0.0711 - mean_squared_error: 0.0099
+Epoch 44: val_mean_absolute_error did not improve from 0.09918
+531/531 [==============================] - 244s 458ms/step - loss: 0.0711 - mean_absolute_error: 0.0711 - mean_squared_error: 0.0099 - val_loss: 0.1047 - val_mean_absolute_error: 0.1047 - val_mean_squared_error: 0.0238
+Epoch 45/100
+531/531 [==============================] - ETA: 0s - loss: 0.0709 - mean_absolute_error: 0.0709 - mean_squared_error: 0.0099
+Epoch 45: val_mean_absolute_error did not improve from 0.09918
+531/531 [==============================] - 244s 459ms/step - loss: 0.0709 - mean_absolute_error: 0.0709 - mean_squared_error: 0.0099 - val_loss: 0.1011 - val_mean_absolute_error: 0.1011 - val_mean_squared_error: 0.0240
+Epoch 46/100
+531/531 [==============================] - ETA: 0s - loss: 0.0687 - mean_absolute_error: 0.0687 - mean_squared_error: 0.0094
+Epoch 46: val_mean_absolute_error did not improve from 0.09918
+531/531 [==============================] - 244s 458ms/step - loss: 0.0687 - mean_absolute_error: 0.0687 - mean_squared_error: 0.0094 - val_loss: 0.0996 - val_mean_absolute_error: 0.0996 - val_mean_squared_error: 0.0236
+Epoch 47/100
+531/531 [==============================] - ETA: 0s - loss: 0.0685 - mean_absolute_error: 0.0685 - mean_squared_error: 0.0094
+Epoch 47: val_mean_absolute_error did not improve from 0.09918
+531/531 [==============================] - 245s 460ms/step - loss: 0.0685 - mean_absolute_error: 0.0685 - mean_squared_error: 0.0094 - val_loss: 0.1110 - val_mean_absolute_error: 0.1110 - val_mean_squared_error: 0.0251
+Epoch 48/100
+531/531 [==============================] - ETA: 0s - loss: 0.0680 - mean_absolute_error: 0.0680 - mean_squared_error: 0.0092
+Epoch 48: val_mean_absolute_error did not improve from 0.09918
+531/531 [==============================] - 243s 457ms/step - loss: 0.0680 - mean_absolute_error: 0.0680 - mean_squared_error: 0.0092 - val_loss: 0.1032 - val_mean_absolute_error: 0.1032 - val_mean_squared_error: 0.0247
+Epoch 49/100
+531/531 [==============================] - ETA: 0s - loss: 0.0672 - mean_absolute_error: 0.0672 - mean_squared_error: 0.0090
+Epoch 49: val_mean_absolute_error did not improve from 0.09918
+531/531 [==============================] - 245s 461ms/step - loss: 0.0672 - mean_absolute_error: 0.0672 - mean_squared_error: 0.0090 - val_loss: 0.1041 - val_mean_absolute_error: 0.1041 - val_mean_squared_error: 0.0240
+Epoch 50/100
+531/531 [==============================] - ETA: 0s - loss: 0.0665 - mean_absolute_error: 0.0665 - mean_squared_error: 0.0088
+Epoch 50: val_mean_absolute_error did not improve from 0.09918
+531/531 [==============================] - 244s 459ms/step - loss: 0.0665 - mean_absolute_error: 0.0665 - mean_squared_error: 0.0088 - val_loss: 0.0994 - val_mean_absolute_error: 0.0994 - val_mean_squared_error: 0.0241
+Epoch 51/100
+531/531 [==============================] - ETA: 0s - loss: 0.0656 - mean_absolute_error: 0.0656 - mean_squared_error: 0.0086
+Epoch 51: val_mean_absolute_error improved from 0.09918 to 0.09543, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_RA-Nadam1-(128, 160).h5
+531/531 [==============================] - 245s 462ms/step - loss: 0.0656 - mean_absolute_error: 0.0656 - mean_squared_error: 0.0086 - val_loss: 0.0954 - val_mean_absolute_error: 0.0954 - val_mean_squared_error: 0.0224
+Epoch 52/100
+531/531 [==============================] - ETA: 0s - loss: 0.0651 - mean_absolute_error: 0.0651 - mean_squared_error: 0.0086
+Epoch 52: val_mean_absolute_error improved from 0.09543 to 0.09499, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_RA-Nadam1-(128, 160).h5
+531/531 [==============================] - 244s 460ms/step - loss: 0.0651 - mean_absolute_error: 0.0651 - mean_squared_error: 0.0086 - val_loss: 0.0950 - val_mean_absolute_error: 0.0950 - val_mean_squared_error: 0.0214
+Epoch 53/100
+531/531 [==============================] - ETA: 0s - loss: 0.0640 - mean_absolute_error: 0.0640 - mean_squared_error: 0.0083
+Epoch 53: val_mean_absolute_error did not improve from 0.09499
+531/531 [==============================] - 245s 461ms/step - loss: 0.0640 - mean_absolute_error: 0.0640 - mean_squared_error: 0.0083 - val_loss: 0.1059 - val_mean_absolute_error: 0.1059 - val_mean_squared_error: 0.0255
+Epoch 54/100
+531/531 [==============================] - ETA: 0s - loss: 0.0637 - mean_absolute_error: 0.0637 - mean_squared_error: 0.0082
+Epoch 54: val_mean_absolute_error did not improve from 0.09499
+531/531 [==============================] - 245s 461ms/step - loss: 0.0637 - mean_absolute_error: 0.0637 - mean_squared_error: 0.0082 - val_loss: 0.0988 - val_mean_absolute_error: 0.0988 - val_mean_squared_error: 0.0235
+Epoch 55/100
+531/531 [==============================] - ETA: 0s - loss: 0.0626 - mean_absolute_error: 0.0626 - mean_squared_error: 0.0081
+Epoch 55: val_mean_absolute_error did not improve from 0.09499
+531/531 [==============================] - 246s 462ms/step - loss: 0.0626 - mean_absolute_error: 0.0626 - mean_squared_error: 0.0081 - val_loss: 0.1106 - val_mean_absolute_error: 0.1106 - val_mean_squared_error: 0.0263
+Epoch 56/100
+531/531 [==============================] - ETA: 0s - loss: 0.0624 - mean_absolute_error: 0.0624 - mean_squared_error: 0.0078
+Epoch 56: val_mean_absolute_error did not improve from 0.09499
+531/531 [==============================] - 244s 460ms/step - loss: 0.0624 - mean_absolute_error: 0.0624 - mean_squared_error: 0.0078 - val_loss: 0.0959 - val_mean_absolute_error: 0.0959 - val_mean_squared_error: 0.0216
+Epoch 57/100
+531/531 [==============================] - ETA: 0s - loss: 0.0613 - mean_absolute_error: 0.0613 - mean_squared_error: 0.0076
+Epoch 57: val_mean_absolute_error did not improve from 0.09499
+531/531 [==============================] - 245s 461ms/step - loss: 0.0613 - mean_absolute_error: 0.0613 - mean_squared_error: 0.0076 - val_loss: 0.0962 - val_mean_absolute_error: 0.0962 - val_mean_squared_error: 0.0218
+Epoch 58/100
+531/531 [==============================] - ETA: 0s - loss: 0.0610 - mean_absolute_error: 0.0610 - mean_squared_error: 0.0076
+Epoch 58: val_mean_absolute_error did not improve from 0.09499
+531/531 [==============================] - 245s 460ms/step - loss: 0.0610 - mean_absolute_error: 0.0610 - mean_squared_error: 0.0076 - val_loss: 0.0981 - val_mean_absolute_error: 0.0981 - val_mean_squared_error: 0.0222
+Epoch 59/100
+531/531 [==============================] - ETA: 0s - loss: 0.0608 - mean_absolute_error: 0.0608 - mean_squared_error: 0.0076
+Epoch 59: val_mean_absolute_error improved from 0.09499 to 0.09428, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_RA-Nadam1-(128, 160).h5
+531/531 [==============================] - 246s 463ms/step - loss: 0.0608 - mean_absolute_error: 0.0608 - mean_squared_error: 0.0076 - val_loss: 0.0943 - val_mean_absolute_error: 0.0943 - val_mean_squared_error: 0.0208
+Epoch 60/100
+531/531 [==============================] - ETA: 0s - loss: 0.0597 - mean_absolute_error: 0.0597 - mean_squared_error: 0.0074
+Epoch 60: val_mean_absolute_error improved from 0.09428 to 0.09335, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_RA-Nadam1-(128, 160).h5
+531/531 [==============================] - 245s 461ms/step - loss: 0.0597 - mean_absolute_error: 0.0597 - mean_squared_error: 0.0074 - val_loss: 0.0933 - val_mean_absolute_error: 0.0933 - val_mean_squared_error: 0.0222
+Epoch 61/100
+531/531 [==============================] - ETA: 0s - loss: 0.0589 - mean_absolute_error: 0.0589 - mean_squared_error: 0.0071
+Epoch 61: val_mean_absolute_error did not improve from 0.09335
+531/531 [==============================] - 245s 462ms/step - loss: 0.0589 - mean_absolute_error: 0.0589 - mean_squared_error: 0.0071 - val_loss: 0.0968 - val_mean_absolute_error: 0.0968 - val_mean_squared_error: 0.0219
+Epoch 62/100
+531/531 [==============================] - ETA: 0s - loss: 0.0587 - mean_absolute_error: 0.0587 - mean_squared_error: 0.0072
+Epoch 62: val_mean_absolute_error improved from 0.09335 to 0.09308, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_RA-Nadam1-(128, 160).h5
+531/531 [==============================] - 243s 457ms/step - loss: 0.0587 - mean_absolute_error: 0.0587 - mean_squared_error: 0.0072 - val_loss: 0.0931 - val_mean_absolute_error: 0.0931 - val_mean_squared_error: 0.0218
+Epoch 63/100
+531/531 [==============================] - ETA: 0s - loss: 0.0581 - mean_absolute_error: 0.0581 - mean_squared_error: 0.0068
+Epoch 63: val_mean_absolute_error did not improve from 0.09308
+531/531 [==============================] - 244s 458ms/step - loss: 0.0581 - mean_absolute_error: 0.0581 - mean_squared_error: 0.0068 - val_loss: 0.1156 - val_mean_absolute_error: 0.1156 - val_mean_squared_error: 0.0274
+Epoch 64/100
+531/531 [==============================] - ETA: 0s - loss: 0.0590 - mean_absolute_error: 0.0590 - mean_squared_error: 0.0070
+Epoch 64: val_mean_absolute_error did not improve from 0.09308
+531/531 [==============================] - 241s 454ms/step - loss: 0.0590 - mean_absolute_error: 0.0590 - mean_squared_error: 0.0070 - val_loss: 0.1038 - val_mean_absolute_error: 0.1038 - val_mean_squared_error: 0.0237
+Epoch 65/100
+531/531 [==============================] - ETA: 0s - loss: 0.0654 - mean_absolute_error: 0.0654 - mean_squared_error: 0.0083
+Epoch 65: val_mean_absolute_error did not improve from 0.09308
+531/531 [==============================] - 244s 460ms/step - loss: 0.0654 - mean_absolute_error: 0.0654 - mean_squared_error: 0.0083 - val_loss: 0.1009 - val_mean_absolute_error: 0.1009 - val_mean_squared_error: 0.0228
+Epoch 66/100
+531/531 [==============================] - ETA: 0s - loss: 0.0643 - mean_absolute_error: 0.0643 - mean_squared_error: 0.0080
+Epoch 66: val_mean_absolute_error did not improve from 0.09308
+531/531 [==============================] - 244s 458ms/step - loss: 0.0643 - mean_absolute_error: 0.0643 - mean_squared_error: 0.0080 - val_loss: 0.0981 - val_mean_absolute_error: 0.0981 - val_mean_squared_error: 0.0218
+Epoch 67/100
+531/531 [==============================] - ETA: 0s - loss: 0.0622 - mean_absolute_error: 0.0622 - mean_squared_error: 0.0076
+Epoch 67: val_mean_absolute_error did not improve from 0.09308
+531/531 [==============================] - 245s 461ms/step - loss: 0.0622 - mean_absolute_error: 0.0622 - mean_squared_error: 0.0076 - val_loss: 0.1042 - val_mean_absolute_error: 0.1042 - val_mean_squared_error: 0.0246
+Epoch 68/100
+531/531 [==============================] - ETA: 0s - loss: 0.0614 - mean_absolute_error: 0.0614 - mean_squared_error: 0.0075
+Epoch 68: val_mean_absolute_error did not improve from 0.09308
+531/531 [==============================] - 245s 460ms/step - loss: 0.0614 - mean_absolute_error: 0.0614 - mean_squared_error: 0.0075 - val_loss: 0.0940 - val_mean_absolute_error: 0.0940 - val_mean_squared_error: 0.0212
+Epoch 69/100
+531/531 [==============================] - ETA: 0s - loss: 0.0604 - mean_absolute_error: 0.0604 - mean_squared_error: 0.0073
+Epoch 69: val_mean_absolute_error did not improve from 0.09308
+531/531 [==============================] - 244s 459ms/step - loss: 0.0604 - mean_absolute_error: 0.0604 - mean_squared_error: 0.0073 - val_loss: 0.0972 - val_mean_absolute_error: 0.0972 - val_mean_squared_error: 0.0230
+Epoch 70/100
+531/531 [==============================] - ETA: 0s - loss: 0.0597 - mean_absolute_error: 0.0597 - mean_squared_error: 0.0071
+Epoch 70: val_mean_absolute_error did not improve from 0.09308
+531/531 [==============================] - 242s 456ms/step - loss: 0.0597 - mean_absolute_error: 0.0597 - mean_squared_error: 0.0071 - val_loss: 0.0987 - val_mean_absolute_error: 0.0987 - val_mean_squared_error: 0.0228
+Epoch 71/100
+531/531 [==============================] - ETA: 0s - loss: 0.0581 - mean_absolute_error: 0.0581 - mean_squared_error: 0.0067
+Epoch 71: val_mean_absolute_error did not improve from 0.09308
+531/531 [==============================] - 243s 457ms/step - loss: 0.0581 - mean_absolute_error: 0.0581 - mean_squared_error: 0.0067 - val_loss: 0.0955 - val_mean_absolute_error: 0.0955 - val_mean_squared_error: 0.0213
+Epoch 72/100
+531/531 [==============================] - ETA: 0s - loss: 0.0579 - mean_absolute_error: 0.0579 - mean_squared_error: 0.0067
+Epoch 72: val_mean_absolute_error did not improve from 0.09308
+531/531 [==============================] - 243s 457ms/step - loss: 0.0579 - mean_absolute_error: 0.0579 - mean_squared_error: 0.0067 - val_loss: 0.0988 - val_mean_absolute_error: 0.0988 - val_mean_squared_error: 0.0225
+Epoch 73/100
+531/531 [==============================] - ETA: 0s - loss: 0.0569 - mean_absolute_error: 0.0569 - mean_squared_error: 0.0064
+Epoch 73: val_mean_absolute_error did not improve from 0.09308
+531/531 [==============================] - 243s 458ms/step - loss: 0.0569 - mean_absolute_error: 0.0569 - mean_squared_error: 0.0064 - val_loss: 0.0956 - val_mean_absolute_error: 0.0956 - val_mean_squared_error: 0.0219
+Epoch 74/100
+531/531 [==============================] - ETA: 0s - loss: 0.0565 - mean_absolute_error: 0.0565 - mean_squared_error: 0.0064
+Epoch 74: val_mean_absolute_error did not improve from 0.09308
+531/531 [==============================] - 243s 457ms/step - loss: 0.0565 - mean_absolute_error: 0.0565 - mean_squared_error: 0.0064 - val_loss: 0.0980 - val_mean_absolute_error: 0.0980 - val_mean_squared_error: 0.0219
+Epoch 75/100
+531/531 [==============================] - ETA: 0s - loss: 0.0558 - mean_absolute_error: 0.0558 - mean_squared_error: 0.0064
+Epoch 75: val_mean_absolute_error did not improve from 0.09308
+531/531 [==============================] - 243s 458ms/step - loss: 0.0558 - mean_absolute_error: 0.0558 - mean_squared_error: 0.0064 - val_loss: 0.0952 - val_mean_absolute_error: 0.0952 - val_mean_squared_error: 0.0224
+Epoch 76/100
+531/531 [==============================] - ETA: 0s - loss: 0.0550 - mean_absolute_error: 0.0550 - mean_squared_error: 0.0062
+Epoch 76: val_mean_absolute_error did not improve from 0.09308
+531/531 [==============================] - 242s 456ms/step - loss: 0.0550 - mean_absolute_error: 0.0550 - mean_squared_error: 0.0062 - val_loss: 0.0934 - val_mean_absolute_error: 0.0934 - val_mean_squared_error: 0.0211
+Epoch 77/100
+531/531 [==============================] - ETA: 0s - loss: 0.0541 - mean_absolute_error: 0.0541 - mean_squared_error: 0.0060
+Epoch 77: val_mean_absolute_error did not improve from 0.09308
+531/531 [==============================] - 243s 458ms/step - loss: 0.0541 - mean_absolute_error: 0.0541 - mean_squared_error: 0.0060 - val_loss: 0.0943 - val_mean_absolute_error: 0.0943 - val_mean_squared_error: 0.0212
+Epoch 78/100
+531/531 [==============================] - ETA: 0s - loss: 0.0538 - mean_absolute_error: 0.0538 - mean_squared_error: 0.0059
+Epoch 78: val_mean_absolute_error did not improve from 0.09308
+531/531 [==============================] - 242s 456ms/step - loss: 0.0538 - mean_absolute_error: 0.0538 - mean_squared_error: 0.0059 - val_loss: 0.0948 - val_mean_absolute_error: 0.0948 - val_mean_squared_error: 0.0219
+Epoch 79/100
+531/531 [==============================] - ETA: 0s - loss: 0.0538 - mean_absolute_error: 0.0538 - mean_squared_error: 0.0060
+Epoch 79: val_mean_absolute_error did not improve from 0.09308
+531/531 [==============================] - 244s 458ms/step - loss: 0.0538 - mean_absolute_error: 0.0538 - mean_squared_error: 0.0060 - val_loss: 0.0973 - val_mean_absolute_error: 0.0973 - val_mean_squared_error: 0.0224
+Epoch 80/100
+531/531 [==============================] - ETA: 0s - loss: 0.0529 - mean_absolute_error: 0.0529 - mean_squared_error: 0.0057
+Epoch 80: val_mean_absolute_error did not improve from 0.09308
+531/531 [==============================] - 243s 457ms/step - loss: 0.0529 - mean_absolute_error: 0.0529 - mean_squared_error: 0.0057 - val_loss: 0.0972 - val_mean_absolute_error: 0.0972 - val_mean_squared_error: 0.0224
+Epoch 81/100
+531/531 [==============================] - ETA: 0s - loss: 0.0522 - mean_absolute_error: 0.0522 - mean_squared_error: 0.0056
+Epoch 81: val_mean_absolute_error did not improve from 0.09308
+531/531 [==============================] - 244s 458ms/step - loss: 0.0522 - mean_absolute_error: 0.0522 - mean_squared_error: 0.0056 - val_loss: 0.1013 - val_mean_absolute_error: 0.1013 - val_mean_squared_error: 0.0232
+Epoch 82/100
+531/531 [==============================] - ETA: 0s - loss: 0.0516 - mean_absolute_error: 0.0516 - mean_squared_error: 0.0055
+Epoch 82: val_mean_absolute_error did not improve from 0.09308
+531/531 [==============================] - 242s 456ms/step - loss: 0.0516 - mean_absolute_error: 0.0516 - mean_squared_error: 0.0055 - val_loss: 0.0943 - val_mean_absolute_error: 0.0943 - val_mean_squared_error: 0.0220
+Epoch 83/100
+531/531 [==============================] - ETA: 0s - loss: 0.0513 - mean_absolute_error: 0.0513 - mean_squared_error: 0.0054
+Epoch 83: val_mean_absolute_error improved from 0.09308 to 0.09135, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_RA-Nadam1-(128, 160).h5
+531/531 [==============================] - 243s 458ms/step - loss: 0.0513 - mean_absolute_error: 0.0513 - mean_squared_error: 0.0054 - val_loss: 0.0913 - val_mean_absolute_error: 0.0913 - val_mean_squared_error: 0.0211
+Epoch 84/100
+531/531 [==============================] - ETA: 0s - loss: 0.0506 - mean_absolute_error: 0.0506 - mean_squared_error: 0.0052
+Epoch 84: val_mean_absolute_error did not improve from 0.09135
+531/531 [==============================] - 243s 457ms/step - loss: 0.0506 - mean_absolute_error: 0.0506 - mean_squared_error: 0.0052 - val_loss: 0.0920 - val_mean_absolute_error: 0.0920 - val_mean_squared_error: 0.0213
+Epoch 85/100
+531/531 [==============================] - ETA: 0s - loss: 0.0502 - mean_absolute_error: 0.0502 - mean_squared_error: 0.0052
+Epoch 85: val_mean_absolute_error did not improve from 0.09135
+531/531 [==============================] - 244s 460ms/step - loss: 0.0502 - mean_absolute_error: 0.0502 - mean_squared_error: 0.0052 - val_loss: 0.0994 - val_mean_absolute_error: 0.0994 - val_mean_squared_error: 0.0229
+Epoch 86/100
+531/531 [==============================] - ETA: 0s - loss: 0.0501 - mean_absolute_error: 0.0501 - mean_squared_error: 0.0053
+Epoch 86: val_mean_absolute_error did not improve from 0.09135
+531/531 [==============================] - 244s 459ms/step - loss: 0.0501 - mean_absolute_error: 0.0501 - mean_squared_error: 0.0053 - val_loss: 0.0937 - val_mean_absolute_error: 0.0937 - val_mean_squared_error: 0.0218
+Epoch 87/100
+531/531 [==============================] - ETA: 0s - loss: 0.0495 - mean_absolute_error: 0.0495 - mean_squared_error: 0.0051
+Epoch 87: val_mean_absolute_error did not improve from 0.09135
+531/531 [==============================] - 245s 461ms/step - loss: 0.0495 - mean_absolute_error: 0.0495 - mean_squared_error: 0.0051 - val_loss: 0.0980 - val_mean_absolute_error: 0.0980 - val_mean_squared_error: 0.0230
+Epoch 88/100
+531/531 [==============================] - ETA: 0s - loss: 0.0493 - mean_absolute_error: 0.0493 - mean_squared_error: 0.0050
+Epoch 88: val_mean_absolute_error did not improve from 0.09135
+531/531 [==============================] - 245s 461ms/step - loss: 0.0493 - mean_absolute_error: 0.0493 - mean_squared_error: 0.0050 - val_loss: 0.0952 - val_mean_absolute_error: 0.0952 - val_mean_squared_error: 0.0222
+Epoch 89/100
+531/531 [==============================] - ETA: 0s - loss: 0.0486 - mean_absolute_error: 0.0486 - mean_squared_error: 0.0048
+Epoch 89: val_mean_absolute_error did not improve from 0.09135
+531/531 [==============================] - 245s 462ms/step - loss: 0.0486 - mean_absolute_error: 0.0486 - mean_squared_error: 0.0048 - val_loss: 0.0941 - val_mean_absolute_error: 0.0941 - val_mean_squared_error: 0.0217
+Epoch 90/100
+531/531 [==============================] - ETA: 0s - loss: 0.0482 - mean_absolute_error: 0.0482 - mean_squared_error: 0.0048
+Epoch 90: val_mean_absolute_error did not improve from 0.09135
+531/531 [==============================] - 244s 459ms/step - loss: 0.0482 - mean_absolute_error: 0.0482 - mean_squared_error: 0.0048 - val_loss: 0.0982 - val_mean_absolute_error: 0.0982 - val_mean_squared_error: 0.0232
+Epoch 91/100
+531/531 [==============================] - ETA: 0s - loss: 0.0480 - mean_absolute_error: 0.0480 - mean_squared_error: 0.0048
+Epoch 91: val_mean_absolute_error did not improve from 0.09135
+531/531 [==============================] - 245s 461ms/step - loss: 0.0480 - mean_absolute_error: 0.0480 - mean_squared_error: 0.0048 - val_loss: 0.0973 - val_mean_absolute_error: 0.0973 - val_mean_squared_error: 0.0221
+Epoch 92/100
+531/531 [==============================] - ETA: 0s - loss: 0.0472 - mean_absolute_error: 0.0472 - mean_squared_error: 0.0047
+Epoch 92: val_mean_absolute_error did not improve from 0.09135
+531/531 [==============================] - 244s 459ms/step - loss: 0.0472 - mean_absolute_error: 0.0472 - mean_squared_error: 0.0047 - val_loss: 0.0971 - val_mean_absolute_error: 0.0971 - val_mean_squared_error: 0.0226
+Epoch 93/100
+531/531 [==============================] - ETA: 0s - loss: 0.0469 - mean_absolute_error: 0.0469 - mean_squared_error: 0.0045
+Epoch 93: val_mean_absolute_error did not improve from 0.09135
+531/531 [==============================] - 245s 460ms/step - loss: 0.0469 - mean_absolute_error: 0.0469 - mean_squared_error: 0.0045 - val_loss: 0.0962 - val_mean_absolute_error: 0.0962 - val_mean_squared_error: 0.0224
+Epoch 94/100
+531/531 [==============================] - ETA: 0s - loss: 0.0464 - mean_absolute_error: 0.0464 - mean_squared_error: 0.0045
+Epoch 94: val_mean_absolute_error did not improve from 0.09135
+531/531 [==============================] - 244s 459ms/step - loss: 0.0464 - mean_absolute_error: 0.0464 - mean_squared_error: 0.0045 - val_loss: 0.0955 - val_mean_absolute_error: 0.0955 - val_mean_squared_error: 0.0222
+Epoch 95/100
+531/531 [==============================] - ETA: 0s - loss: 0.0465 - mean_absolute_error: 0.0465 - mean_squared_error: 0.0045
+Epoch 95: val_mean_absolute_error did not improve from 0.09135
+531/531 [==============================] - 245s 460ms/step - loss: 0.0465 - mean_absolute_error: 0.0465 - mean_squared_error: 0.0045 - val_loss: 0.0939 - val_mean_absolute_error: 0.0939 - val_mean_squared_error: 0.0219
+Epoch 96/100
+531/531 [==============================] - ETA: 0s - loss: 0.0472 - mean_absolute_error: 0.0472 - mean_squared_error: 0.0046
+Epoch 96: val_mean_absolute_error did not improve from 0.09135
+531/531 [==============================] - 245s 460ms/step - loss: 0.0472 - mean_absolute_error: 0.0472 - mean_squared_error: 0.0046 - val_loss: 0.0947 - val_mean_absolute_error: 0.0947 - val_mean_squared_error: 0.0213
+Epoch 97/100
+531/531 [==============================] - ETA: 0s - loss: 0.0555 - mean_absolute_error: 0.0555 - mean_squared_error: 0.0060
+Epoch 97: val_mean_absolute_error did not improve from 0.09135
+531/531 [==============================] - 244s 459ms/step - loss: 0.0555 - mean_absolute_error: 0.0555 - mean_squared_error: 0.0060 - val_loss: 0.0935 - val_mean_absolute_error: 0.0935 - val_mean_squared_error: 0.0220
+Epoch 98/100
+531/531 [==============================] - ETA: 0s - loss: 0.0539 - mean_absolute_error: 0.0539 - mean_squared_error: 0.0057
+Epoch 98: val_mean_absolute_error did not improve from 0.09135
+531/531 [==============================] - 244s 459ms/step - loss: 0.0539 - mean_absolute_error: 0.0539 - mean_squared_error: 0.0057 - val_loss: 0.1019 - val_mean_absolute_error: 0.1019 - val_mean_squared_error: 0.0233
+Epoch 99/100
+531/531 [==============================] - ETA: 0s - loss: 0.0531 - mean_absolute_error: 0.0531 - mean_squared_error: 0.0056
+Epoch 99: val_mean_absolute_error did not improve from 0.09135
+531/531 [==============================] - 244s 460ms/step - loss: 0.0531 - mean_absolute_error: 0.0531 - mean_squared_error: 0.0056 - val_loss: 0.0955 - val_mean_absolute_error: 0.0955 - val_mean_squared_error: 0.0217
+Epoch 100/100
+531/531 [==============================] - ETA: 0s - loss: 0.0514 - mean_absolute_error: 0.0514 - mean_squared_error: 0.0052
+Epoch 100: val_mean_absolute_error did not improve from 0.09135
+531/531 [==============================] - 244s 458ms/step - loss: 0.0514 - mean_absolute_error: 0.0514 - mean_squared_error: 0.0052 - val_loss: 0.0978 - val_mean_absolute_error: 0.0978 - val_mean_squared_error: 0.0222
+
+For ResNet_5M_ELU_RA-Nadam1-(128, 160):
+pog corrected train3.csv:
+MSE Loss: 0.0035 , MAE Loss: 0.0408 , Avg Cm: 1.8147
+pog corrected validation3.csv:
+MSE Loss: 0.0211 , MAE Loss: 0.0912 , Avg Cm: 3.9781
+pog corrected test3.csv:
+MSE Loss: 0.0185 , MAE Loss: 0.0871 , Avg Cm: 3.6575
+
+Process finished with exit code 0
