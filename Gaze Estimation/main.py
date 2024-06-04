@@ -621,22 +621,22 @@ def train_model():
     loss_function = losses.MeanAbsoluteError()
     loss_name = ("MAE" if loss_function == losses.MeanAbsoluteError() else "MSE")
 
-    # to_monitor = "val_mean_absolute_error"
-    to_monitor = "val_mean_squared_error"
+    to_monitor = "val_mean_absolute_error"
+    # to_monitor = "val_mean_squared_error"
     # --------------
 
     print("Model hyper parameters:")
     print(f"Image size:{image_size} , NoChannels:{no_channels}")
     print(f"No epochs: {no_epochs} with batch size:{train_batch_size}")
 
-    # optimizer = optimizers.Adam(learning_rate=init_learning_rate, decay=weight_decay)
-    optimizer = optimizers.Nadam(learning_rate=init_learning_rate, decay=weight_decay)
-    print(f"Optimizer {optimizer.name} , Learning rate:{init_learning_rate} , Weight Decay:{weight_decay}")
+    optimizer = optimizers.Adam(learning_rate=init_learning_rate, decay=weight_decay, amsgrad=True)
+    # optimizer = optimizers.Nadam(learning_rate=init_learning_rate, decay=weight_decay)
+    print(f"Optimizer {optimizer}, Learning rate:{init_learning_rate} , Weight Decay:{weight_decay}")
 
     print(f"Loss function used:{loss_name} , monitor:{to_monitor}")
 
     model_folder = "Models/" + str(model_type).split(".")[1]
-    model_name = str(model_architecture_type).split(".")[1] + "-Nadam1-" + str(image_size)
+    model_name = str(model_architecture_type).split(".")[1] + "-AdamAMS1-" + str(image_size)
     model_path = ("" if model_folder == "" else model_folder + "/") + model_name
 
     # verbose = False
