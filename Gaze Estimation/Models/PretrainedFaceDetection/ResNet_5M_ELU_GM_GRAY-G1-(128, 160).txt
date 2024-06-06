@@ -2,7 +2,7 @@ C:\Users\simio\AppData\Local\Programs\Python\Python310\python.exe "E:\Facultate\
 Model hyper parameters:
 Image size:(128, 160) , NoChannels:3
 No epochs: 100 with batch size:64
-Optimizer <keras.optimizers.optimizer_v2.adam.Adam object at 0x000001EFBD4ECE20>, Learning rate:0.001 , Weight Decay:0.0005
+Optimizer <keras.optimizers.optimizer_v2.adam.Adam>, Learning rate:0.001 , Weight Decay:0.0005
 Loss function used:MSE , monitor:val_mean_absolute_error
 2024-06-04 21:57:26.031876: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX AVX2
 To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.

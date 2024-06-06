@@ -1,0 +1,494 @@
+C:\Users\simio\AppData\Local\Programs\Python\Python310\python.exe "E:\Facultate\Anul 1M\ATCC-Gaze-Estimation-Project\Gaze Estimation\main.py"
+Model hyper parameters:
+Image size:(128, 160) , NoChannels:3
+No epochs: 50 with batch size:64
+Optimizer <keras.optimizers.optimizer_v2.adam.Adam>, Learning rate:0.001 , Weight Decay:0.0005
+Loss function used:MSE , monitor:val_mean_absolute_error
+2024-06-05 10:40:35.579239: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX AVX2
+To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2024-06-05 10:40:35.975841: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1616] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 3970 MB memory:  -> device: 0, name: NVIDIA GeForce GTX 1660 SUPER, pci bus id: 0000:01:00.0, compute capability: 7.5
+Model: "ResNetLight"
+__________________________________________________________________________________________________
+ Layer (type)                   Output Shape         Param #     Connected to
+==================================================================================================
+ image (InputLayer)             [(None, 128, 160, 3  0           []
+                                )]
+
+ rand_augment (RandAugment)     (None, 128, 160, 3)  0           ['image[0][0]']
+
+ zero_padding2d (ZeroPadding2D)  (None, 134, 166, 3)  0          ['rand_augment[0][0]']
+
+ conv1_1_1_conv (Conv2D)        (None, 64, 80, 64)   9472        ['zero_padding2d[0][0]']
+
+ conv1_1_1_nb (BatchNormalizati  (None, 64, 80, 64)  256         ['conv1_1_1_conv[0][0]']
+ on)
+
+ activation (Activation)        (None, 64, 80, 64)   0           ['conv1_1_1_nb[0][0]']
+
+ max_pooling2d (MaxPooling2D)   (None, 31, 39, 64)   0           ['activation[0][0]']
+
+ conv2_1_1_conv (Conv2D)        (None, 31, 39, 64)   4160        ['max_pooling2d[0][0]']
+
+ conv2_1_1_bn (BatchNormalizati  (None, 31, 39, 64)  256         ['conv2_1_1_conv[0][0]']
+ on)
+
+ conv2_1_1_elu (Activation)     (None, 31, 39, 64)   0           ['conv2_1_1_bn[0][0]']
+
+ conv2_1_2_conv (Conv2D)        (None, 31, 39, 64)   36928       ['conv2_1_1_elu[0][0]']
+
+ conv2_1_2_bn (BatchNormalizati  (None, 31, 39, 64)  256         ['conv2_1_2_conv[0][0]']
+ on)
+
+ conv2_1_2_elu (Activation)     (None, 31, 39, 64)   0           ['conv2_1_2_bn[0][0]']
+
+ conv2_1_3_conv (Conv2D)        (None, 31, 39, 256)  16640       ['conv2_1_2_elu[0][0]']
+
+ conv2_1_short_conv (Conv2D)    (None, 31, 39, 256)  16640       ['max_pooling2d[0][0]']
+
+ conv2_1_3_bn (BatchNormalizati  (None, 31, 39, 256)  1024       ['conv2_1_3_conv[0][0]']
+ on)
+
+ conv2_1_short_bn (BatchNormali  (None, 31, 39, 256)  1024       ['conv2_1_short_conv[0][0]']
+ zation)
+
+ add (Add)                      (None, 31, 39, 256)  0           ['conv2_1_3_bn[0][0]',
+                                                                  'conv2_1_short_bn[0][0]']
+
+ conv2_1_3_elu (Activation)     (None, 31, 39, 256)  0           ['add[0][0]']
+
+ conv2_2_1_conv (Conv2D)        (None, 31, 39, 64)   16448       ['conv2_1_3_elu[0][0]']
+
+ conv2_2_1_bn (BatchNormalizati  (None, 31, 39, 64)  256         ['conv2_2_1_conv[0][0]']
+ on)
+
+ conv2_2_1_elu (Activation)     (None, 31, 39, 64)   0           ['conv2_2_1_bn[0][0]']
+
+ conv2_2_2_conv (Conv2D)        (None, 31, 39, 64)   36928       ['conv2_2_1_elu[0][0]']
+
+ conv2_2_2_bn (BatchNormalizati  (None, 31, 39, 64)  256         ['conv2_2_2_conv[0][0]']
+ on)
+
+ activation_1 (Activation)      (None, 31, 39, 64)   0           ['conv2_2_2_bn[0][0]']
+
+ conv2_2_3_conv (Conv2D)        (None, 31, 39, 256)  16640       ['activation_1[0][0]']
+
+ conv2_2_3_bn (BatchNormalizati  (None, 31, 39, 256)  1024       ['conv2_2_3_conv[0][0]']
+ on)
+
+ add_1 (Add)                    (None, 31, 39, 256)  0           ['conv2_2_3_bn[0][0]',
+                                                                  'conv2_1_3_elu[0][0]']
+
+ conv2_2_3_elu (Activation)     (None, 31, 39, 256)  0           ['add_1[0][0]']
+
+ conv2_3_1_conv (Conv2D)        (None, 31, 39, 64)   16448       ['conv2_2_3_elu[0][0]']
+
+ conv2_3_1_bn (BatchNormalizati  (None, 31, 39, 64)  256         ['conv2_3_1_conv[0][0]']
+ on)
+
+ conv2_3_1_elu (Activation)     (None, 31, 39, 64)   0           ['conv2_3_1_bn[0][0]']
+
+ conv2_3_2_conv (Conv2D)        (None, 31, 39, 64)   36928       ['conv2_3_1_elu[0][0]']
+
+ conv2_3_2_bn (BatchNormalizati  (None, 31, 39, 64)  256         ['conv2_3_2_conv[0][0]']
+ on)
+
+ activation_2 (Activation)      (None, 31, 39, 64)   0           ['conv2_3_2_bn[0][0]']
+
+ conv2_3_3_conv (Conv2D)        (None, 31, 39, 256)  16640       ['activation_2[0][0]']
+
+ conv2_3_3_bn (BatchNormalizati  (None, 31, 39, 256)  1024       ['conv2_3_3_conv[0][0]']
+ on)
+
+ add_2 (Add)                    (None, 31, 39, 256)  0           ['conv2_3_3_bn[0][0]',
+                                                                  'conv2_2_3_elu[0][0]']
+
+ conv2_3_3_elu (Activation)     (None, 31, 39, 256)  0           ['add_2[0][0]']
+
+ conv3_1_1_conv (Conv2D)        (None, 16, 20, 128)  32896       ['conv2_3_3_elu[0][0]']
+
+ conv3_1_1_bn (BatchNormalizati  (None, 16, 20, 128)  512        ['conv3_1_1_conv[0][0]']
+ on)
+
+ conv3_1_1_elu (Activation)     (None, 16, 20, 128)  0           ['conv3_1_1_bn[0][0]']
+
+ conv3_1_2_conv (Conv2D)        (None, 16, 20, 128)  147584      ['conv3_1_1_elu[0][0]']
+
+ conv3_1_2_bn (BatchNormalizati  (None, 16, 20, 128)  512        ['conv3_1_2_conv[0][0]']
+ on)
+
+ conv3_1_2_elu (Activation)     (None, 16, 20, 128)  0           ['conv3_1_2_bn[0][0]']
+
+ conv3_1_3_conv (Conv2D)        (None, 16, 20, 512)  66048       ['conv3_1_2_elu[0][0]']
+
+ conv3_1_short_conv (Conv2D)    (None, 16, 20, 512)  131584      ['conv2_3_3_elu[0][0]']
+
+ conv3_1_3_bn (BatchNormalizati  (None, 16, 20, 512)  2048       ['conv3_1_3_conv[0][0]']
+ on)
+
+ conv3_1_short_bn (BatchNormali  (None, 16, 20, 512)  2048       ['conv3_1_short_conv[0][0]']
+ zation)
+
+ add_3 (Add)                    (None, 16, 20, 512)  0           ['conv3_1_3_bn[0][0]',
+                                                                  'conv3_1_short_bn[0][0]']
+
+ conv3_1_3_elu (Activation)     (None, 16, 20, 512)  0           ['add_3[0][0]']
+
+ conv3_2_1_conv (Conv2D)        (None, 16, 20, 128)  65664       ['conv3_1_3_elu[0][0]']
+
+ conv3_2_1_bn (BatchNormalizati  (None, 16, 20, 128)  512        ['conv3_2_1_conv[0][0]']
+ on)
+
+ conv3_2_1_elu (Activation)     (None, 16, 20, 128)  0           ['conv3_2_1_bn[0][0]']
+
+ conv3_2_2_conv (Conv2D)        (None, 16, 20, 128)  147584      ['conv3_2_1_elu[0][0]']
+
+ conv3_2_2_bn (BatchNormalizati  (None, 16, 20, 128)  512        ['conv3_2_2_conv[0][0]']
+ on)
+
+ activation_3 (Activation)      (None, 16, 20, 128)  0           ['conv3_2_2_bn[0][0]']
+
+ conv3_2_3_conv (Conv2D)        (None, 16, 20, 512)  66048       ['activation_3[0][0]']
+
+ conv3_2_3_bn (BatchNormalizati  (None, 16, 20, 512)  2048       ['conv3_2_3_conv[0][0]']
+ on)
+
+ add_4 (Add)                    (None, 16, 20, 512)  0           ['conv3_2_3_bn[0][0]',
+                                                                  'conv3_1_3_elu[0][0]']
+
+ conv3_2_3_elu (Activation)     (None, 16, 20, 512)  0           ['add_4[0][0]']
+
+ conv3_3_1_conv (Conv2D)        (None, 16, 20, 128)  65664       ['conv3_2_3_elu[0][0]']
+
+ conv3_3_1_bn (BatchNormalizati  (None, 16, 20, 128)  512        ['conv3_3_1_conv[0][0]']
+ on)
+
+ conv3_3_1_elu (Activation)     (None, 16, 20, 128)  0           ['conv3_3_1_bn[0][0]']
+
+ conv3_3_2_conv (Conv2D)        (None, 16, 20, 128)  147584      ['conv3_3_1_elu[0][0]']
+
+ conv3_3_2_bn (BatchNormalizati  (None, 16, 20, 128)  512        ['conv3_3_2_conv[0][0]']
+ on)
+
+ activation_4 (Activation)      (None, 16, 20, 128)  0           ['conv3_3_2_bn[0][0]']
+
+ conv3_3_3_conv (Conv2D)        (None, 16, 20, 512)  66048       ['activation_4[0][0]']
+
+ conv3_3_3_bn (BatchNormalizati  (None, 16, 20, 512)  2048       ['conv3_3_3_conv[0][0]']
+ on)
+
+ add_5 (Add)                    (None, 16, 20, 512)  0           ['conv3_3_3_bn[0][0]',
+                                                                  'conv3_2_3_elu[0][0]']
+
+ conv3_3_3_elu (Activation)     (None, 16, 20, 512)  0           ['add_5[0][0]']
+
+ conv3_4_1_conv (Conv2D)        (None, 16, 20, 128)  65664       ['conv3_3_3_elu[0][0]']
+
+ conv3_4_1_bn (BatchNormalizati  (None, 16, 20, 128)  512        ['conv3_4_1_conv[0][0]']
+ on)
+
+ conv3_4_1_elu (Activation)     (None, 16, 20, 128)  0           ['conv3_4_1_bn[0][0]']
+
+ conv3_4_2_conv (Conv2D)        (None, 16, 20, 128)  147584      ['conv3_4_1_elu[0][0]']
+
+ conv3_4_2_bn (BatchNormalizati  (None, 16, 20, 128)  512        ['conv3_4_2_conv[0][0]']
+ on)
+
+ activation_5 (Activation)      (None, 16, 20, 128)  0           ['conv3_4_2_bn[0][0]']
+
+ conv3_4_3_conv (Conv2D)        (None, 16, 20, 512)  66048       ['activation_5[0][0]']
+
+ conv3_4_3_bn (BatchNormalizati  (None, 16, 20, 512)  2048       ['conv3_4_3_conv[0][0]']
+ on)
+
+ add_6 (Add)                    (None, 16, 20, 512)  0           ['conv3_4_3_bn[0][0]',
+                                                                  'conv3_3_3_elu[0][0]']
+
+ conv3_4_3_elu (Activation)     (None, 16, 20, 512)  0           ['add_6[0][0]']
+
+ conv4_1_1_conv (Conv2D)        (None, 6, 7, 256)    131328      ['conv3_4_3_elu[0][0]']
+
+ conv4_1_1_bn (BatchNormalizati  (None, 6, 7, 256)   1024        ['conv4_1_1_conv[0][0]']
+ on)
+
+ conv4_1_1_elu (Activation)     (None, 6, 7, 256)    0           ['conv4_1_1_bn[0][0]']
+
+ conv4_1_2_conv (Conv2D)        (None, 6, 7, 256)    590080      ['conv4_1_1_elu[0][0]']
+
+ conv4_1_2_bn (BatchNormalizati  (None, 6, 7, 256)   1024        ['conv4_1_2_conv[0][0]']
+ on)
+
+ conv4_1_2_elu (Activation)     (None, 6, 7, 256)    0           ['conv4_1_2_bn[0][0]']
+
+ conv4_1_3_conv (Conv2D)        (None, 6, 7, 1024)   263168      ['conv4_1_2_elu[0][0]']
+
+ conv4_1_short_conv (Conv2D)    (None, 6, 7, 1024)   525312      ['conv3_4_3_elu[0][0]']
+
+ conv4_1_3_bn (BatchNormalizati  (None, 6, 7, 1024)  4096        ['conv4_1_3_conv[0][0]']
+ on)
+
+ conv4_1_short_bn (BatchNormali  (None, 6, 7, 1024)  4096        ['conv4_1_short_conv[0][0]']
+ zation)
+
+ add_7 (Add)                    (None, 6, 7, 1024)   0           ['conv4_1_3_bn[0][0]',
+                                                                  'conv4_1_short_bn[0][0]']
+
+ conv4_1_3_elu (Activation)     (None, 6, 7, 1024)   0           ['add_7[0][0]']
+
+ conv4_2_1_conv (Conv2D)        (None, 6, 7, 256)    262400      ['conv4_1_3_elu[0][0]']
+
+ conv4_2_1_bn (BatchNormalizati  (None, 6, 7, 256)   1024        ['conv4_2_1_conv[0][0]']
+ on)
+
+ conv4_2_1_elu (Activation)     (None, 6, 7, 256)    0           ['conv4_2_1_bn[0][0]']
+
+ conv4_2_2_conv (Conv2D)        (None, 6, 7, 256)    590080      ['conv4_2_1_elu[0][0]']
+
+ conv4_2_2_bn (BatchNormalizati  (None, 6, 7, 256)   1024        ['conv4_2_2_conv[0][0]']
+ on)
+
+ activation_6 (Activation)      (None, 6, 7, 256)    0           ['conv4_2_2_bn[0][0]']
+
+ conv4_2_3_conv (Conv2D)        (None, 6, 7, 1024)   263168      ['activation_6[0][0]']
+
+ conv4_2_3_bn (BatchNormalizati  (None, 6, 7, 1024)  4096        ['conv4_2_3_conv[0][0]']
+ on)
+
+ add_8 (Add)                    (None, 6, 7, 1024)   0           ['conv4_2_3_bn[0][0]',
+                                                                  'conv4_1_3_elu[0][0]']
+
+ conv4_2_3_elu (Activation)     (None, 6, 7, 1024)   0           ['add_8[0][0]']
+
+ avg_pool (AveragePooling2D)    (None, 3, 3, 1024)   0           ['conv4_2_3_elu[0][0]']
+
+ flatten (Flatten)              (None, 9216)         0           ['avg_pool[0][0]']
+
+ info (InputLayer)              [(None, 19)]         0           []
+
+ concatenate (Concatenate)      (None, 9235)         0           ['flatten[0][0]',
+                                                                  'info[0][0]']
+
+ batch_normalization (BatchNorm  (None, 9235)        36940       ['concatenate[0][0]']
+ alization)
+
+ dense (Dense)                  (None, 128)          1182208     ['batch_normalization[0][0]']
+
+ fc_1 (Activation)              (None, 128)          0           ['dense[0][0]']
+
+ pixel_prediction (Dense)       (None, 2)            258         ['fc_1[0][0]']
+
+==================================================================================================
+Total params: 5,321,422
+Trainable params: 5,284,648
+Non-trainable params: 36,774
+__________________________________________________________________________________________________
+Epoch 1/50
+2024-06-05 10:40:49.497073: I tensorflow/stream_executor/cuda/cuda_dnn.cc:384] Loaded cuDNN version 8100
+266/266 [==============================] - ETA: 0s - loss: 1.5259 - mean_absolute_error: 1.5259 - mean_squared_error: 5.3420
+Epoch 1: val_mean_absolute_error improved from inf to 1.05012, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_GM_RA_GRAY-G1-(128, 160).h5
+266/266 [==============================] - 268s 965ms/step - loss: 1.5259 - mean_absolute_error: 1.5259 - mean_squared_error: 5.3420 - val_loss: 1.0501 - val_mean_absolute_error: 1.0501 - val_mean_squared_error: 2.0834
+Epoch 2/50
+266/266 [==============================] - ETA: 0s - loss: 0.7298 - mean_absolute_error: 0.7298 - mean_squared_error: 2.1642
+Epoch 2: val_mean_absolute_error improved from 1.05012 to 0.42486, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_GM_RA_GRAY-G1-(128, 160).h5
+266/266 [==============================] - 257s 965ms/step - loss: 0.7298 - mean_absolute_error: 0.7298 - mean_squared_error: 2.1642 - val_loss: 0.4249 - val_mean_absolute_error: 0.4249 - val_mean_squared_error: 0.3690
+Epoch 3/50
+266/266 [==============================] - ETA: 0s - loss: 0.6146 - mean_absolute_error: 0.6146 - mean_squared_error: 1.6556
+Epoch 3: val_mean_absolute_error did not improve from 0.42486
+266/266 [==============================] - 261s 979ms/step - loss: 0.6146 - mean_absolute_error: 0.6146 - mean_squared_error: 1.6556 - val_loss: 0.4595 - val_mean_absolute_error: 0.4595 - val_mean_squared_error: 0.6455
+Epoch 4/50
+266/266 [==============================] - ETA: 0s - loss: 0.3144 - mean_absolute_error: 0.3144 - mean_squared_error: 0.2440
+Epoch 4: val_mean_absolute_error improved from 0.42486 to 0.31440, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_GM_RA_GRAY-G1-(128, 160).h5
+266/266 [==============================] - 261s 978ms/step - loss: 0.3144 - mean_absolute_error: 0.3144 - mean_squared_error: 0.2440 - val_loss: 0.3144 - val_mean_absolute_error: 0.3144 - val_mean_squared_error: 0.2858
+Epoch 5/50
+266/266 [==============================] - ETA: 0s - loss: 0.2249 - mean_absolute_error: 0.2249 - mean_squared_error: 0.0825
+Epoch 5: val_mean_absolute_error improved from 0.31440 to 0.22541, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_GM_RA_GRAY-G1-(128, 160).h5
+266/266 [==============================] - 258s 969ms/step - loss: 0.2249 - mean_absolute_error: 0.2249 - mean_squared_error: 0.0825 - val_loss: 0.2254 - val_mean_absolute_error: 0.2254 - val_mean_squared_error: 0.0923
+Epoch 6/50
+266/266 [==============================] - ETA: 0s - loss: 0.1963 - mean_absolute_error: 0.1963 - mean_squared_error: 0.0604
+Epoch 6: val_mean_absolute_error improved from 0.22541 to 0.18838, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_GM_RA_GRAY-G1-(128, 160).h5
+266/266 [==============================] - 257s 965ms/step - loss: 0.1963 - mean_absolute_error: 0.1963 - mean_squared_error: 0.0604 - val_loss: 0.1884 - val_mean_absolute_error: 0.1884 - val_mean_squared_error: 0.0537
+Epoch 7/50
+266/266 [==============================] - ETA: 0s - loss: 0.1794 - mean_absolute_error: 0.1794 - mean_squared_error: 0.0530
+Epoch 7: val_mean_absolute_error improved from 0.18838 to 0.16167, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_GM_RA_GRAY-G1-(128, 160).h5
+266/266 [==============================] - 260s 976ms/step - loss: 0.1794 - mean_absolute_error: 0.1794 - mean_squared_error: 0.0530 - val_loss: 0.1617 - val_mean_absolute_error: 0.1617 - val_mean_squared_error: 0.0440
+Epoch 8/50
+266/266 [==============================] - ETA: 0s - loss: 0.1648 - mean_absolute_error: 0.1648 - mean_squared_error: 0.0458
+Epoch 8: val_mean_absolute_error improved from 0.16167 to 0.15225, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_GM_RA_GRAY-G1-(128, 160).h5
+266/266 [==============================] - 256s 963ms/step - loss: 0.1648 - mean_absolute_error: 0.1648 - mean_squared_error: 0.0458 - val_loss: 0.1523 - val_mean_absolute_error: 0.1523 - val_mean_squared_error: 0.0401
+Epoch 9/50
+266/266 [==============================] - ETA: 0s - loss: 0.1543 - mean_absolute_error: 0.1543 - mean_squared_error: 0.0413
+Epoch 9: val_mean_absolute_error improved from 0.15225 to 0.14562, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_GM_RA_GRAY-G1-(128, 160).h5
+266/266 [==============================] - 258s 968ms/step - loss: 0.1543 - mean_absolute_error: 0.1543 - mean_squared_error: 0.0413 - val_loss: 0.1456 - val_mean_absolute_error: 0.1456 - val_mean_squared_error: 0.0376
+Epoch 10/50
+266/266 [==============================] - ETA: 0s - loss: 0.1447 - mean_absolute_error: 0.1447 - mean_squared_error: 0.0371
+Epoch 10: val_mean_absolute_error did not improve from 0.14562
+266/266 [==============================] - 257s 967ms/step - loss: 0.1447 - mean_absolute_error: 0.1447 - mean_squared_error: 0.0371 - val_loss: 0.1464 - val_mean_absolute_error: 0.1464 - val_mean_squared_error: 0.0373
+Epoch 11/50
+266/266 [==============================] - ETA: 0s - loss: 0.1404 - mean_absolute_error: 0.1404 - mean_squared_error: 0.0360
+Epoch 11: val_mean_absolute_error improved from 0.14562 to 0.13712, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_GM_RA_GRAY-G1-(128, 160).h5
+266/266 [==============================] - 258s 970ms/step - loss: 0.1404 - mean_absolute_error: 0.1404 - mean_squared_error: 0.0360 - val_loss: 0.1371 - val_mean_absolute_error: 0.1371 - val_mean_squared_error: 0.0331
+Epoch 12/50
+266/266 [==============================] - ETA: 0s - loss: 0.1310 - mean_absolute_error: 0.1310 - mean_squared_error: 0.0318
+Epoch 12: val_mean_absolute_error improved from 0.13712 to 0.13485, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_GM_RA_GRAY-G1-(128, 160).h5
+266/266 [==============================] - 256s 961ms/step - loss: 0.1310 - mean_absolute_error: 0.1310 - mean_squared_error: 0.0318 - val_loss: 0.1349 - val_mean_absolute_error: 0.1349 - val_mean_squared_error: 0.0324
+Epoch 13/50
+266/266 [==============================] - ETA: 0s - loss: 0.1267 - mean_absolute_error: 0.1267 - mean_squared_error: 0.0301
+Epoch 13: val_mean_absolute_error improved from 0.13485 to 0.13173, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_GM_RA_GRAY-G1-(128, 160).h5
+266/266 [==============================] - 258s 969ms/step - loss: 0.1267 - mean_absolute_error: 0.1267 - mean_squared_error: 0.0301 - val_loss: 0.1317 - val_mean_absolute_error: 0.1317 - val_mean_squared_error: 0.0308
+Epoch 14/50
+266/266 [==============================] - ETA: 0s - loss: 0.1237 - mean_absolute_error: 0.1237 - mean_squared_error: 0.0287
+Epoch 14: val_mean_absolute_error improved from 0.13173 to 0.12093, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_GM_RA_GRAY-G1-(128, 160).h5
+266/266 [==============================] - 256s 962ms/step - loss: 0.1237 - mean_absolute_error: 0.1237 - mean_squared_error: 0.0287 - val_loss: 0.1209 - val_mean_absolute_error: 0.1209 - val_mean_squared_error: 0.0277
+Epoch 15/50
+266/266 [==============================] - ETA: 0s - loss: 0.1210 - mean_absolute_error: 0.1210 - mean_squared_error: 0.0280
+Epoch 15: val_mean_absolute_error did not improve from 0.12093
+266/266 [==============================] - 260s 975ms/step - loss: 0.1210 - mean_absolute_error: 0.1210 - mean_squared_error: 0.0280 - val_loss: 0.1218 - val_mean_absolute_error: 0.1218 - val_mean_squared_error: 0.0283
+Epoch 16/50
+266/266 [==============================] - ETA: 0s - loss: 0.1170 - mean_absolute_error: 0.1170 - mean_squared_error: 0.0264
+Epoch 16: val_mean_absolute_error improved from 0.12093 to 0.12040, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_GM_RA_GRAY-G1-(128, 160).h5
+266/266 [==============================] - 257s 966ms/step - loss: 0.1170 - mean_absolute_error: 0.1170 - mean_squared_error: 0.0264 - val_loss: 0.1204 - val_mean_absolute_error: 0.1204 - val_mean_squared_error: 0.0293
+Epoch 17/50
+266/266 [==============================] - ETA: 0s - loss: 0.1182 - mean_absolute_error: 0.1182 - mean_squared_error: 0.0272
+Epoch 17: val_mean_absolute_error improved from 0.12040 to 0.11241, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_GM_RA_GRAY-G1-(128, 160).h5
+266/266 [==============================] - 257s 966ms/step - loss: 0.1182 - mean_absolute_error: 0.1182 - mean_squared_error: 0.0272 - val_loss: 0.1124 - val_mean_absolute_error: 0.1124 - val_mean_squared_error: 0.0261
+Epoch 18/50
+266/266 [==============================] - ETA: 0s - loss: 0.1124 - mean_absolute_error: 0.1124 - mean_squared_error: 0.0246
+Epoch 18: val_mean_absolute_error improved from 0.11241 to 0.10807, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_GM_RA_GRAY-G1-(128, 160).h5
+266/266 [==============================] - 257s 965ms/step - loss: 0.1124 - mean_absolute_error: 0.1124 - mean_squared_error: 0.0246 - val_loss: 0.1081 - val_mean_absolute_error: 0.1081 - val_mean_squared_error: 0.0247
+Epoch 19/50
+266/266 [==============================] - ETA: 0s - loss: 0.1093 - mean_absolute_error: 0.1093 - mean_squared_error: 0.0239
+Epoch 19: val_mean_absolute_error improved from 0.10807 to 0.10760, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_GM_RA_GRAY-G1-(128, 160).h5
+266/266 [==============================] - 260s 980ms/step - loss: 0.1093 - mean_absolute_error: 0.1093 - mean_squared_error: 0.0239 - val_loss: 0.1076 - val_mean_absolute_error: 0.1076 - val_mean_squared_error: 0.0244
+Epoch 20/50
+266/266 [==============================] - ETA: 0s - loss: 0.1054 - mean_absolute_error: 0.1054 - mean_squared_error: 0.0223
+Epoch 20: val_mean_absolute_error improved from 0.10760 to 0.10731, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_GM_RA_GRAY-G1-(128, 160).h5
+266/266 [==============================] - 258s 967ms/step - loss: 0.1054 - mean_absolute_error: 0.1054 - mean_squared_error: 0.0223 - val_loss: 0.1073 - val_mean_absolute_error: 0.1073 - val_mean_squared_error: 0.0244
+Epoch 21/50
+266/266 [==============================] - ETA: 0s - loss: 0.1048 - mean_absolute_error: 0.1048 - mean_squared_error: 0.0222
+Epoch 21: val_mean_absolute_error did not improve from 0.10731
+266/266 [==============================] - 256s 963ms/step - loss: 0.1048 - mean_absolute_error: 0.1048 - mean_squared_error: 0.0222 - val_loss: 0.1097 - val_mean_absolute_error: 0.1097 - val_mean_squared_error: 0.0242
+Epoch 22/50
+266/266 [==============================] - ETA: 0s - loss: 0.1023 - mean_absolute_error: 0.1023 - mean_squared_error: 0.0214
+Epoch 22: val_mean_absolute_error did not improve from 0.10731
+266/266 [==============================] - 257s 964ms/step - loss: 0.1023 - mean_absolute_error: 0.1023 - mean_squared_error: 0.0214 - val_loss: 0.1125 - val_mean_absolute_error: 0.1125 - val_mean_squared_error: 0.0256
+Epoch 23/50
+266/266 [==============================] - ETA: 0s - loss: 0.1005 - mean_absolute_error: 0.1005 - mean_squared_error: 0.0207
+Epoch 23: val_mean_absolute_error did not improve from 0.10731
+266/266 [==============================] - 261s 980ms/step - loss: 0.1005 - mean_absolute_error: 0.1005 - mean_squared_error: 0.0207 - val_loss: 0.1188 - val_mean_absolute_error: 0.1188 - val_mean_squared_error: 0.0274
+Epoch 24/50
+266/266 [==============================] - ETA: 0s - loss: 0.0985 - mean_absolute_error: 0.0985 - mean_squared_error: 0.0201
+Epoch 24: val_mean_absolute_error improved from 0.10731 to 0.10590, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_GM_RA_GRAY-G1-(128, 160).h5
+266/266 [==============================] - 260s 975ms/step - loss: 0.0985 - mean_absolute_error: 0.0985 - mean_squared_error: 0.0201 - val_loss: 0.1059 - val_mean_absolute_error: 0.1059 - val_mean_squared_error: 0.0236
+Epoch 25/50
+266/266 [==============================] - ETA: 0s - loss: 0.0980 - mean_absolute_error: 0.0980 - mean_squared_error: 0.0200
+Epoch 25: val_mean_absolute_error did not improve from 0.10590
+266/266 [==============================] - 260s 975ms/step - loss: 0.0980 - mean_absolute_error: 0.0980 - mean_squared_error: 0.0200 - val_loss: 0.1131 - val_mean_absolute_error: 0.1131 - val_mean_squared_error: 0.0262
+Epoch 26/50
+266/266 [==============================] - ETA: 0s - loss: 0.1021 - mean_absolute_error: 0.1021 - mean_squared_error: 0.0220
+Epoch 26: val_mean_absolute_error did not improve from 0.10590
+266/266 [==============================] - 262s 986ms/step - loss: 0.1021 - mean_absolute_error: 0.1021 - mean_squared_error: 0.0220 - val_loss: 0.1091 - val_mean_absolute_error: 0.1091 - val_mean_squared_error: 0.0251
+Epoch 27/50
+266/266 [==============================] - ETA: 0s - loss: 0.0976 - mean_absolute_error: 0.0976 - mean_squared_error: 0.0201
+Epoch 27: val_mean_absolute_error did not improve from 0.10590
+266/266 [==============================] - 275s 1s/step - loss: 0.0976 - mean_absolute_error: 0.0976 - mean_squared_error: 0.0201 - val_loss: 0.1078 - val_mean_absolute_error: 0.1078 - val_mean_squared_error: 0.0237
+Epoch 28/50
+266/266 [==============================] - ETA: 0s - loss: 0.0943 - mean_absolute_error: 0.0943 - mean_squared_error: 0.0187
+Epoch 28: val_mean_absolute_error improved from 0.10590 to 0.10513, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_GM_RA_GRAY-G1-(128, 160).h5
+266/266 [==============================] - 274s 1s/step - loss: 0.0943 - mean_absolute_error: 0.0943 - mean_squared_error: 0.0187 - val_loss: 0.1051 - val_mean_absolute_error: 0.1051 - val_mean_squared_error: 0.0246
+Epoch 29/50
+266/266 [==============================] - ETA: 0s - loss: 0.0916 - mean_absolute_error: 0.0916 - mean_squared_error: 0.0178
+Epoch 29: val_mean_absolute_error improved from 0.10513 to 0.10495, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_GM_RA_GRAY-G1-(128, 160).h5
+266/266 [==============================] - 273s 1s/step - loss: 0.0916 - mean_absolute_error: 0.0916 - mean_squared_error: 0.0178 - val_loss: 0.1049 - val_mean_absolute_error: 0.1049 - val_mean_squared_error: 0.0238
+Epoch 30/50
+266/266 [==============================] - ETA: 0s - loss: 0.0896 - mean_absolute_error: 0.0896 - mean_squared_error: 0.0172
+Epoch 30: val_mean_absolute_error did not improve from 0.10495
+266/266 [==============================] - 274s 1s/step - loss: 0.0896 - mean_absolute_error: 0.0896 - mean_squared_error: 0.0172 - val_loss: 0.1056 - val_mean_absolute_error: 0.1056 - val_mean_squared_error: 0.0246
+Epoch 31/50
+266/266 [==============================] - ETA: 0s - loss: 0.0887 - mean_absolute_error: 0.0887 - mean_squared_error: 0.0169
+Epoch 31: val_mean_absolute_error improved from 0.10495 to 0.10311, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_GM_RA_GRAY-G1-(128, 160).h5
+266/266 [==============================] - 276s 1s/step - loss: 0.0887 - mean_absolute_error: 0.0887 - mean_squared_error: 0.0169 - val_loss: 0.1031 - val_mean_absolute_error: 0.1031 - val_mean_squared_error: 0.0228
+Epoch 32/50
+266/266 [==============================] - ETA: 0s - loss: 0.0879 - mean_absolute_error: 0.0879 - mean_squared_error: 0.0166
+Epoch 32: val_mean_absolute_error improved from 0.10311 to 0.10242, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_GM_RA_GRAY-G1-(128, 160).h5
+266/266 [==============================] - 274s 1s/step - loss: 0.0879 - mean_absolute_error: 0.0879 - mean_squared_error: 0.0166 - val_loss: 0.1024 - val_mean_absolute_error: 0.1024 - val_mean_squared_error: 0.0249
+Epoch 33/50
+266/266 [==============================] - ETA: 0s - loss: 0.0870 - mean_absolute_error: 0.0870 - mean_squared_error: 0.0166
+Epoch 33: val_mean_absolute_error improved from 0.10242 to 0.10200, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_GM_RA_GRAY-G1-(128, 160).h5
+266/266 [==============================] - 273s 1s/step - loss: 0.0870 - mean_absolute_error: 0.0870 - mean_squared_error: 0.0166 - val_loss: 0.1020 - val_mean_absolute_error: 0.1020 - val_mean_squared_error: 0.0233
+Epoch 34/50
+266/266 [==============================] - ETA: 0s - loss: 0.0869 - mean_absolute_error: 0.0869 - mean_squared_error: 0.0167
+Epoch 34: val_mean_absolute_error improved from 0.10200 to 0.10140, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_GM_RA_GRAY-G1-(128, 160).h5
+266/266 [==============================] - 272s 1s/step - loss: 0.0869 - mean_absolute_error: 0.0869 - mean_squared_error: 0.0167 - val_loss: 0.1014 - val_mean_absolute_error: 0.1014 - val_mean_squared_error: 0.0227
+Epoch 35/50
+266/266 [==============================] - ETA: 0s - loss: 0.0860 - mean_absolute_error: 0.0860 - mean_squared_error: 0.0160
+Epoch 35: val_mean_absolute_error did not improve from 0.10140
+266/266 [==============================] - 264s 990ms/step - loss: 0.0860 - mean_absolute_error: 0.0860 - mean_squared_error: 0.0160 - val_loss: 0.1050 - val_mean_absolute_error: 0.1050 - val_mean_squared_error: 0.0236
+Epoch 36/50
+266/266 [==============================] - ETA: 0s - loss: 0.0820 - mean_absolute_error: 0.0820 - mean_squared_error: 0.0149
+Epoch 36: val_mean_absolute_error improved from 0.10140 to 0.10069, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_GM_RA_GRAY-G1-(128, 160).h5
+266/266 [==============================] - 261s 979ms/step - loss: 0.0820 - mean_absolute_error: 0.0820 - mean_squared_error: 0.0149 - val_loss: 0.1007 - val_mean_absolute_error: 0.1007 - val_mean_squared_error: 0.0226
+Epoch 37/50
+266/266 [==============================] - ETA: 0s - loss: 0.0818 - mean_absolute_error: 0.0818 - mean_squared_error: 0.0148
+Epoch 37: val_mean_absolute_error did not improve from 0.10069
+266/266 [==============================] - 262s 985ms/step - loss: 0.0818 - mean_absolute_error: 0.0818 - mean_squared_error: 0.0148 - val_loss: 0.1028 - val_mean_absolute_error: 0.1028 - val_mean_squared_error: 0.0237
+Epoch 38/50
+266/266 [==============================] - ETA: 0s - loss: 0.0802 - mean_absolute_error: 0.0802 - mean_squared_error: 0.0144
+Epoch 38: val_mean_absolute_error improved from 0.10069 to 0.09517, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_GM_RA_GRAY-G1-(128, 160).h5
+266/266 [==============================] - 262s 983ms/step - loss: 0.0802 - mean_absolute_error: 0.0802 - mean_squared_error: 0.0144 - val_loss: 0.0952 - val_mean_absolute_error: 0.0952 - val_mean_squared_error: 0.0224
+Epoch 39/50
+266/266 [==============================] - ETA: 0s - loss: 0.0803 - mean_absolute_error: 0.0803 - mean_squared_error: 0.0147
+Epoch 39: val_mean_absolute_error did not improve from 0.09517
+266/266 [==============================] - 263s 987ms/step - loss: 0.0803 - mean_absolute_error: 0.0803 - mean_squared_error: 0.0147 - val_loss: 0.0954 - val_mean_absolute_error: 0.0954 - val_mean_squared_error: 0.0217
+Epoch 40/50
+266/266 [==============================] - ETA: 0s - loss: 0.0803 - mean_absolute_error: 0.0803 - mean_squared_error: 0.0146
+Epoch 40: val_mean_absolute_error did not improve from 0.09517
+266/266 [==============================] - 261s 980ms/step - loss: 0.0803 - mean_absolute_error: 0.0803 - mean_squared_error: 0.0146 - val_loss: 0.1251 - val_mean_absolute_error: 0.1251 - val_mean_squared_error: 0.0358
+Epoch 41/50
+266/266 [==============================] - ETA: 0s - loss: 0.0799 - mean_absolute_error: 0.0799 - mean_squared_error: 0.0142
+Epoch 41: val_mean_absolute_error did not improve from 0.09517
+266/266 [==============================] - 262s 982ms/step - loss: 0.0799 - mean_absolute_error: 0.0799 - mean_squared_error: 0.0142 - val_loss: 0.1073 - val_mean_absolute_error: 0.1073 - val_mean_squared_error: 0.0253
+Epoch 42/50
+266/266 [==============================] - ETA: 0s - loss: 0.0777 - mean_absolute_error: 0.0777 - mean_squared_error: 0.0142
+Epoch 42: val_mean_absolute_error did not improve from 0.09517
+266/266 [==============================] - 265s 996ms/step - loss: 0.0777 - mean_absolute_error: 0.0777 - mean_squared_error: 0.0142 - val_loss: 0.0986 - val_mean_absolute_error: 0.0986 - val_mean_squared_error: 0.0223
+Epoch 43/50
+266/266 [==============================] - ETA: 0s - loss: 0.0749 - mean_absolute_error: 0.0749 - mean_squared_error: 0.0127
+Epoch 43: val_mean_absolute_error improved from 0.09517 to 0.09432, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_GM_RA_GRAY-G1-(128, 160).h5
+266/266 [==============================] - 266s 997ms/step - loss: 0.0749 - mean_absolute_error: 0.0749 - mean_squared_error: 0.0127 - val_loss: 0.0943 - val_mean_absolute_error: 0.0943 - val_mean_squared_error: 0.0213
+Epoch 44/50
+266/266 [==============================] - ETA: 0s - loss: 0.0739 - mean_absolute_error: 0.0739 - mean_squared_error: 0.0124
+Epoch 44: val_mean_absolute_error improved from 0.09432 to 0.09412, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_GM_RA_GRAY-G1-(128, 160).h5
+266/266 [==============================] - 262s 982ms/step - loss: 0.0739 - mean_absolute_error: 0.0739 - mean_squared_error: 0.0124 - val_loss: 0.0941 - val_mean_absolute_error: 0.0941 - val_mean_squared_error: 0.0212
+Epoch 45/50
+266/266 [==============================] - ETA: 0s - loss: 0.0733 - mean_absolute_error: 0.0733 - mean_squared_error: 0.0127
+Epoch 45: val_mean_absolute_error did not improve from 0.09412
+266/266 [==============================] - 263s 988ms/step - loss: 0.0733 - mean_absolute_error: 0.0733 - mean_squared_error: 0.0127 - val_loss: 0.0990 - val_mean_absolute_error: 0.0990 - val_mean_squared_error: 0.0221
+Epoch 46/50
+266/266 [==============================] - ETA: 0s - loss: 0.0724 - mean_absolute_error: 0.0724 - mean_squared_error: 0.0121
+Epoch 46: val_mean_absolute_error improved from 0.09412 to 0.09250, saving model to Models/PretrainedFaceDetection\ResNet_5M_ELU_GM_RA_GRAY-G1-(128, 160).h5
+266/266 [==============================] - 261s 982ms/step - loss: 0.0724 - mean_absolute_error: 0.0724 - mean_squared_error: 0.0121 - val_loss: 0.0925 - val_mean_absolute_error: 0.0925 - val_mean_squared_error: 0.0215
+Epoch 47/50
+266/266 [==============================] - ETA: 0s - loss: 0.0714 - mean_absolute_error: 0.0714 - mean_squared_error: 0.0118
+Epoch 47: val_mean_absolute_error did not improve from 0.09250
+266/266 [==============================] - 262s 984ms/step - loss: 0.0714 - mean_absolute_error: 0.0714 - mean_squared_error: 0.0118 - val_loss: 0.0969 - val_mean_absolute_error: 0.0969 - val_mean_squared_error: 0.0220
+Epoch 48/50
+266/266 [==============================] - ETA: 0s - loss: 0.0704 - mean_absolute_error: 0.0704 - mean_squared_error: 0.0116
+Epoch 48: val_mean_absolute_error did not improve from 0.09250
+266/266 [==============================] - 262s 983ms/step - loss: 0.0704 - mean_absolute_error: 0.0704 - mean_squared_error: 0.0116 - val_loss: 0.0969 - val_mean_absolute_error: 0.0969 - val_mean_squared_error: 0.0222
+Epoch 49/50
+266/266 [==============================] - ETA: 0s - loss: 0.0708 - mean_absolute_error: 0.0708 - mean_squared_error: 0.0116
+Epoch 49: val_mean_absolute_error did not improve from 0.09250
+266/266 [==============================] - 261s 981ms/step - loss: 0.0708 - mean_absolute_error: 0.0708 - mean_squared_error: 0.0116 - val_loss: 0.0958 - val_mean_absolute_error: 0.0958 - val_mean_squared_error: 0.0216
+Epoch 50/50
+266/266 [==============================] - ETA: 0s - loss: 0.0691 - mean_absolute_error: 0.0691 - mean_squared_error: 0.0111
+Epoch 50: val_mean_absolute_error did not improve from 0.09250
+266/266 [==============================] - 263s 988ms/step - loss: 0.0691 - mean_absolute_error: 0.0691 - mean_squared_error: 0.0111 - val_loss: 0.0956 - val_mean_absolute_error: 0.0956 - val_mean_squared_error: 0.0219
+
+For ResNet_5M_ELU_GM_RA_GRAY-G1-(128, 160):
+pog corrected train3.csv:
+MSE Loss: 0.0052 , MAE Loss: 0.0464 , Avg Cm: 2.0243
+pog corrected validation3.csv:
+MSE Loss: 0.0214 , MAE Loss: 0.0923 , Avg Cm: 3.9969
+pog corrected test3.csv:
+MSE Loss: 0.0181 , MAE Loss: 0.0871 , Avg Cm: 3.6275
+
+Process finished with exit code 0
