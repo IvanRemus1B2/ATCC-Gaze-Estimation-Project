@@ -33,6 +33,7 @@ import zipfile2
 import cv2
 
 from mtcnn.mtcnn import MTCNN
+from pynput import mouse
 
 
 class MyCustomGenerator(keras.utils.Sequence):
@@ -554,28 +555,10 @@ def get_face_info_from(file_name: str, image_width: int, image_height: int):
     return face_info, box_info
 
 
-def get_model_prediction_closest_for(dataset_name):
-    zip_file_name = "PoG Dataset.zip"
-    archive = zipfile2.ZipFile(zip_file_name, "r")
-
-    x_pos, y_pos = 900, 900
-    width_pixels, height_pixels = 1920, 1080
-
-    model_type = ModelType.PretrainedFaceDetection
-    model_name = "ResNet_5M_ELU_GM_RA_GRAY-G2-(128, 160)"
-    circle_radius_cm = 3.45
-    no_channels = 3
-
-    height_resize, width_resize = list(map(int, model_name.split("-")[2][1:-1].split(",")))
-
-    model_folder = "Models/" + str(model_type).split(".")[1]
-    model_path = ("" if model_folder == "" else model_folder + "/") + model_name
-    model = models.load_model(model_path + ".h5")
-
-    all_image_info = None
-    all_images = None
-
-    file_name, image_file_info, (dataset_x_pos, dataset_y_pos) = get_closest_point(dataset, x_pos, y_pos,
+def get_model_prediction_closest_for(dataset_name, x_pos, y_pos,
+                                     width_pixels, height_pixels,
+                                     archive, model):
+    file_name, image_file_info, (dataset_x_pos, dataset_y_pos) = get_closest_point(dataset_name, x_pos, y_pos,
                                                                                    width_pixels, height_pixels)
     image_face_info, face_box = get_face_info_from(file_name, width_pixels, height_pixels)
     box_x, box_y, box_width, box_height = face_box
@@ -596,111 +579,61 @@ def get_model_prediction_closest_for(dataset_name):
     dataset_x_pos, dataset_y_pos = int(dataset_x_pos), int(dataset_y_pos)
     predicted_x, predicted_y = int(predicted_x), int(predicted_y)
 
-    return (dataset_x_pos, dataset_y_pos), (predicted_x, predicted_y)
+    return dataset_x_pos, dataset_y_pos, predicted_x, predicted_y
 
 
+def compute_distance_cm_to_px(
+        distance_cm: float,
+        width_pixels1: float, height_pixels1: float,
+        width_mm1, height_mm1):
+    diagonal_inches = np.sqrt(width_mm1 ** 2 + height_mm1 ** 2) / 25.4
+    ppi = np.sqrt(width_pixels1 ** 2 + height_pixels1 ** 2) / diagonal_inches
 
-from pynput import mouse
+    distance_pixels = distance_cm * ppi / 2.54
 
-def on_click(x, y, button, pressed):
+    return int(distance_pixels)
+
+
+zip_file_name = "PoG Dataset.zip"
+archive = zipfile2.ZipFile(zip_file_name, "r")
+
+x_pos, y_pos = 900, 900
+width_pixels, height_pixels = 1920, 1080
+
+model_type = ModelType.PretrainedFaceDetection
+model_name = "ResNet_5M_ELU_GM_RA_GRAY-G2-(128, 160)"
+circle_radius_cm = 3.45
+no_channels = 3
+
+height_resize, width_resize = list(map(int, model_name.split("-")[2][1:-1].split(",")))
+
+model_folder = "Models/" + str(model_type).split(".")[1]
+model_path = ("" if model_folder == "" else model_folder + "/") + model_name
+model = models.load_model(model_path + ".h5")
+
+
+def on_click(mouse_x, mouse_y, button, pressed):
     if pressed:
-        print(f"Mouse clicked at ({x}, {y}) with {button}")
+        datasets = ['pog corrected test3', 'pog corrected train3', 'pog corrected validation3']
+        colors = [(0, 0, 255), (0, 255, 0), (255, 0, 0)]
+        for index in range(len(datasets)):
+            dataset_name, color = datasets[index], colors[index]
+            dataset_x_pos, dataset_y_pos, predicted_x, predicted_y = get_model_prediction_closest_for(dataset_name,
+                                                                                                      mouse_x, mouse_y,
+                                                                                                      width_pixels,
+                                                                                                      height_pixels,
+                                                                                                      archive, model)
 
-# Set up the listener
+            blank_image = np.zeros((height_pixels, width_pixels, 3), np.uint8)
+
+            cv2.circle(blank_image, (dataset_x_pos, dataset_y_pos), color=color, radius=10)
+            cv2.circle(blank_image, (predicted_x, predicted_y), color=color, radius=10)
+            cv2.line(blank_image, (dataset_x_pos, dataset_y_pos), (predicted_x, predicted_y), (255, 255, 255))
+
+            cv2.namedWindow("Window", cv2.WINDOW_NORMAL)
+            cv2.setWindowProperty("Window", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+            cv2.imshow('Window', blank_image)
+
+
 with mouse.Listener(on_click=on_click) as listener:
     listener.join()
-
-
-if __name__ == '__main__':
-    get_model_prediction_closest_for()
-    # see_predictions_on("Test_VGG_1M_Regularized_ELU-1-(128, 128)")
-    # see_predictions_on("Test_VGG_4M_2-1-(156, 156)")
-    # see_predictions_on("Simple-4-(128, 128)")
-    # see_predictions_on("Simple-5-(128, 128)")
-    # show_face_box("pog corrected validation3.csv")
-    # image_size = (96, 160)
-
-    # file_names = ['an482.jpg', 'an489.jpg', 'an509.jpg', 'ARA_529.jpg', 'ARA_549.jpg', 'MD580.jpg', 'ei531.jpg']
-    # file_names=['an456.jpg', 'an475.jpg', 'ichim658.jpg', 'ichim586.jpg', 'HDM747.jpg', 'MD510.jpg', 'MD516.jpg', 'MD548.jpg']
-    # file_names=['an8.jpg', 'an16.jpg', 'an58.jpg', 'an63.jpg', 'an112.jpg', 'an123.jpg', 'an141.jpg', 'an147.jpg', 'an158.jpg', 'an172.jpg', 'an180.jpg', 'an194.jpg', 'an222.jpg', 'an233.jpg', 'an234.jpg', 'an248.jpg', 'an249.jpg', 'an270.jpg', 'an277.jpg', 'an278.jpg', 'an293.jpg', 'an309.jpg', 'an314.jpg', 'an322.jpg', 'an329.jpg', 'an384.jpg', 'an410.jpg', 'an417.jpg', 'ichim590.jpg', 'ichim769.jpg', 'ichim545.jpg', 'ichim194.jpg', 'mihai_bojescu_1711116742.9454212.png', 'mihai_bojescu_1711116826.216444.png']
-    # file_names = ["ichim545.jpg", "ichim769.jpg"] <------- only for these 2 it can't find a face...
-    # Found with scale_factor=0.5:
-    # ichim545.jpg: {'box': [284, 0, 230, 269], 'confidence': 0.9955950379371643,
-    #                'keypoints': {'left_eye': (365, 77), 'right_eye': (477, 80), 'nose': (431, 157),
-    #                              'mouth_left': (367, 202), 'mouth_right': (452, 203)}}
-    # ichim769.jpg: {'box': [284, 0, 230, 269], 'confidence': 0.9990921020507812,
-    #                'keypoints': {'left_eye': (370, 75), 'right_eye': (481, 81), 'nose': (436, 153),
-    #                              'mouth_left': (370, 200), 'mouth_right': (455, 202)}}
-
-    # file_names = ['mihai_bojescu_1711118507.1910124.png']
-    # file_names=['ARA_107.jpg', 'ARA_175.jpg', 'ARA_192.jpg', 'ARA_201.jpg', 'ARA_246.jpg', 'ARA_297.jpg', 'ARA_344.jpg', 'ARA_374.jpg', 'ARA_438.jpg']
-    # file_names=['HDM7.jpg', 'HDM15.jpg', 'HDM64.jpg', 'HDM194.jpg', 'HDM228.jpg', 'HDM261.jpg', 'HDM301.jpg', 'HDM306.jpg', 'HDM340.jpg', 'HDM370.jpg', 'HDM398.jpg', 'HDM443.jpg', 'HDM521.jpg', 'HDM582.jpg', 'HDM626.jpg', 'HDM678.jpg', 'HDM720.jpg', 'HDM723.jpg']
-    # file_names=['DG460.jpg', 'MD65.jpg', 'MD87.jpg', 'MD101.jpg', 'MD143.jpg', 'MD200.jpg', 'MD213.jpg', 'MD473.jpg', 'MD495.jpg', 'MD499.jpg']
-    # file_names=['mrg247.jpg', 'mrg248.jpg']
-    # file_names=['ei216.jpg', 'ei388.jpg', 'ei401.jpg', 'ei428.jpg', 'ei434.jpg']
-
-    # TODO:Sometimes the program ends before showing all images...preprocessing layers
-    #  might be at fault?
-    # show_face_box_for(file_names, False, image_size,
-    #                   std=0.025, brightness_factor=0.15)
-
-    # # TODO:Make tensorflow==2.14 realise i have a GPU...if only this version worked well where 2.10 did...
-    # print(tf.config.list_physical_devices('GPU'))
-
-    # show_box_face_on(["ichim545.jpg", "ichim769.jpg"])
-
-    # show_face_box("pog corrected validation3.csv")
-    # ['an482.jpg', 'an489.jpg', 'an509.jpg', 'ARA_529.jpg', 'ARA_549.jpg', 'MD580.jpg', 'ei531.jpg']
-
-    # show_face_box("pog corrected test3.csv")
-
-    # zip_file_name = "PoG Dataset.zip"
-    # archive = zipfile.ZipFile(zip_file_name, "r")
-    #
-    # image_size = (128, 128)
-    # no_channels = 3
-    #
-    # info_length = 5
-    #
-    # no_epochs = 10
-    # val_batch_size = 6
-    #
-    # augmentation_generator = ImageDataGenerator(
-    #     # featurewise_center=False,  # set input mean to 0 over the dataset
-    #     # samplewise_center=False,  # set each sample mean to 0
-    #     # featurewise_std_normalization=False,  # divide inputs by std of the dataset
-    #     # samplewise_std_normalization=False,  # divide each input by its std
-    #     # zca_whitening=True,  # apply ZCA whitening
-    #     # zca_epsilon=1e-06,  # epsilon for ZCA whitening
-    #     rotation_range=5,  # randomly rotate images in the range (degrees, 0 to 180)
-    #     # randomly shift images horizontally (fraction of total width)
-    #     width_shift_range=0.05,
-    #     # randomly shift images vertically (fraction of total height)
-    #     height_shift_range=0.05,
-    #     # shear_range=0.,  # set range for random shear
-    #     # zoom_range=0.,  # set range for random zoom
-    #     # channel_shift_range=0.,  # set range for random channel shifts
-    #     # set mode for filling points outside the input boundaries
-    #     # fill_mode='nearest',
-    #     # cval=0.,  # value used for fill_mode = "constant"
-    #     # horizontal_flip=True,  # randomly flip images
-    #     # vertical_flip=False,  # randomly flip images
-    #     # set rescaling factor (applied before any other transformation)
-    #     # rescale=None,
-    #     # set function that will be applied on each input
-    #     # preprocessing_function=None,
-    #     # image data format, either "channels_first" or "channels_last"
-    #     # data_format=None,
-    #     # fraction of images reserved for validation (strictly between 0 and 1)
-    #     # validation_split=0.0
-    # )
-    #
-    # val_generator = MyCustomGenerator(archive, "pog corrected validation3.csv",
-    #                                   val_batch_size, image_size,
-    #                                   augmentation_generator)
-    #
-    # batch = val_generator.__getitem__(100)
-    # print(batch[0][0])
-    # # print(batch[0][0].shape)
-    # # for index in range(batch[0][0].shape[0]):
-    # #     plot_image(batch[0][0][index])

@@ -26,8 +26,6 @@ from keras import losses
 from keras import optimizers
 
 
-# TODO:Use Jupiter Notebook with Pycharm to save time
-
 class Callback_MSE(tf.keras.callbacks.Callback):
     def __init__(self, filepath, x_val, y_val, best=1e9, interval=1):
         # Initialize the callback
@@ -136,14 +134,12 @@ def read_dataset(archive, dataset_file_name: str, image_resize_shape: tuple[int,
                     file_name] = f"human_distance_mm > 80 cm,so transform from mm to cm"
                 human_distance_cm = human_distance_cm / 10
 
-            # TODO:Make sure that replacing this works the same way
 
             x_norm, y_norm = np.float32(x_pixel_pos / width_pixels), np.float32(y_pixel_pos / height_pixels)
 
             # Read images,assume they are jpg
             with archive.open("PoG Dataset/" + file_name) as zip_image:
                 with Image.open(io.BytesIO(zip_image.read())) as image:
-                    # TODO:Consider making the dataset without an initial resizing
                     image_array = np.array(tf.expand_dims(tf.image.resize(np.array(image), image_resize_shape), 0))
 
             image_info = np.array([width_pixels, height_pixels, width_mm, height_mm, human_distance_cm]).reshape(
@@ -526,7 +522,6 @@ def print_metrics(model, dataset_name: str, dataset_generator: keras.utils.Seque
     mae_error /= no_instances
     cm_error /= no_instances
 
-    # TODO:Consider using Dice score?
     print(f"{dataset_name}:\nMSE Loss: {mse_error:.4f} , MAE Loss: {mae_error:.4f} , Avg Cm: {cm_error:.4f}")
 
 

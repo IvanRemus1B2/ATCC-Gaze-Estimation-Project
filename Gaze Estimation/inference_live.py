@@ -13,7 +13,9 @@ import matplotlib.pyplot as plt
 from my_models import ModelType
 from mtcnn.mtcnn import MTCNN
 from keras import layers
+
 from keras_cv.layers import RandAugment
+from keras_cv.layers import GridMask
 
 
 def plot_image(image):
@@ -94,15 +96,15 @@ width_mm, height_mm = 380, 215
 human_distance_cm = 50
 
 # -- Parameters to set for model and time delay
-frame_delay = 1
+frame_delay = 500
 model_type = ModelType.PretrainedFaceDetection
-model_name = "ResNet_4M_ELU-11-(96, 160)"
-circle_radius_cm = 4.35
+model_name = "ResNet_5M_ELU_GM_RA_GRAY-G2-(128, 160)"
+circle_radius_cm = 3.45
 no_channels = 3
 
-use_tta = True
+use_tta = False
 use_rand_augment = False
-tta_iterations = 30
+tta_iterations = 10
 # ----------------------
 circle_radius_px = compute_distance_cm_to_px(circle_radius_cm, width_pixels, height_pixels, width_mm, height_mm)
 
@@ -120,8 +122,8 @@ with Listener() as listener:
         input_layer = layers.Input(shape=(height_resize, width_resize, no_channels))
         output, image_augmentation = None, None
         if not use_rand_augment:
-            output = layers.GaussianNoise(stddev=0.025)(input_layer, training=True)
-            output = layers.RandomBrightness(factor=0.15, value_range=[0.0, 1.0])(output, training=True)
+            output = layers.GaussianNoise(stddev=0.01)(input_layer, training=True)
+            output = GridMask(ratio_factor=0.5)(output, training=True)
         else:
             output = RandAugment(value_range=[0, 1], geometric=False, magnitude=0.15, magnitude_stddev=0.15)(
                 input_layer, training=True)
